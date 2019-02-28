@@ -1,0 +1,55 @@
+# Add an EventSeries.
+entity.eventseries.add_form:
+  path: '/events/series/add'
+  defaults:
+  # Calls the form.add controller, defined in the event entity.
+    _entity_form: eventseries.add
+    _title: 'Add Event'
+  requirements:
+    _entity_create_access: 'eventseries'
+    _access_event: 'create'
+  options:
+    _admin_route: TRUE
+
+# Edit an EventSeries.
+entity.eventseries.edit_form:
+  path: '/events/series/{eventseries}/edit'
+  defaults:
+    _entity_form: eventseries.edit
+    _title: 'Edit Event Series'
+  requirements:
+    _entity_access: 'eventseries.edit'
+    _access_event: 'update'
+  options:
+    _admin_route: TRUE
+
+# Delete an EventSeries.
+entity.eventseries.delete_form:
+  path: '/events/series/{eventseries}/delete'
+  defaults:
+    _entity_form: eventseries.delete
+    _title: 'Delete Event'
+  requirements:
+    _entity_access: 'eventseries.delete'
+    _access_event: 'delete'
+  options:
+    _admin_route: TRUE
+
+# Clone an EventSeries.
+entity.eventseries.clone_form:
+  path: '/events/series/{eventseries}/clone'
+  defaults:
+    _entity_form: eventseries.clone
+    _title_callback: '\Drupal\recurring_events\Controller\EventSeriesController::getCloneTitle'
+  requirements:
+    _entity_access: 'eventseries.clone'
+    _access_event: 'clone'
+  options:
+    _admin_route: TRUE
+
+# Event Series table list route.
+entity.eventseries.collection:
+  path: '/admin/content/events/series'
+  requirements:
+  # Checks for permission directly.
+    _permission: 'access eventseries overview'

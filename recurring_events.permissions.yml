@@ -1,0 +1,25 @@
+# Event Series Entities.
+add eventseries entity:
+  title: 'Add eventseries entity'
+  description: 'Create new event series entities'
+view eventseries entity:
+  title: 'View eventseries entity'
+  description: 'View existing event series entities'
+edit eventseries entity:
+  title: 'Edit eventseries entity'
+  description: 'Modify existing event series entities'
+delete eventseries entity:
+  title: 'Delete eventseries entity'
+  description: 'Delete existing event series entities'
+clone eventseries entity:
+  title: 'Clone eventseries entity'
+  description: 'Clone existing event series entities'
+
+# Event Series Administration.
+administer eventseries:
+  title: 'Administer eventseries'
+  description: 'Promote, change ownership, edit revisions, and perform other tasks for eventseries.'
+  restrict access: true
+access eventseries overview:
+  title: 'Access the eventseries overview page'
+  description: 'View the admin table view of eventseries'

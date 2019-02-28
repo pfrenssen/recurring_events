@@ -401,7 +401,7 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setLabel(t('Events in this Series'))
       ->setDescription(t('The events in this series.'))
       ->setRevisionable(FALSE)
-      ->setSetting('target_type', 'eventinstance')
+      ->setSetting('target_type', 'node')
       ->setTranslatable(FALSE)
       ->setDisplayOptions('view', [
         'label' => 'above',
