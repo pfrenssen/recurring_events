@@ -397,6 +397,20 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setTranslatable(FALSE)
       ->setRequired(FALSE);
 
+    $fields['instances'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Events in this Series'))
+      ->setDescription(t('The events in this series.'))
+      ->setRevisionable(FALSE)
+      ->setSetting('target_type', 'eventinstance')
+      ->setTranslatable(FALSE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'entity_reference',
+        'weight' => 10,
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', FALSE);
+
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code of event entity.'));
