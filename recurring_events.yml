@@ -1,0 +1,5 @@
+name: 'Recurring Events'
+type: module
+description: 'Events and Registration Management Module'
+core: 8.x
+package: 'recurring_events'
