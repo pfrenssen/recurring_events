@@ -344,14 +344,31 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setTranslatable(TRUE)
       ->setRequired(TRUE);
 
-    $fields['recur_type'] = BaseFieldDefinition::create('string')
+    $fields['recur_type'] = BaseFieldDefinition::create('list_string')
       ->setLabel(t('Recur Type'))
       ->setDescription('The way that the event recurs.')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(FALSE)
-      ->setRequired(TRUE);
+      ->setRequired(TRUE)
+      ->setCardinality(1)
+      ->setSetting('allowed_values', [
+        'weekly' => t('Weekly Event'),
+        'monthly' => t('Monthly Event'),
+        'custom' => t('Custom Event'),
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'options_buttons',
+        'settings' => [
+          'allowed_values' => [
+            'weekly' => t('Weekly Event'),
+            'monthly' => t('Monthly Event'),
+            'custom' => t('Custom Event'),
+          ],
+        ],
+        'weight' => 1,
+      ]);
 
     $fields['weekly_recurring_date'] = BaseFieldDefinition::create('weekly_recurring_date')
       ->setLabel(t('Weekly Recurring Date'))
