@@ -6,9 +6,6 @@ entity.eventseries.add_form:
     _title: 'Add Event'
   requirements:
     _entity_create_access: 'eventseries'
-    _access_event: 'create'
-  options:
-    _admin_route: TRUE
 
 # Edit an EventSeries.
 entity.eventseries.edit_form:
@@ -18,9 +15,11 @@ entity.eventseries.edit_form:
     _title: 'Edit Event Series'
   requirements:
     _entity_access: 'eventseries.edit'
-    _access_event: 'update'
+    eventseries: \d+
   options:
-    _admin_route: TRUE
+    parameters:
+      eventseries:
+        type: entity:eventseries
 
 # Delete an EventSeries.
 entity.eventseries.delete_form:
@@ -30,9 +29,11 @@ entity.eventseries.delete_form:
     _title: 'Delete Event'
   requirements:
     _entity_access: 'eventseries.delete'
-    _access_event: 'delete'
+    eventseries: \d+
   options:
-    _admin_route: TRUE
+    parameters:
+      eventseries:
+        type: entity:eventseries
 
 # Clone an EventSeries.
 entity.eventseries.clone_form:
@@ -42,13 +43,15 @@ entity.eventseries.clone_form:
     _title_callback: '\Drupal\recurring_events\Controller\EventSeriesController::getCloneTitle'
   requirements:
     _entity_access: 'eventseries.clone'
-    _access_event: 'clone'
+    eventseries: \d+
   options:
-    _admin_route: TRUE
+    parameters:
+      eventseries:
+        type: entity:eventseries
 
 # Event Series table list route.
 entity.eventseries.collection:
-  path: '/admin/content/events/series'
+  path: '/events/series'
   requirements:
   # Checks for permission directly.
     _permission: 'access eventseries overview'
