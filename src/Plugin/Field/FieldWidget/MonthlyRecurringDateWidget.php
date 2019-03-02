@@ -44,7 +44,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
     ];
 
     $element['day_occurrence'] = [
-      '#type' => 'radios',
+      '#type' => 'checkboxes',
       '#title' => t('Day Occurrence'),
       '#options' => [
         'first' => t('First'),

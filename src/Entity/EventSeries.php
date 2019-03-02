@@ -400,13 +400,18 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
 
     $fields['custom_date'] = BaseFieldDefinition::create('daterange')
       ->setLabel(t('Custom Date'))
-      ->setDescription('The custom, date configuration.')
+      ->setDescription('The custom date configuration.')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(FALSE)
       ->setCardinality(-1)
-      ->setRequired(FALSE);
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'daterange_default',
+        'label' => 'above',
+        'weight' => 4,
+      ]);
 
     $fields['instances'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Events in this Series'))

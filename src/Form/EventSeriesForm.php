@@ -21,6 +21,12 @@ class EventSeriesForm extends ContentEntityForm {
     /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
     $entity = $this->entity;
 
+    $form['custom_date']['#states'] = [
+      'visible' => [
+        ':input[name="recur_type"]' => ['value' => 'custom'],
+      ],
+    ];
+
     $form['advanced']['#attributes']['class'][] = 'entity-meta';
 
     $form['meta'] = [
