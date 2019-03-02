@@ -26,7 +26,6 @@ class MonthlyRecurringDate extends WeeklyRecurringDate {
 
     $schema['columns']['type'] = [
       'type' => 'varchar',
-      'not null' => TRUE,
       'length' => 20,
     ];
 

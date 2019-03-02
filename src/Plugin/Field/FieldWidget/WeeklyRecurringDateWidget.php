@@ -77,6 +77,31 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    $values = parent::massageFormValues($values, $form, $form_state);
+
+    foreach ($values as &$item) {
+      if (empty($item['value'])) {
+        $item['value'] = '';
+      }
+      if (empty($item['end_value'])) {
+        $item['end_value'] = '';
+      }
+
+      $item['days'] = array_filter($item['days']);
+      if (!empty($item['days'])) {
+        $item['days'] = implode(',', $item['days']);
+      }
+      else {
+        $item['days'] = '';
+      }
+    }
+    return $values;
+  }
+
+  /**
    * Generate times based on specific intervals and min/max times.
    *
    * @return array
@@ -91,7 +116,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
     $interval = $config->get('interval') * 60;
     $min_time = $config->get('min_time');
     $max_time = $config->get('max_time');
-    $format = $config->get('format'); */
+    $format = $config->get('time_format'); */
 
     // Take interval in minutes, and multiply it by 60 to convert to seconds.
     $interval = 15 * 60;

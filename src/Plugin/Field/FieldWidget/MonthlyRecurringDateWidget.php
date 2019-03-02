@@ -94,6 +94,25 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    $values = parent::massageFormValues($values, $form, $form_state);
+
+    foreach ($values as &$item) {
+
+      $item['day_occurrence'] = array_filter($item['day_occurrence']);
+      if (!empty($item['day_occurrence'])) {
+        $item['day_occurrence'] = implode(',', $item['day_occurrence']);
+      }
+      else {
+        $item['day_occurrence'] = '';
+      }
+    }
+    return $values;
+  }
+
+  /**
    * Return day of month options for events.
    *
    * @return array

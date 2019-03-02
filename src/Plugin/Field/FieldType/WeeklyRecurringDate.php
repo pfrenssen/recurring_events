@@ -27,19 +27,16 @@ class WeeklyRecurringDate extends DateRangeItem {
 
     $schema['columns']['time'] = [
       'type' => 'varchar',
-      'not null' => TRUE,
       'length' => 20,
     ];
 
     $schema['columns']['duration'] = [
       'type' => 'int',
-      'not null' => TRUE,
       'unsigned' => TRUE,
     ];
 
     $schema['columns']['days'] = [
       'type' => 'varchar',
-      'not null' => TRUE,
       'length' => 255,
     ];
 

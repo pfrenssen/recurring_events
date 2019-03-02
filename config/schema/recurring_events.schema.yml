@@ -1,0 +1,16 @@
+recurring_events.config
+  type: config_object
+  label: 'Recurring Events'
+  mapping:
+    interval:
+      type: integer
+      label: 'The interval between times when creating events'
+    min_time:
+      type: string
+      label: 'The earliest an event can start'
+    max_time:
+      type: string
+      label: 'The latest an event can start'
+    time_format:
+      type: string
+      label: 'The formatting of times when creating events'
