@@ -381,7 +381,8 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'weekly_recurring_date',
-      ]);;
+        'weight' => 2,
+      ]);
 
     $fields['monthly_recurring_date'] = BaseFieldDefinition::create('monthly_recurring_date')
       ->setLabel(t('Monthly Recurring Date'))
@@ -391,7 +392,11 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setRevisionable(TRUE)
       ->setTranslatable(FALSE)
       ->setCardinality(1)
-      ->setRequired(FALSE);
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'monthly_recurring_date',
+        'weight' => 3,
+      ]);
 
     $fields['custom_date'] = BaseFieldDefinition::create('daterange')
       ->setLabel(t('Custom Date'))

@@ -26,11 +26,21 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
+    $element['#states'] = [
+      'visible' => [
+        ':input[name="recur_type"]' => ['value' => 'weekly'],
+      ],
+    ];
+
+    $element['value']['#title'] = t('Create Events Between');
+    $element['value']['#weight'] = 1;
     $element['value']['#date_date_format'] = 'Y-m-d';
     $element['value']['#date_date_element'] = 'date';
     $element['value']['#date_time_format'] = '';
     $element['value']['#date_time_element'] = 'none';
 
+    $element['end_value']['#title'] = t('And');
+    $element['end_value']['#weight'] = 2;
     $element['end_value']['#date_date_format'] = 'Y-m-d';
     $element['end_value']['#date_date_element'] = 'date';
     $element['end_value']['#date_time_format'] = '';
@@ -39,17 +49,19 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
     $times = $this->getTimeOptions();
     $element['time'] = [
       '#type' => 'select',
-      '#title' => t('Event Time'),
+      '#title' => t('Events Start Time'),
       '#options' => $times,
-      '#default_value' => isset($items[$delta]->time) ? $items[$delta]->time : '',
+      '#default_value' => $items[$delta]->time ?: '',
+      '#weight' => 3,
     ];
 
     $durations = $this->getDurationOptions();
     $element['duration'] = [
       '#type' => 'select',
-      '#title' => t('Event Duration'),
+      '#title' => t('Events Duration'),
       '#options' => $durations,
-      '#default_value' => isset($items[$delta]->duration) ? $items[$delta]->duration : '',
+      '#default_value' => $items[$delta]->duration ?: '',
+      '#weight' => 4,
     ];
 
     $days = $this->getDayOptions();
@@ -57,7 +69,8 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
       '#type' => 'checkboxes',
       '#title' => t('Days of the Week'),
       '#options' => $days,
-      '#default_value' => isset($items[$delta]->days) ? $items[$delta]->days : '',
+      '#default_value' => $items[$delta]->days ?: '',
+      '#weight' => 5,
     ];
 
     return $element;
