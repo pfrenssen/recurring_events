@@ -377,7 +377,11 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setDisplayConfigurable('view', TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(FALSE)
-      ->setRequired(FALSE);
+      ->setCardinality(1)
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'weekly_recurring_date',
+      ]);;
 
     $fields['monthly_recurring_date'] = BaseFieldDefinition::create('monthly_recurring_date')
       ->setLabel(t('Monthly Recurring Date'))
@@ -386,6 +390,7 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setDisplayConfigurable('view', TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(FALSE)
+      ->setCardinality(1)
       ->setRequired(FALSE);
 
     $fields['custom_date'] = BaseFieldDefinition::create('daterange')
@@ -395,6 +400,7 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setDisplayConfigurable('view', TRUE)
       ->setRevisionable(TRUE)
       ->setTranslatable(FALSE)
+      ->setCardinality(-1)
       ->setRequired(FALSE);
 
     $fields['instances'] = BaseFieldDefinition::create('entity_reference')
@@ -409,7 +415,8 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
         'weight' => 10,
       ])
       ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayConfigurable('form', FALSE);
+      ->setDisplayConfigurable('form', FALSE)
+      ->setCardinality(-1);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
