@@ -268,7 +268,7 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
    * {@inheritdoc}
    */
   public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
+    $this->setOwnerId($account->id());
     return $this;
   }
 
@@ -285,13 +285,12 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    // Standard field, used as unique if primary index.
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('ID'))
-      ->setDescription(t('The ID of the event entity.'))
+      ->setDescription(t('The ID of the eventseries entity.'))
       ->setReadOnly(TRUE);
 
-    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Authored by'))
       ->setDescription(t('The username of the content author.'))
       ->setRevisionable(TRUE)

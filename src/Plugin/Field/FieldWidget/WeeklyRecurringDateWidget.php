@@ -69,7 +69,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
       '#type' => 'checkboxes',
       '#title' => t('Days of the Week'),
       '#options' => $days,
-      '#default_value' => $items[$delta]->days ?: '',
+      '#default_value' => $items[$delta]->days ? explode(',', $items[$delta]->days): '',
       '#weight' => 5,
     ];
 

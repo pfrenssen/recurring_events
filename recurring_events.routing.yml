@@ -1,8 +1,7 @@
 # Add an EventSeries.
 entity.eventseries.add_form:
-  path: '/events/series/add'
+  path: '/events/add'
   defaults:
-  # Calls the form.add controller, defined in the event entity.
     _entity_form: eventseries.add
     _title: 'Add Event'
   requirements:

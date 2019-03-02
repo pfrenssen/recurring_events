@@ -1,4 +1,4 @@
-recurring_events.config
+recurring_events.config:
   type: config_object
   label: 'Recurring Events'
   mapping:

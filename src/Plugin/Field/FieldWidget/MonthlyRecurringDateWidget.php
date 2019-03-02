@@ -53,7 +53,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
         'fourth' => t('Fourth'),
         'last' => t('Last'),
       ],
-      '#default_value' => $items[$delta]->day_occurrence ?: '',
+      '#default_value' => $items[$delta]->day_occurrence ? explode(',', $items[$delta]->day_occurrence) : '',
       '#states' => [
         'visible' => [
           ':input[name="monthly_recurring_date[0][type]"]' => ['value' => 'weekday'],
@@ -67,7 +67,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
       '#type' => 'checkboxes',
       '#title' => t('Days of the Week'),
       '#options' => $days,
-      '#default_value' => $items[$delta]->days ?: '',
+      '#default_value' => $items[$delta]->days ? explode(',', $items[$delta]->days) : '',
       '#states' => [
         'visible' => [
           ':input[name="monthly_recurring_date[0][type]"]' => ['value' => 'weekday'],
