@@ -10,9 +10,9 @@ use Drupal\recurring_events\EventInterface;
 use Drupal\user\UserInterface;
 
 /**
- * Defines the Event Series entity.
+ * Defines the Event Instance entity.
  *
- * @ingroup recurring_events
+ * @ingroup recurring events
  *
  * This is the main definition of the entity type. From it, an entityType is
  * derived. The most important properties in this example are listed below.
@@ -69,34 +69,34 @@ use Drupal\user\UserInterface;
  * is read and cached. Don't forget to clear cache after changes.
  *
  * @ContentEntityType(
- *   id = "eventseries",
- *   label = @Translation("Event entity"),
+ *   id = "eventinstance",
+ *   label = @Translation("Event Instance entity"),
  *   handlers = {
  *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
- *       "add" = "Drupal\recurring_events\Form\EventSeriesForm",
- *       "edit" = "Drupal\recurring_events\Form\EventSeriesForm",
- *       "delete" = "Drupal\recurring_events\Form\EventSeriesDeleteForm",
- *       "clone" = "Drupal\recurring_events\Form\EventSeriesCloneForm",
+ *       "edit" = "Drupal\recurring_events\Form\EventInstanceForm",
+ *       "delete" = "Drupal\recurring_events\Form\EventInstanceDeleteForm",
+ *       "default" = "Drupal\recurring_events\Form\EventInstanceForm",
+ *       "clone" = "Drupal\recurring_events\Form\EventInstanceCloneForm",
+ *       "contact" = "Drupal\recurring_events\Form\EventInstanceContactRegistrationsForm",
  *     },
- *     "access" = "Drupal\recurring_events\EventSeriesAccessControlHandler",
+ *     "access" = "Drupal\recurring_events\EventInstanceAccessControlHandler",
  *   },
- *   base_table = "eventseries",
- *   data_table = "eventseries_field_data",
- *   revision_table = "eventseries_revision",
- *   revision_data_table = "eventseries_field_revision",
+ *   base_table = "eventinstance",
+ *   data_table = "eventinstance_field_data",
+ *   revision_table = "eventinstance_revision",
+ *   revision_data_table = "eventinstance_field_revision",
  *   show_revision_ui = TRUE,
  *   translatable = TRUE,
- *   admin_permission = "administer eventseries entity",
+ *   admin_permission = "administer eventinstance entity",
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "id",
  *     "revision" = "vid",
  *     "published" = "status",
  *     "langcode" = "langcode",
- *     "label" = "title",
  *     "uuid" = "uuid"
  *   },
  *   revision_metadata_keys = {
@@ -105,26 +105,28 @@ use Drupal\user\UserInterface;
  *     "revision_log_message" = "revision_log"
  *   },
  *   links = {
- *     "canonical" = "/events/series/{eventseries}",
- *     "edit-form" = "/events/series/{eventseries}/edit",
- *     "delete-form" = "/events/series/{eventseries}/delete",
- *     "collection" = "/admin/content/events/series",
- *     "version-history" = "/events/series/{eventseries}/revisions",
- *     "revision" = "/events/series/{eventseries}/revisions/{eventseries_revision}/view",
- *     "clone-form" = "/events/series/{eventseries}/clone",
+ *     "canonical" = "/events/{eventinstance}",
+ *     "edit-form" = "/events/{eventinstance}/edit",
+ *     "delete-form" = "/events/{eventinstance}/delete",
+ *     "collection" = "/admin/content/events/instances",
+ *     "version-history" = "/events/{eventinstance}/revisions",
+ *     "revision" = "/events/{eventinstance}/revisions/{eventinstance_revision}/view",
+ *     "clone-form" = "/events/{eventinstance}/clone",
+ *     "contact-form" = "/events/{eventinstance}/registration/contact",
  *   },
- *   field_ui_base_route = "eventseries.settings",
+ *   field_ui_base_route = "eventinstance.settings",
  * )
  *
  * The 'links' above are defined by their path. For core to find the
  * corresponding route, the route name must follow the correct pattern:
  *
  * entity.<entity-name>.<link-name> (replace dashes with underscores)
- * Example: 'entity.event.canonical'
+ * Example: 'entity.eventinstance.canonical'
  *
  * See routing file above for the corresponding implementation
  *
- * The 'EventSeries' class defines the eventseries entity.
+ * The 'EventInstance' class defines methods and fields for the eventinstance
+ * entity.
  *
  * Being derived from the ContentEntityBase class, we can override the methods
  * we want. In our case we want to provide access to the standard fields about
@@ -140,12 +142,12 @@ use Drupal\user\UserInterface;
  * the rights privileges can influence the presentation (view, edit) of each
  * field.
  */
-class EventSeries extends EditorialContentEntityBase implements EventInterface {
+class EventInstance extends EditorialContentEntityBase implements EventInterface {
 
   /**
    * {@inheritdoc}
    *
-   * When a new entity instance is added, set the uid entity reference to
+   * When a new entity instance is added, set the user_id entity reference to
    * the current user as the creator of the instance.
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
@@ -184,7 +186,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
     parent::preSaveRevision($storage, $record);
 
     if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing event without adding a new
+      // If we are updating an existing eventinstance without adding a new
       // revision, we need to make sure $entity->revision_log is reset whenever
       // it is empty. Therefore, this code allows us to avoid clobbering an
       // existing log entry with an empty one.
@@ -285,9 +287,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
+    // Standard field, used as unique if primary index.
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('ID'))
-      ->setDescription(t('The ID of the eventseries entity.'))
+      ->setDescription(t('The ID of the event entity.'))
       ->setReadOnly(TRUE);
 
     $fields['uid'] = BaseFieldDefinition::create('entity_reference')
@@ -295,7 +298,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDescription(t('The username of the content author.'))
       ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
-      ->setDefaultValueCallback('Drupal\recurring_events\Entity\Event::getCurrentUserId')
+      ->setDefaultValueCallback('Drupal\recurring_events\Entity\EventInstance::getCurrentUserId')
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
@@ -308,29 +311,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ])
       ->setDisplayConfigurable('form', TRUE);
 
+    // Standard field, unique outside of the scope of the current project.
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the event entity.'))
       ->setReadOnly(TRUE);
-
-    // Title field for the event.
-    $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Title'))
-      ->setDescription(t('The title of the event entity.'))
-      ->setSettings([
-        'default_value' => '',
-        'max_length' => 255,
-        'text_processing' => 0,
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'string_textfield',
-        'weight' => -6,
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setTranslatable(TRUE)
-      ->setRequired(TRUE);
 
     $fields['body'] = BaseFieldDefinition::create('text_long')
       ->setLabel(t('Event Description'))
@@ -344,89 +329,27 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ])
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['recur_type'] = BaseFieldDefinition::create('list_string')
-      ->setLabel(t('Recur Type'))
-      ->setDescription('The way that the event recurs.')
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
+    $fields['date'] = BaseFieldDefinition::create('daterange')
+      ->setLabel(t('Event Description'))
       ->setTranslatable(FALSE)
+      ->setRevisionable(TRUE)
       ->setRequired(TRUE)
-      ->setCardinality(1)
-      ->setSetting('allowed_values', [
-        'weekly' => t('Weekly Event'),
-        'monthly' => t('Monthly Event'),
-        'custom' => t('Custom Event'),
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'options_buttons',
-        'settings' => [
-          'allowed_values' => [
-            'weekly' => t('Weekly Event'),
-            'monthly' => t('Monthly Event'),
-            'custom' => t('Custom Event'),
-          ],
-        ],
-        'weight' => 1,
-      ]);
-
-    $fields['weekly_recurring_date'] = BaseFieldDefinition::create('weekly_recurring_date')
-      ->setLabel(t('Weekly Recurring Date'))
-      ->setDescription('The weekly recurring date configuration.')
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setTranslatable(FALSE)
-      ->setCardinality(1)
-      ->setRequired(FALSE)
-      ->setDisplayOptions('form', [
-        'type' => 'weekly_recurring_date',
-        'weight' => 2,
-      ]);
-
-    $fields['monthly_recurring_date'] = BaseFieldDefinition::create('monthly_recurring_date')
-      ->setLabel(t('Monthly Recurring Date'))
-      ->setDescription('The monthly recurring date configuration.')
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setTranslatable(FALSE)
-      ->setCardinality(1)
-      ->setRequired(FALSE)
-      ->setDisplayOptions('form', [
-        'type' => 'monthly_recurring_date',
-        'weight' => 3,
-      ]);
-
-    $fields['custom_date'] = BaseFieldDefinition::create('daterange')
-      ->setLabel(t('Custom Date(s) and Time(s)'))
-      ->setDescription('The custom date configuration.')
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setTranslatable(FALSE)
-      ->setCardinality(-1)
-      ->setRequired(FALSE)
-      ->setDisplayOptions('form', [
+      ->setDisplayOptions('view', array(
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => -4,
+      ))
+      ->setDisplayOptions('form', array(
         'type' => 'daterange_default',
-        'label' => 'above',
-        'weight' => 4,
-      ]);
+        'weight' => -4,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
-    $fields['event_instances'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Events in this Series'))
-      ->setDescription(t('The events in this series.'))
-      ->setRevisionable(FALSE)
-      ->setSetting('target_type', 'eventinstance')
-      ->setTranslatable(FALSE)
-      ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'entity_reference',
-        'weight' => 10,
-      ])
-      ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayConfigurable('form', FALSE)
-      ->setCardinality(-1);
+    $fields['eventseries_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Event Series ID'))
+      ->setDescription(t('The ID of the event series entity.'))
+      ->setSetting('target_type', 'eventseries');
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))

@@ -9,9 +9,9 @@ use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 
 /**
- * Provides an interface defining an EventSeries entity.
+ * Provides an interface defining an EventSeries and EventInstance entities.
  */
-interface EventSeriesInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, RevisionLogInterface, EntityPublishedInterface {
+interface EventInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface, RevisionLogInterface, EntityPublishedInterface {
   /**
    * Denotes that the event/eventinstance is not published.
    */
