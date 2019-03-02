@@ -298,11 +298,6 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setSetting('target_type', 'user')
       ->setDefaultValueCallback('Drupal\recurring_events\Entity\Event::getCurrentUserId')
       ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ])
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
         'weight' => 5,
@@ -329,11 +324,6 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
         'max_length' => 255,
         'text_processing' => 0,
       ])
-      ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -6,
-      ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -6,
@@ -343,6 +333,18 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ->setRevisionable(TRUE)
       ->setTranslatable(TRUE)
       ->setRequired(TRUE);
+
+    $fields['body'] = BaseFieldDefinition::create('text_with_summary')
+      ->setLabel(t('Description of the event.'))
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
+      ->setRequired(TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'text_textarea_with_summary',
+        'weight' => -5,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['recur_type'] = BaseFieldDefinition::create('list_string')
       ->setLabel(t('Recur Type'))
@@ -399,7 +401,7 @@ class EventSeries extends EditorialContentEntityBase implements EventSeriesInter
       ]);
 
     $fields['custom_date'] = BaseFieldDefinition::create('daterange')
-      ->setLabel(t('Custom Date'))
+      ->setLabel(t('Custom Date(s) and Time(s)'))
       ->setDescription('The custom date configuration.')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
