@@ -26,6 +26,16 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
+    $element['value']['#date_date_format'] = 'Y-m-d';
+    $element['value']['#date_date_element'] = 'date';
+    $element['value']['#date_time_format'] = '';
+    $element['value']['#date_time_element'] = 'none';
+
+    $element['end_value']['#date_date_format'] = 'Y-m-d';
+    $element['end_value']['#date_date_element'] = 'date';
+    $element['end_value']['#date_time_format'] = '';
+    $element['end_value']['#date_time_element'] = 'none';
+
     $times = $this->getTimeOptions();
     $element['time'] = [
       '#type' => 'select',
