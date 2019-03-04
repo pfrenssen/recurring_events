@@ -6,7 +6,7 @@ use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Form controller for the eventseries entity edit forms.
+ * Form controller for the eventseries entity create form.
  *
  * @ingroup recurring_events
  */

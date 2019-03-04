@@ -77,7 +77,7 @@ use Drupal\user\UserInterface;
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "add" = "Drupal\recurring_events\Form\EventSeriesForm",
- *       "edit" = "Drupal\recurring_events\Form\EventSeriesForm",
+ *       "edit" = "Drupal\recurring_events\Form\EventSeriesEditForm",
  *       "delete" = "Drupal\recurring_events\Form\EventSeriesDeleteForm",
  *       "clone" = "Drupal\recurring_events\Form\EventSeriesCloneForm",
  *     },
