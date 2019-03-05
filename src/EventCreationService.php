@@ -97,13 +97,28 @@ class EventCreationService {
       case 'weekly':
         $config['start_date'] = $event->getWeeklyStartDate();
         $config['end_date'] = $event->getWeeklyEndDate();
-        $config['time'] = $event->getWeeklyTime();
+        $config['time'] = $event->getWeeklyStartTime();
         $config['duration'] = $event->getWeeklyDuration();
         $config['days'] = $event->getWeeklyDays();
         break;
 
       case 'monthly':
+        $config['start_date'] = $event->getMonthlyStartDate();
+        $config['end_date'] = $event->getMonthlyEndDate();
+        $config['time'] = $event->getMonthlyStartTime();
+        $config['duration'] = $event->getMonthlyDuration();
+        $config['monthly_type'] = $event->getMonthlyType();
 
+        switch ($event->getMonthlyType()) {
+          case 'weekday':
+            $config['day_occurrence'] = $event->getMonthlyDayOccurrences();
+            $config['days'] = $event->getMonthlyDays();
+            break;
+
+          case 'monthday':
+            $config['day_of_month'] = $event->getMonthlyDayOfMonth();
+            break;
+        }
         break;
 
       case 'custom':

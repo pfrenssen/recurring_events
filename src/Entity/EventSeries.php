@@ -519,4 +519,92 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
     return $days;
   }
 
+  /**
+   * Get mnthly recurring start date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the monthly start date.
+   */
+  public function getMonthlyStartDate() {
+    return $this->get('monthly_recurring_date')->start_date;
+  }
+
+  /**
+   * Get monthly recurring end date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the monthly end date.
+   */
+  public function getMonthlyEndDate() {
+    return $this->get('monthly_recurring_date')->end_date;
+  }
+
+  /**
+   * Get monthly recurring start time.
+   *
+   * @return string
+   *   The string for the monthly start time.
+   */
+  public function getMonthlyStartTime() {
+    return $this->get('monthly_recurring_date')->time;
+  }
+
+  /**
+   * Get monthly recurring duration.
+   *
+   * @return int
+   *   The integer for the monthly duration.
+   */
+  public function getMonthlyDuration() {
+    return $this->get('monthly_recurring_date')->duration;
+  }
+
+  /**
+   * Get monthly recurring days.
+   *
+   * @return array
+   *   The array of days for the monthly event.
+   */
+  public function getMonthlyDays() {
+    $days = $this->get('monthly_recurring_date')->days;
+    if (!empty($days)) {
+      $days = explode(',', $days);
+    }
+    return $days;
+  }
+
+  /**
+   * Get monthly recurring type.
+   *
+   * @return string
+   *   The type of monthly recurrence.
+   */
+  public function getMonthlyType() {
+    return $this->get('monthly_recurring_date')->type;
+  }
+
+  /**
+   * Get monthly recurring day occurrences.
+   *
+   * @return array
+   *   The day occurrences of the monthly recurrence.
+   */
+  public function getMonthlyDayOccurrences() {
+    $occurrences = $this->get('monthly_recurring_date')->day_occurrence;
+    if (!empty($occurrences)) {
+      $occurrences = explode(',', $occurrences);
+    }
+    return $occurrences;
+  }
+
+  /**
+   * Get monthly recurring day of month.
+   *
+   * @return int
+   *   The day of month of monthly recurrence.
+   */
+  public function getMonthlyDayOfMonth() {
+    return $this->get('monthly_recurring_date')->day_of_month;
+  }
+
 }
