@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\recurring_events\EventInterface;
 use Drupal\user\UserInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
  * Defines the Event Series entity.
@@ -452,6 +453,70 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
+  }
+
+  /**
+   * Get EventSeries recur type.
+   *
+   * @return string
+   *   The type of recurrence for this event: weekly|monthly|custom.
+   */
+  public function getRecurType() {
+    return $this->get('recur_type')->value;
+  }
+
+  /**
+   * Get weekly recurring start date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the weekly start date.
+   */
+  public function getWeeklyStartDate() {
+    return $this->get('weekly_recurring_date')->start_date;
+  }
+
+  /**
+   * Get weekly recurring end date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the weekly end date.
+   */
+  public function getWeeklyEndDate() {
+    return $this->get('weekly_recurring_date')->end_date;
+  }
+
+  /**
+   * Get weekly recurring start time.
+   *
+   * @return string
+   *   The string for the weekly start time.
+   */
+  public function getWeeklyStartTime() {
+    return $this->get('weekly_recurring_date')->time;
+  }
+
+  /**
+   * Get weekly recurring duration.
+   *
+   * @return int
+   *   The integer for the weekly duration.
+   */
+  public function getWeeklyDuration() {
+    return $this->get('weekly_recurring_date')->duration;
+  }
+
+  /**
+   * Get weekly recurring days.
+   *
+   * @return array
+   *   The array of days for the weekly event.
+   */
+  public function getWeeklyDays() {
+    $days = $this->get('weekly_recurring_date')->days;
+    if (!empty($days)) {
+      $days = explode(',', $days);
+    }
+    return $days;
   }
 
 }

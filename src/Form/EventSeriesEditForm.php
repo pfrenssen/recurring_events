@@ -42,7 +42,7 @@ class EventSeriesEditForm extends EventSeriesForm {
       unset($create_form);
     }
 
-    if($this->step === 0) {
+    if ($this->step === 0) {
       $button_label = $this->t('Next');
     }
     else {
@@ -50,7 +50,6 @@ class EventSeriesEditForm extends EventSeriesForm {
     }
 
     $form['actions']['submit']['#value'] = $button_label;
-
 
     return $form;
   }
