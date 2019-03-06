@@ -122,7 +122,7 @@ class EventCreationService {
         break;
 
       case 'custom':
-
+        $config['custom_dates'] = $event->getCustomDates();
         break;
     }
     return $config;

@@ -603,7 +603,33 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The day of month of monthly recurrence.
    */
   public function getMonthlyDayOfMonth() {
-    return $this->get('monthly_recurring_date')->day_of_month;
+    $days = $this->get('monthly_recurring_date')->day_of_month;
+    if (!empty($days)) {
+      $days = explode(',', $days);
+    }
+    return $days;
+  }
+
+  /**
+   * Get custom event dates.
+   *
+   * @return array
+   *   An array of custom dates.
+   */
+  public function getCustomDates() {
+    $custom_dates = [];
+
+    $dates = $this->get('custom_date')->getIterator();
+    if (!empty($dates)) {
+      foreach ($dates as $date) {
+        $custom_dates[] = [
+          'start_date' => $date->start_date,
+          'end_date' => $date->end_date,
+        ];
+      }
+    }
+
+    return $custom_dates;
   }
 
 }
