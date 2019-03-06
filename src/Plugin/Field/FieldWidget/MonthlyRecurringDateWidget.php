@@ -3,7 +3,6 @@
 namespace Drupal\recurring_events\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\recurring_events\Plugin\Field\FieldWidget\WeeklyRecurringDateWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 
@@ -36,8 +35,8 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
       '#type' => 'radios',
       '#title' => t('Event Recurrence Schedule'),
       '#options' => [
-        'weekday' => t('Recur On Day of Week'),
-        'monthday' => t('Recur On Day of Month'),
+        'weekday' => t('Recur on Day of Week'),
+        'monthday' => t('Recur on Day of Month'),
       ],
       '#default_value' => $items[$delta]->type ?: '',
       '#weight' => 5,
@@ -78,10 +77,10 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
 
     $month_days = $this->getMonthDayOptions();
     $element['day_of_month'] = [
-      '#type' => 'select',
+      '#type' => 'checkboxes',
       '#title' => t('Day of Month'),
       '#options' => $month_days,
-      '#default_value' => $items[$delta]->day_of_month ?: '',
+      '#default_value' => $items[$delta]->day_of_month ? explode(',', $items[$delta]->day_of_month) : '',
       '#states' => [
         'visible' => [
           ':input[name="monthly_recurring_date[0][type]"]' => ['value' => 'monthday'],
@@ -107,6 +106,14 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
       }
       else {
         $item['day_occurrence'] = '';
+      }
+
+      $item['day_of_month'] = array_filter($item['day_of_month']);
+      if (!empty($item['day_of_month'])) {
+        $item['day_of_month'] = implode(',', $item['day_of_month']);
+      }
+      else {
+        $item['day_of_month'] = '';
       }
     }
     return $values;

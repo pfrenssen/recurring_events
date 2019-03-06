@@ -143,6 +143,4 @@ class EventCreationService {
     return $config;
   }
 
-
-
 }

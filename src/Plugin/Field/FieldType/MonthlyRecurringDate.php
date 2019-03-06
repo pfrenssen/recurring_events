@@ -27,6 +27,7 @@ class MonthlyRecurringDate extends WeeklyRecurringDate {
     $schema['columns']['type'] = [
       'type' => 'varchar',
       'length' => 20,
+      'not null' => TRUE,
     ];
 
     $schema['columns']['day_occurrence'] = [
@@ -37,8 +38,8 @@ class MonthlyRecurringDate extends WeeklyRecurringDate {
     $schema['columns']['days']['not null'] = FALSE;
 
     $schema['columns']['day_of_month'] = [
-      'type' => 'int',
-      'unsigned' => TRUE,
+      'type' => 'varchar',
+      'length' => 255,
     ];
 
     return $schema;
@@ -69,7 +70,7 @@ class MonthlyRecurringDate extends WeeklyRecurringDate {
       ->setLabel(t('Day Occurrence'))
       ->setDescription(t('Which occurence of the day(s) of the week should event take place'));
 
-    $properties['day_of_month'] = DataDefinition::create('integer')
+    $properties['day_of_month'] = DataDefinition::create('string')
       ->setLabel(t('Day of Month'))
       ->setDescription(t('The days of the month on which the event takes place'));
 
