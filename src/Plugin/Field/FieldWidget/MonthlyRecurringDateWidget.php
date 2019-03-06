@@ -137,7 +137,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
 
     $days[-1] = t('Last');
 
-    // TODO: Add hook ability to modify these days.
+    \Drupal::moduleHandler()->alter('recurring_events_month_days', $days);
 
     return $days;
   }

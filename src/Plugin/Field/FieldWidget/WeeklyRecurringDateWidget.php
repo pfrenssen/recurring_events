@@ -142,7 +142,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
       $times[$time_option->format('h:i a')] = $time_option->format($format);
     }
 
-    // TODO: Add hook ability to modify these times.
+    \Drupal::moduleHandler()->alter('recurring_events_times', $times);
 
     return $times;
   }
@@ -189,7 +189,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
       '86400' => t('24 hours'),
     ];
 
-    // TODO: Add hook ability to modify these durations.
+    \Drupal::moduleHandler()->alter('recurring_events_durations', $durations);
 
     return $durations;
   }
@@ -215,7 +215,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
       'sunday' => t('Sunday'),
     ];
 
-    // TODO: Add hook ability to modify these days.
+    \Drupal::moduleHandler()->alter('recurring_events_days', $days);
 
     return $days;
   }
