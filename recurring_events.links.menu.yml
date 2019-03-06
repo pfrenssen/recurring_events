@@ -1,0 +1,13 @@
+# Parent Menu Structure.
+events.admin.overview:
+  title: 'Events'
+  description: 'Configure Event Series and Instances.'
+  route_name: events.admin.overview
+  parent: system.admin_structure
+
+# Events Series settings admin page.
+events.admin.structure.settings:
+  title: 'Event Series'
+  description: 'Configure Event Series Entity'
+  route_name:  eventseries.settings
+  parent: events.admin.overview

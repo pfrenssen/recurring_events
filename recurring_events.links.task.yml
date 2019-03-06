@@ -1,0 +1,5 @@
+# Events Series settings admin page.
+eventseries.settings_tab:
+  route_name: eventseries.settings
+  title: Event Series Settings
+  base_route: eventseries.settings

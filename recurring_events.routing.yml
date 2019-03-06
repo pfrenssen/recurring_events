@@ -56,6 +56,15 @@ entity.eventseries.collection:
   # Checks for permission directly.
     _permission: 'access eventseries overview'
 
+# Admin Menu Strucutre.
+events.admin.overview:
+  path: '/admin/structure/events'
+  defaults:
+    _title: 'Events Management'
+    _controller: '\Drupal\recurring_events\Controller\EventController::adminPage'
+  requirements:
+    _permission: 'access administration pages'
+
 # Event Series settings admin page.
 eventseries.settings:
   path: '/admin/structure/events/series/settings'

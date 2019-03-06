@@ -422,7 +422,6 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setTranslatable(FALSE)
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'type' => 'entity_reference',
         'weight' => 10,
       ])
       ->setDisplayConfigurable('view', TRUE)
