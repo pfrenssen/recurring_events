@@ -14,6 +14,10 @@ delete eventseries entity:
 clone eventseries entity:
   title: 'Clone eventseries entity'
   description: 'Clone existing event series entities'
+administer eventseries entity:
+  title: 'Administer eventseries entity'
+  description: 'Make changes to the event series entity type.'
+  restrict access: true
 
 # Event Series Administration.
 administer eventseries:

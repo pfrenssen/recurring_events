@@ -110,19 +110,15 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
   protected function getTimeOptions() {
     $times = [];
 
-    // TODO: Hook these up to configs.
-    /* $config = \Drupal::config('recurring_events.config');
+    $config = \Drupal::config('recurring_events.eventseries.config');
     // Take interval in minutes, and multiply it by 60 to convert to seconds.
     $interval = $config->get('interval') * 60;
     $min_time = $config->get('min_time');
     $max_time = $config->get('max_time');
-    $format = $config->get('time_format'); */
+    $format = $config->get('time_format');
 
-    // Take interval in minutes, and multiply it by 60 to convert to seconds.
-    $interval = 15 * 60;
-    $min_time = DrupalDateTime::createFromFormat('h:ia', '08:00am');
-    $max_time = DrupalDateTime::createFromFormat('h:ia', '11:00pm');
-    $format = 'h:i A';
+    $min_time = DrupalDateTime::createFromFormat('h:ia', $min_time);
+    $max_time = DrupalDateTime::createFromFormat('h:ia', $max_time);
 
     // Convert the mininum time to a number of seconds after midnight.
     $lower_hour = $min_time->format('H') * 60 * 60;
@@ -201,19 +197,11 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
    *   An array of days suitable for a checkbox field.
    */
   protected function getDayOptions() {
-    // TODO: Hook these up to configs.
-    /* $config = \Drupal::config('recurring_events.config');
-    $days = $config->get('days'); */
-
-    $days = [
-      'monday' => t('Monday'),
-      'tuesday' => t('Tuesday'),
-      'wednesday' => t('Wednesday'),
-      'thursday' => t('Thursday'),
-      'friday' => t('Friday'),
-      'saturday' => t('Saturday'),
-      'sunday' => t('Sunday'),
-    ];
+    $config = \Drupal::config('recurring_events.eventseries.config');
+    $days = explode(',', $config->get('days'));
+    // All labels should have a capital first letter as they are proper nouns.
+    $day_labels = array_map('ucwords', $days);
+    $days = array_combine($days, $day_labels);
 
     \Drupal::moduleHandler()->alter('recurring_events_days', $days);
 

@@ -55,3 +55,12 @@ entity.eventseries.collection:
   requirements:
   # Checks for permission directly.
     _permission: 'access eventseries overview'
+
+# Event Series settings admin page.
+eventseries.settings:
+  path: '/admin/structure/events/series/settings'
+  defaults:
+    _form: '\Drupal\recurring_events\Form\EventSeriesSettingsForm'
+    _title: 'Event Series Settings'
+  requirements:
+    _permission: 'administer eventseries entity'

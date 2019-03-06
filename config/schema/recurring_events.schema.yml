@@ -1,6 +1,6 @@
-recurring_events.config:
+recurring_events.eventseries.config:
   type: config_object
-  label: 'Recurring Events'
+  label: 'Recurring Events Series Config'
   mapping:
     interval:
       type: integer
@@ -14,3 +14,6 @@ recurring_events.config:
     time_format:
       type: string
       label: 'The formatting of times when creating events'
+    days:
+      type: string
+      label: 'The days of the week available when creating events'
