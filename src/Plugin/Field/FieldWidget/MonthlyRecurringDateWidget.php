@@ -78,7 +78,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
     $month_days = $this->getMonthDayOptions();
     $element['day_of_month'] = [
       '#type' => 'checkboxes',
-      '#title' => t('Day of Month'),
+      '#title' => t('Days of the Month'),
       '#options' => $month_days,
       '#default_value' => $items[$delta]->day_of_month ? explode(',', $items[$delta]->day_of_month) : '',
       '#states' => [

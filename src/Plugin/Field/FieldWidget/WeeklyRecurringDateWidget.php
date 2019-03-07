@@ -34,14 +34,14 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
 
     $element['value']['#title'] = t('Create Events Between');
     $element['value']['#weight'] = 1;
-    $element['value']['#date_date_format'] = 'Y-m-d';
+    $element['value']['#date_date_format'] = DATETIME_DATE_STORAGE_FORMAT;
     $element['value']['#date_date_element'] = 'date';
     $element['value']['#date_time_format'] = '';
     $element['value']['#date_time_element'] = 'none';
 
     $element['end_value']['#title'] = t('And');
     $element['end_value']['#weight'] = 2;
-    $element['end_value']['#date_date_format'] = 'Y-m-d';
+    $element['end_value']['#date_date_format'] = DATETIME_DATE_STORAGE_FORMAT;
     $element['end_value']['#date_date_element'] = 'date';
     $element['end_value']['#date_time_format'] = '';
     $element['end_value']['#date_time_element'] = 'none';
@@ -49,7 +49,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
     $times = $this->getTimeOptions();
     $element['time'] = [
       '#type' => 'select',
-      '#title' => t('Events Start Time'),
+      '#title' => t('Event Start Time'),
       '#options' => $times,
       '#default_value' => $items[$delta]->time ?: '',
       '#weight' => 3,
@@ -58,7 +58,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
     $durations = $this->getDurationOptions();
     $element['duration'] = [
       '#type' => 'select',
-      '#title' => t('Events Duration'),
+      '#title' => t('Event Duration'),
       '#options' => $durations,
       '#default_value' => $items[$delta]->duration ?: '',
       '#weight' => 4,
@@ -80,14 +80,18 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
    * {@inheritdoc}
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
-    $values = parent::massageFormValues($values, $form, $form_state);
-
     foreach ($values as &$item) {
       if (empty($item['value'])) {
         $item['value'] = '';
       }
+      else {
+        $item['value'] = substr($item['value'], 0, 10) . 'T00:00:00';
+      }
       if (empty($item['end_value'])) {
         $item['end_value'] = '';
+      }
+      else {
+        $item['end_value'] = substr($item['end_value'], 0, 10) . 'T00:00:00';
       }
 
       $item['days'] = array_filter($item['days']);
@@ -97,7 +101,9 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
       else {
         $item['days'] = '';
       }
+
     }
+    $values = parent::massageFormValues($values, $form, $form_state);
     return $values;
   }
 

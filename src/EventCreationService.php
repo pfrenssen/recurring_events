@@ -140,6 +140,76 @@ class EventCreationService {
   public function convertFormConfigToArray(FormStateInterface $form_state) {
     $config = [];
 
+    $date_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $utc_timezone = new \DateTimeZone(DATETIME_STORAGE_TIMEZONE);
+    $user_input = $form_state->getUserInput();
+
+    $config['type'] = $user_input['recur_type'];
+
+    switch ($config['type']) {
+      case 'weekly':
+        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T00:00:00';
+        $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+
+        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T00:00:00';
+        $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
+
+        $config['start_date'] = $start_date;
+        $config['end_date'] = $end_date;
+
+        $config['time'] = $user_input['weekly_recurring_date'][0]['time'];
+        $config['duration'] = $user_input['weekly_recurring_date'][0]['duration'];
+        $config['days'] = array_filter(array_values($user_input['weekly_recurring_date'][0]['days']));
+        break;
+
+      case 'monthly':
+        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T00:00:00';
+        $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+
+        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T00:00:00';
+        $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
+
+        $config['start_date'] = $start_date;
+        $config['end_date'] = $end_date;
+
+        $config['time'] = $user_input['monthly_recurring_date'][0]['time'];
+        $config['duration'] = $user_input['monthly_recurring_date'][0]['duration'];
+        $config['monthly_type'] = $user_input['monthly_recurring_date'][0]['type'];
+
+        switch ($config['monthly_type']) {
+          case 'weekday':
+            $config['day_occurrence'] = array_filter(array_values($user_input['monthly_recurring_date'][0]['day_occurrence']));
+            $config['days'] = array_filter(array_values($user_input['monthly_recurring_date'][0]['days']));
+            break;
+
+          case 'monthday':
+            $config['day_of_month'] = array_filter(array_values($user_input['monthly_recurring_date'][0]['day_of_month']));
+            break;
+        }
+        break;
+
+      case 'custom':
+        foreach ($user_input['custom_date'] as $custom_date) {
+          $start_date = $end_date = NULL;
+
+          $start_timestamp = implode('T', $custom_date['value']);
+          $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $date_timezone);
+          // Convert the DateTime object back to UTC timezone.
+          $start_date->setTimezone($utc_timezone);
+
+          $end_timestamp = implode('T', $custom_date['end_value']);
+          $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $date_timezone);
+          // Convert the DateTime object back to UTC timezone.
+          $end_date->setTimezone($utc_timezone);
+
+          $config['custom_dates'][] = [
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+          ];
+        }
+        break;
+    }
+
     return $config;
   }
 
