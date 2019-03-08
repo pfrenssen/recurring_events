@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\recurring_events\EventInterface;
 use Drupal\user\UserInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
  * Defines the Event Series entity.
