@@ -19,7 +19,7 @@ class EventSeriesEditForm extends EventSeriesForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     if ($this->step === 0) {
       $form = parent::buildForm($form, $form_state);
-      $button_label = $this->t('Next');
+      $save_button_label = $this->t('Next');
     }
     else {
       /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
@@ -30,17 +30,32 @@ class EventSeriesEditForm extends EventSeriesForm {
 
       $create_form = parent::buildForm($form, $form_state);
 
+      $form['actions'] = $create_form['actions'];
+      unset($create_form);
+
+      $title = $this->t('Save Changes?');
+      $message = $this->t('No recurrence configuration has been changed so no changes will be made to event instances.');
+      $save_button_label = $this->t('Save');
+
+      if (!empty($diff_array)) {
+        $title = $this->t('Confirm Modifications?');
+        $message = $this->t('Recurrence configuration has been changed, as a result all instances will be removed and recreated. This action cannot be undone.');
+        $save_button_label = $this->t('Save and Recreate Event Instances');
+      }
+
       $form['title'] = [
         '#type' => '#markup',
         '#prefix' => '<h2>',
-        '#markup' => $this->t('Confirm Modifications?'),
+        '#markup' => $title,
         '#suffix' => '</h2>',
+        '#weight' => -10,
       ];
       $form['message'] = [
         '#type' => '#markup',
         '#prefix' => '<p>',
-        '#markup' => $this->t('As a result of submitting these changes, all event instances related to this event series will be removed and recreated. Tnis action cannot be undone.'),
+        '#markup' => $message,
         '#suffix' => '</p>',
+        '#weight' => -9,
       ];
 
       if (!empty($diff_array)) {
@@ -52,16 +67,18 @@ class EventSeriesEditForm extends EventSeriesForm {
             $this->t('Overridden'),
           ],
           '#rows' => $diff_array,
+          '#weight' => -8,
         ];
       }
 
-      $form['actions'] = $create_form['actions'];
-      unset($create_form);
-
-      $button_label = $this->t('Save');
+      $form['actions']['back'] = [
+        '#type' => 'submit',
+        '#value' => $this->t('Back'),
+      ];
+      $form['actions']['delete']['#printed'] = TRUE;
     }
 
-    $form['actions']['submit']['#value'] = $button_label;
+    $form['actions']['submit']['#value'] = $save_button_label;
 
     return $form;
   }
