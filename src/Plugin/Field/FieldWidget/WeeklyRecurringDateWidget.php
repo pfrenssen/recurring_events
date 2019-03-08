@@ -85,13 +85,13 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
         $item['value'] = '';
       }
       else {
-        $item['value'] = substr($item['value'], 0, 10) . 'T00:00:00';
+        $item['value'] = substr($item['value'], 0, 10) . 'T12:00:00';
       }
       if (empty($item['end_value'])) {
         $item['end_value'] = '';
       }
       else {
-        $item['end_value'] = substr($item['end_value'], 0, 10) . 'T00:00:00';
+        $item['end_value'] = substr($item['end_value'], 0, 10) . 'T12:00:00';
       }
 
       $item['days'] = array_filter($item['days']);

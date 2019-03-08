@@ -140,7 +140,7 @@ class EventCreationService {
   public function convertFormConfigToArray(FormStateInterface $form_state) {
     $config = [];
 
-    $date_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
     $utc_timezone = new \DateTimeZone(DATETIME_STORAGE_TIMEZONE);
     $user_input = $form_state->getUserInput();
 
@@ -148,11 +148,13 @@ class EventCreationService {
 
     switch ($config['type']) {
       case 'weekly':
-        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T00:00:00';
+        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T12:00:00';
         $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+        $start_date->setTime(0, 0, 0);
 
-        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T00:00:00';
+        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
         $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
+        $end_date->setTime(0, 0, 0);
 
         $config['start_date'] = $start_date;
         $config['end_date'] = $end_date;
@@ -163,11 +165,13 @@ class EventCreationService {
         break;
 
       case 'monthly':
-        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T00:00:00';
+        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T12:00:00';
         $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+        $start_date->setTime(0, 0, 0);
 
-        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T00:00:00';
+        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
         $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
+        $end_date->setTime(0, 0, 0);
 
         $config['start_date'] = $start_date;
         $config['end_date'] = $end_date;
@@ -191,21 +195,25 @@ class EventCreationService {
       case 'custom':
         foreach ($user_input['custom_date'] as $custom_date) {
           $start_date = $end_date = NULL;
+          if (!empty($custom_date['value']['date'])
+            && !empty($custom_date['value']['time'])
+            && !empty($custom_date['end_value']['date'])
+            && !empty($custom_date['end_value']['time'])) {
+            $start_timestamp = implode('T', $custom_date['value']);
+            $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
+            // Convert the DateTime object back to UTC timezone.
+            $start_date->setTimezone($utc_timezone);
 
-          $start_timestamp = implode('T', $custom_date['value']);
-          $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $date_timezone);
-          // Convert the DateTime object back to UTC timezone.
-          $start_date->setTimezone($utc_timezone);
+            $end_timestamp = implode('T', $custom_date['end_value']);
+            $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
+            // Convert the DateTime object back to UTC timezone.
+            $end_date->setTimezone($utc_timezone);
 
-          $end_timestamp = implode('T', $custom_date['end_value']);
-          $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $date_timezone);
-          // Convert the DateTime object back to UTC timezone.
-          $end_date->setTimezone($utc_timezone);
-
-          $config['custom_dates'][] = [
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-          ];
+            $config['custom_dates'][] = [
+              'start_date' => $start_date,
+              'end_date' => $end_date,
+            ];
+          }
         }
         break;
     }
