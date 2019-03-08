@@ -2,7 +2,6 @@
 
 namespace Drupal\recurring_events\Form;
 
-use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -20,8 +19,14 @@ class EventSeriesEditForm extends EventSeriesForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     if ($this->step === 0) {
       $form = parent::buildForm($form, $form_state);
+      $button_label = $this->t('Next');
     }
     else {
+      /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
+      $entity = $this->entity;
+
+      $creation_service = \Drupal::service('recurring_events.event_creation_service');
+      $diff_array = $creation_service->buildDiffArray($entity, $form_state);
 
       $create_form = parent::buildForm($form, $form_state);
 
@@ -38,14 +43,21 @@ class EventSeriesEditForm extends EventSeriesForm {
         '#suffix' => '</p>',
       ];
 
+      if (!empty($diff_array)) {
+        $form['diff'] = [
+          '#type' => 'table',
+          '#header' => [
+            $this->t('Data'),
+            $this->t('Stored'),
+            $this->t('Overridden'),
+          ],
+          '#rows' => $diff_array,
+        ];
+      }
+
       $form['actions'] = $create_form['actions'];
       unset($create_form);
-    }
 
-    if ($this->step === 0) {
-      $button_label = $this->t('Next');
-    }
-    else {
       $button_label = $this->t('Save');
     }
 

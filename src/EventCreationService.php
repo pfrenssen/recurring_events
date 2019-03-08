@@ -150,10 +150,12 @@ class EventCreationService {
       case 'weekly':
         $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T12:00:00';
         $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+        $start_date->setTimezone($user_timezone);
         $start_date->setTime(0, 0, 0);
 
         $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
         $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
+        $start_date->setTimezone($user_timezone);
         $end_date->setTime(0, 0, 0);
 
         $config['start_date'] = $start_date;
@@ -165,12 +167,14 @@ class EventCreationService {
         break;
 
       case 'monthly':
-        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T12:00:00';
+        $start_timestamp = $user_input['monthly_recurring_date'][0]['value']['date'] . 'T12:00:00';
         $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+        $start_date->setTimezone($user_timezone);
         $start_date->setTime(0, 0, 0);
 
-        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
+        $end_timestamp = $user_input['monthly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
         $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
+        $start_date->setTimezone($user_timezone);
         $end_date->setTime(0, 0, 0);
 
         $config['start_date'] = $start_date;
@@ -195,10 +199,21 @@ class EventCreationService {
       case 'custom':
         foreach ($user_input['custom_date'] as $custom_date) {
           $start_date = $end_date = NULL;
+
           if (!empty($custom_date['value']['date'])
             && !empty($custom_date['value']['time'])
             && !empty($custom_date['end_value']['date'])
             && !empty($custom_date['end_value']['time'])) {
+
+            // For some reason, sometimes we do not receive seconds from the
+            // date range picker.
+            if (strlen($custom_date['value']['time']) == 5) {
+              $custom_date['value']['time'] .= ':00';
+            }
+            if (strlen($custom_date['end_value']['time']) == 5) {
+              $custom_date['end_value']['time'] .= ':00';
+            }
+
             $start_timestamp = implode('T', $custom_date['value']);
             $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
             // Convert the DateTime object back to UTC timezone.
@@ -219,6 +234,139 @@ class EventCreationService {
     }
 
     return $config;
+  }
+
+  /**
+   * Build diff array between stored entity and form state.
+   *
+   * @param Drupal\recurring_events\Entity\EventSeries $event
+   *   The stored event series entity.
+   * @param Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of an updated event series entity.
+   *
+   * @return array
+   *   An array of differences.
+   */
+  public function buildDiffArray(EventSeries $event, FormStateInterface $form_state) {
+    $diff = [];
+
+    $entity_config = $this->convertEntityConfigToArray($event);
+    $form_config = $this->convertFormConfigToArray($form_state);
+
+    if ($entity_config['type'] !== $form_config['type']) {
+      $diff['type'] = [
+        'label' => $this->translation->translate('Recur Type'),
+        'stored' => $entity_config['type'],
+        'override' => $form_config['type'],
+      ];
+    }
+    else {
+      switch ($entity_config['type']) {
+        case 'weekly':
+        case 'monthly':
+          if ($entity_config['start_date']->format(DATETIME_DATETIME_STORAGE_FORMAT) !== $form_config['start_date']->format(DATETIME_DATETIME_STORAGE_FORMAT)) {
+            $diff['start_date'] = [
+              'label' => $this->translation->translate('Start Date'),
+              'stored' => $entity_config['start_date']->format('Y-m-d'),
+              'override' => $form_config['start_date']->format('Y-m-d'),
+            ];
+          }
+          if ($entity_config['end_date']->format(DATETIME_DATETIME_STORAGE_FORMAT) !== $form_config['end_date']->format(DATETIME_DATETIME_STORAGE_FORMAT)) {
+            $diff['end_date'] = [
+              'label' => $this->translation->translate('End Date'),
+              'stored' => $entity_config['end_date']->format('Y-m-d'),
+              'override' => $form_config['end_date']->format('Y-m-d'),
+            ];
+          }
+          if ($entity_config['time'] !== $form_config['time']) {
+            $diff['time'] = [
+              'label' => $this->translation->translate('Time'),
+              'stored' => $entity_config['time'],
+              'override' => $form_config['time'],
+            ];
+          }
+          if ($entity_config['duration'] !== $form_config['duration']) {
+            $diff['duration'] = [
+              'label' => $this->translation->translate('Duration'),
+              'stored' => $entity_config['duration'],
+              'override' => $form_config['duration'],
+            ];
+          }
+
+          if ($entity_config['type'] === 'weekly') {
+            if ($entity_config['days'] !== $form_config['days']) {
+              $diff['days'] = [
+                'label' => $this->translation->translate('Days'),
+                'stored' => implode(',', $entity_config['days']),
+                'override' => implode(',', $form_config['days']),
+              ];
+            }
+          }
+
+          if ($entity_config['type'] === 'monthly') {
+            if ($entity_config['monthly_type'] !== $form_config['monthly_type']) {
+              $diff['monthly_type'] = [
+                'label' => $this->translation->translate('Monthly Type'),
+                'stored' => $entity_config['monthly_type'],
+                'override' => $form_config['monthly_type'],
+              ];
+            }
+            if ($entity_config['monthly_type'] === 'weekday') {
+              if ($entity_config['day_occurrence'] !== $form_config['day_occurrence']) {
+                $diff['day_occurrence'] = [
+                  'label' => $this->translation->translate('Day Occurrence'),
+                  'stored' => implode(',', $entity_config['day_occurrence']),
+                  'override' => implode(',', $form_config['day_occurrence']),
+                ];
+              }
+              if ($entity_config['days'] !== $form_config['days']) {
+                $diff['days'] = [
+                  'label' => $this->translation->translate('Days'),
+                  'stored' => implode(',', $entity_config['days']),
+                  'override' => implode(',', $form_config['days']),
+                ];
+              }
+            }
+            else {
+              if ($entity_config['monthday'] !== $form_config['monthday']) {
+                $diff['monthday'] = [
+                  'label' => $this->translation->translate('Day of the Month'),
+                  'stored' => implode(',', $entity_config['monthday']),
+                  'override' => implode(',', $form_config['monthday']),
+                ];
+              }
+            }
+          }
+
+          break;
+
+        case 'custom':
+          if ($entity_config['custom_dates'] !== $form_config['custom_dates']) {
+            $stored_start_ends = $overridden_start_ends = [];
+
+            foreach ($entity_config['custom_dates'] as $date) {
+              if (!empty($date['start_date']) && !empty($date['end_date'])) {
+                $stored_start_ends[] = $date['start_date']->format('Y-m-d h:ia') . ' - ' . $date['end_date']->format('Y-m-d h:ia');
+              }
+            }
+
+            foreach ($form_config['custom_dates'] as $dates) {
+              if (!empty($date['start_date']) && !empty($date['end_date'])) {
+                $overridden_start_ends[] = $date['start_date']->format('Y-m-d h:ia') . ' - ' . $date['end_date']->format('Y-m-d h:ia');
+              }
+            }
+
+            $diff['custom_dates'] = [
+              'label' => $this->translation->translate('Custom Dates'),
+              'stored' => implode(', ', $stored_start_ends),
+              'override' => implode(', ', $overridden_start_ends),
+            ];
+          }
+          break;
+      }
+    }
+
+    return $diff;
   }
 
 }
