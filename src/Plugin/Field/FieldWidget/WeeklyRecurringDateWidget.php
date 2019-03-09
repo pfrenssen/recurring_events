@@ -26,6 +26,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
+    $element['#type'] = 'container';
     $element['#states'] = [
       'visible' => [
         ':input[name="recur_type"]' => ['value' => 'weekly'],
@@ -69,7 +70,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
       '#type' => 'checkboxes',
       '#title' => t('Days of the Week'),
       '#options' => $days,
-      '#default_value' => $items[$delta]->days ? explode(',', $items[$delta]->days) : '',
+      '#default_value' => $items[$delta]->days ? explode(',', $items[$delta]->days) : [],
       '#weight' => 5,
     ];
 

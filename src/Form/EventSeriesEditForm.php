@@ -25,6 +25,7 @@ class EventSeriesEditForm extends EventSeriesForm {
       /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
       $entity = $this->entity;
 
+      // Determine if there have been changes to the saved eventseries.
       $creation_service = \Drupal::service('recurring_events.event_creation_service');
       $diff_array = $creation_service->buildDiffArray($entity, $form_state);
 
@@ -75,6 +76,7 @@ class EventSeriesEditForm extends EventSeriesForm {
         '#type' => 'submit',
         '#value' => $this->t('Back'),
       ];
+
       $form['actions']['delete']['#printed'] = TRUE;
     }
 
@@ -92,7 +94,18 @@ class EventSeriesEditForm extends EventSeriesForm {
       $form_state->setRebuild();
     }
     else {
-      parent::submitForm($form, $form_state);
+      $triggering_element = $form_state->getTriggeringElement();
+
+      switch ($triggering_element['#id']) {
+        case 'edit-back':
+          $this->step--;
+          $form_state->setRebuild();
+          break;
+
+        case 'edit-submit':
+          parent::submitForm($form, $form_state);
+          break;
+      }
     }
   }
 

@@ -24,7 +24,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
-
+    $element['#type'] = 'container';
     $element['#states'] = [
       'visible' => [
         ':input[name="recur_type"]' => ['value' => 'monthly'],
@@ -52,7 +52,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
         'fourth' => t('Fourth'),
         'last' => t('Last'),
       ],
-      '#default_value' => $items[$delta]->day_occurrence ? explode(',', $items[$delta]->day_occurrence) : '',
+      '#default_value' => $items[$delta]->day_occurrence ? explode(',', $items[$delta]->day_occurrence) : [],
       '#states' => [
         'visible' => [
           ':input[name="monthly_recurring_date[0][type]"]' => ['value' => 'weekday'],
@@ -66,7 +66,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
       '#type' => 'checkboxes',
       '#title' => t('Days of the Week'),
       '#options' => $days,
-      '#default_value' => $items[$delta]->days ? explode(',', $items[$delta]->days) : '',
+      '#default_value' => $items[$delta]->days ? explode(',', $items[$delta]->days) : [],
       '#states' => [
         'visible' => [
           ':input[name="monthly_recurring_date[0][type]"]' => ['value' => 'weekday'],
@@ -80,7 +80,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
       '#type' => 'checkboxes',
       '#title' => t('Days of the Month'),
       '#options' => $month_days,
-      '#default_value' => $items[$delta]->day_of_month ? explode(',', $items[$delta]->day_of_month) : '',
+      '#default_value' => $items[$delta]->day_of_month ? explode(',', $items[$delta]->day_of_month) : [],
       '#states' => [
         'visible' => [
           ':input[name="monthly_recurring_date[0][type]"]' => ['value' => 'monthday'],
