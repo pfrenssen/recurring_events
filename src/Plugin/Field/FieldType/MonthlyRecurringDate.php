@@ -32,7 +32,7 @@ class MonthlyRecurringDate extends WeeklyRecurringDate {
 
     $schema['columns']['day_occurrence'] = [
       'type' => 'varchar',
-      'length' => 20,
+      'length' => 255,
     ];
 
     $schema['columns']['days']['not null'] = FALSE;

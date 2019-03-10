@@ -85,14 +85,20 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
       if (empty($item['value'])) {
         $item['value'] = '';
       }
-      else {
+      elseif (!$item['value'] instanceof DrupalDateTime) {
         $item['value'] = substr($item['value'], 0, 10) . 'T12:00:00';
+      }
+      else {
+        $item['value']->setTime(12, 0, 0);
       }
       if (empty($item['end_value'])) {
         $item['end_value'] = '';
       }
-      else {
+      elseif (!$item['end_value'] instanceof DrupalDateTime) {
         $item['end_value'] = substr($item['end_value'], 0, 10) . 'T12:00:00';
+      }
+      else {
+        $item['end_value']->setTime(12, 0, 0);
       }
 
       $item['days'] = array_filter($item['days']);
