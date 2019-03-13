@@ -7,9 +7,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\recurring_events\EventCreationService;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Form controller for the eventseries entity create form.
@@ -17,6 +16,13 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * @ingroup recurring_events
  */
 class EventSeriesForm extends ContentEntityForm {
+
+  /**
+   * The current step of the form.
+   *
+   * @var int
+   */
+  protected $step = 0;
 
   /**
    * The event creation service.
@@ -64,12 +70,12 @@ class EventSeriesForm extends ContentEntityForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-    $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
 
     $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_edit_form');
 
     /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
     $entity = $this->entity;
+    $original = $this->storage->loadUnchanged($entity->id());
 
     $form['custom_date']['#states'] = [
       'visible' => [
@@ -108,16 +114,51 @@ class EventSeriesForm extends ContentEntityForm {
     ];
 
     if ($editing) {
-      $form['actions']['verify'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Verify Changes'),
-        '#ajax' => [
-          'wrapper' => 'eventseries-edit-form',
-          'callback' => [$this, 'ajaxVerifyChanges'],
-          'method' => 'replace',
-          'effect' => 'fade',
-        ],
-      ];
+      $form['#entity_builders'][] = '::updateRecurringDates';
+      if ($this->step === 1) {
+        $diff_array = $this->creationService->buildDiffArray($original, $form_state);
+
+        if (!empty($diff_array)) {
+          $this->step = 0;
+          $form['diff'] = [
+            '#type' => 'container',
+            '#weight' => -10,
+          ];
+
+          $form['diff']['diff_title'] = [
+            '#type' => '#markup',
+            '#prefix' => '<h2>',
+            '#markup' => $this->t('Confirm Date Changes'),
+            '#suffix' => '</h2>',
+          ];
+
+          $form['diff']['diff_message'] = [
+            '#type' => '#markup',
+            '#prefix' => '<p>',
+            '#markup' => $this->t('Recurrence configuration has been changed, as a result all instances will be removed and recreated. This action cannot be undone.'),
+            '#suffix' => '</p>',
+          ];
+
+          $form['diff']['table'] = [
+            '#type' => 'table',
+            '#header' => [
+              $this->t('Data'),
+              $this->t('Stored'),
+              $this->t('Overridden'),
+            ],
+            '#rows' => $diff_array,
+          ];
+
+          $form['diff']['confirm'] = [
+            '#type' => 'submit',
+            '#value' => $this->t('Confirm Date Changes'),
+            '#submit' => [
+              '::submitForm',
+              '::save',
+            ],
+          ];
+        }
+      }
     }
 
     return $form;
@@ -127,56 +168,21 @@ class EventSeriesForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    // TODO: Add validation.
     parent::validateForm($form, $form_state);
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function ajaxVerifyChanges(array &$form, FormStateInterface $form_state) {
     /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
     $entity = $this->entity;
     $original = $this->storage->loadUnchanged($entity->id());
 
-    // Determine if there have been changes to the saved eventseries.
-    $diff_array = $this->creationService->buildDiffArray($original, $form_state);
+    $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_edit_form');
+    $trigger = $form_state->getTriggeringElement();
 
-    if (!empty($diff_array)) {
-      $build = [];
-      $build['message'] = [
-        '#type' => '#markup',
-        '#prefix' => '<p>',
-        '#markup' => $this->t('Recurrence configuration has been changed, as a result all instances will be removed and recreated. This action cannot be undone.'),
-        '#suffix' => '</p>',
-        '#weight' => -9,
-      ];
-
-      $build['diff'] = [
-        '#type' => 'table',
-        '#header' => [
-          $this->t('Data'),
-          $this->t('Stored'),
-          $this->t('Overridden'),
-        ],
-        '#rows' => $diff_array,
-        '#weight' => -8,
-      ];
+    if ($trigger['#id'] !== 'edit-confirm' && $editing) {
+      if ($this->creationService->checkForRecurConfigChanges($original, $form_state)) {
+        $this->step = 1;
+        $form_state->setRebuild(TRUE);
+      }
     }
-    else {
-      $build = [];
-      $build['message'] = [
-        '#type' => '#markup',
-        '#prefix' => '<p>',
-        '#markup' => $this->t('No recurrence configuration has changed. No existing instances will be affected by this update.'),
-        '#suffix' => '</p>',
-        '#weight' => -9,
-      ];
-    }
-
-    $response = new AjaxResponse();
-    $title = $this->t('Check Recurrence Modifications');
-    $response->addCommand(new OpenModalDialogCommand($title, $build, ['width' => '700']));
-    return $response;
   }
+
 }
