@@ -98,7 +98,6 @@ class EventSeriesForm extends ContentEntityForm {
 
     /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
     $entity = $this->entity;
-    $original = $this->storage->loadUnchanged($entity->id());
 
     $form['custom_date']['#states'] = [
       'visible' => [
@@ -107,6 +106,7 @@ class EventSeriesForm extends ContentEntityForm {
     ];
 
     if ($editing) {
+      $original = $this->storage->loadUnchanged($entity->id());
       if ($this->step === 1) {
         $diff_array = $this->creationService->buildDiffArray($original, $form_state);
 
@@ -194,12 +194,12 @@ class EventSeriesForm extends ContentEntityForm {
 
     /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
     $entity = $this->entity;
-    $original = $this->storage->loadUnchanged($entity->id());
 
     $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_edit_form');
     $trigger = $form_state->getTriggeringElement();
 
     if ($trigger['#id'] !== 'edit-confirm' && $editing) {
+      $original = $this->storage->loadUnchanged($entity->id());
       if ($this->creationService->checkForRecurConfigChanges($original, $form_state)) {
         $this->step = 1;
         $form_state->setRebuild(TRUE);

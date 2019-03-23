@@ -341,11 +341,11 @@ class EventCreationService {
               }
             }
             else {
-              if ($entity_config['monthday'] !== $form_config['monthday']) {
-                $diff['monthday'] = [
+              if ($entity_config['day_of_month'] !== $form_config['day_of_month']) {
+                $diff['day_of_month'] = [
                   'label' => $this->translation->translate('Day of the Month'),
-                  'stored' => implode(',', $entity_config['monthday']),
-                  'override' => implode(',', $form_config['monthday']),
+                  'stored' => implode(',', $entity_config['day_of_month']),
+                  'override' => implode(',', $form_config['day_of_month']),
                 ];
               }
             }
