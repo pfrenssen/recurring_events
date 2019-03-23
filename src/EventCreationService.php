@@ -390,7 +390,7 @@ class EventCreationService {
    * @param Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of an updated event series entity.
    */
-  public static function saveEvent(EventSeries $event, FormStateInterface $form_state) {
+  public function saveEvent(EventSeries $event, FormStateInterface $form_state) {
     // We only need a revision if this is an existing entity.
     if ($event->isNew()) {
       $create_instances = TRUE;
@@ -419,6 +419,387 @@ class EventCreationService {
     if ($create_instances) {
       $this->createInstances($event, $form_state);
     }
+  }
+
+  /**
+   * Create the event instances from the form state.
+   *
+   * @param Drupal\recurring_events\Entity\EventSeries $event
+   *   The stored event series entity.
+   * @param Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of an updated event series entity.
+   */
+  public function createInstances(EventSeries $event, FormStateInterface $form_state) {
+    $form_data = $this->convertFormConfigToArray($form_state);
+    $event_instances = [];
+
+    $timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
+
+    if (!empty($form_data['type'])) {
+      switch ($form_data['type']) {
+        case 'custom':
+          if (!empty($form_data['custom_dates'])) {
+            foreach ($form_data['custom_dates'] as $date_range) {
+              // Create this event instance.
+              $event_instances[] = $this->createEventInstance($event, $date_range['start_date'], $date_range['end_date']);
+            }
+          }
+          break;
+
+        case 'weekly':
+          if (!empty($form_data['days'])) {
+            $dates = [];
+
+            // Loop through each weekday and find occurrences of it in the
+            // date range provided.
+            foreach ($form_data['days'] as $weekday) {
+              $weekday_dates = $this->findWeekdaysBetweenDates($weekday, $form_data['start_date'], $form_data['end_date']);
+              $dates = array_merge($dates, $weekday_dates);
+            }
+            $time_parts = $this->convertTimeTo24hourFormat($form_data['time']);
+
+            if (!empty($dates)) {
+              foreach ($dates as $weekly_date) {
+                // Set the time of the start date to be the hours and minutes.
+                $weekly_date->setTime($time_parts[0], $time_parts[1]);
+                // Configure the right timezone.
+                $weekly_date->setTimezone($utc_timezone);
+                // Create a clone of this date.
+                $weekly_date_end = clone $weekly_date;
+                // Add the number of seconds specified in the duration field.
+                $weekly_date_end->modify('+' . $form_data['duration'] . ' seconds');
+                // Create this event instance.
+                $event_instances[] = $this->createEventInstance($event, $weekly_date, $weekly_date_end);
+              }
+            }
+          }
+          break;
+
+        case 'monthly':
+          $dates = [];
+          $time_parts = $this->convertTimeTo24hourFormat($form_data['time']);
+
+          if (!empty($form_data['monthly_type'])) {
+            $dates = [];
+            switch ($form_data['monthly_type']) {
+              case 'weekday':
+                // Loop through each weekday occurrence and weekday.
+                if (!empty($form_data['day_occurrence']) && !empty($form_data['days'])) {
+                  foreach ($form_data['day_occurrence'] as $occurrence) {
+                    foreach ($form_data['days'] as $weekday) {
+                      // Find the occurrence of the specific weekdays within
+                      // each month.
+                      $day_occurrences = $this->findWeekdayOccurrencesBetweenDates($occurrence, $weekday, $form_data['start_date'], $form_data['end_date']);
+                      $dates = array_merge($dates, $day_occurrences);
+                    }
+                  }
+                }
+                break;
+
+              case 'monthday':
+                foreach ($form_data['day_of_month'] as $day_of_month) {
+                  $days_of_month = $this->findMonthDaysBetweenDates($day_of_month, $form_data['start_date'], $form_data['end_date']);
+                  $dates = array_merge($dates, $days_of_month);
+                }
+                break;
+
+            }
+
+            // If valid recurring dates were found.
+            if (!empty($dates)) {
+              foreach ($dates as $monthly_date) {
+                // Set the time of the start date to be the hours and
+                // minutes.
+                $monthly_date->setTime($time_parts[0], $time_parts[1]);
+                // Configure the timezone.
+                $monthly_date->setTimezone($utc_timezone);
+                // Create a clone of this date.
+                $monthly_date_end = clone $monthly_date;
+                // Add the number of seconds specified in the duration
+                // field.
+                $monthly_date_end->modify('+' . $form_data['duration'] . ' seconds');
+                // Create this event instance.
+                $event_instances[] = $this->createEventInstance($event, $monthly_date, $monthly_date_end);
+              }
+            }
+          }
+          break;
+
+      }
+    }
+
+    // Create a message to indicate how many instances were changed.
+    $this->messenger->addMessage($this->translation->translate('A total of @items event instances were created as part of this event series.', [
+      '@items' => count($event_instances),
+    ]));
+    $event->set('event_instances', $event_instances);
+  }
+
+  /**
+   * Convert a time from 12 hour format to 24 hour format.
+   *
+   * @var string $time
+   *   The time to convert to 24 hour format.
+   *
+   * @return array
+   *   An array of time parts.
+   */
+  public function convertTimeTo24hourFormat($time) {
+    $time_parts = [];
+
+    // Split the start time up to separate out hours and minutes.
+    $time_parts = explode(':', $time);
+    // If this is PM then add 12 hours to the hours, unless the time was
+    // set as noon.
+    if (strpos($time_parts[1], 'pm') !== FALSE && $time_parts[0] != '12') {
+      $time_parts[0] += 12;
+    }
+    // If this is AM and the time was midnight, set hours to 00.
+    elseif (strpos($time_parts[1], 'am') !== FALSE && $time_parts[0] == '12') {
+      $time_parts[0] = '00';
+    }
+    // Strip out AM or PM from the time.
+    $time_parts[1] = substr($time_parts[1], 0, -3);
+
+    return $time_parts;
+  }
+
+  /**
+   * Find all the weekday occurrences between two dates.
+   *
+   * @param string $weekday
+   *   The name of the day of the week.
+   * @param Drupal\Core\Datetime\DrupalDateTime $start_date
+   *   The start date.
+   * @param Drupal\Core\Datetime\DrupalDateTime $end_date
+   *   The end date.
+   *
+   * @return array
+   *   An array of matching dates.
+   */
+  public static function findWeekdaysBetweenDates($weekday, DrupalDateTime $start_date, DrupalDateTime $end_date) {
+    $dates = [];
+
+    // Clone the date as we do not want to make changes to the original object.
+    $start = clone $start_date;
+    $end = clone $end_date;
+
+    // We want to create events up to and including the last day, so modify the
+    // end date to be midnight of the next day.
+    $end->modify('midnight next day');
+
+    // If the start date is after the end date then we have an invalid range so
+    // just return nothing.
+    if ($start > $end) {
+      return $dates;
+    }
+
+    // If the start date is not the weekday we are seeking, jump to the next
+    // instance of that weekday.
+    if ($start->format('l') != ucwords($weekday)) {
+      $start->modify('next ' . $weekday);
+    }
+
+    // Loop through a week at a time, storing the date in the array to return
+    // until the end date is surpassed.
+    while ($start <= $end) {
+      // If we do not clone here we end up modifying the value of start in
+      // the array and get some funky dates returned.
+      $dates[] = clone $start;
+      $start->modify('+1 week');
+    }
+
+    return $dates;
+  }
+
+  /**
+   * Find all the day-of-month occurrences between two dates.
+   *
+   * @param int $day_of_month
+   *   The day of the month.
+   * @param Drupal\Core\Datetime\DrupalDateTime $start_date
+   *   The start date.
+   * @param Drupal\Core\Datetime\DrupalDateTime $end_date
+   *   The end date.
+   *
+   * @return array
+   *   An array of matching dates.
+   */
+  public function findMonthDaysBetweenDates($day_of_month, DrupalDateTime $start_date, DrupalDateTime $end_date) {
+    $dates = [];
+
+    // Clone the date as we do not want to make changes to the original object.
+    $start = clone $start_date;
+    $end = clone $end_date;
+
+    // We want to create events up to and including the last day, so modify the
+    // end date to be midnight of the next day.
+    $end->modify('midnight next day');
+
+    // If the start date is after the end date then we have an invalid range so
+    // just return nothing.
+    if ($start > $end) {
+      return $dates;
+    }
+
+    $day_to_check = $day_of_month;
+
+    // If day of month is set to -1 that is the last day of the month, we need
+    // to calculate how many days a month has.
+    if ($day_of_month === '-1') {
+      $day_to_check = $start->format('t');
+    }
+
+    // If the day of the month is after the start date.
+    if ($start->format('d') < $day_to_check) {
+      $new_date = clone $start;
+      $curr_month = $new_date->format('m');
+      $curr_year = $new_date->format('Y');
+
+      // Check to see if that date is a valid date.
+      if (!checkdate($curr_month, $day_to_check, $curr_year)) {
+        // If not, go find the next valid date.
+        $start = $this->findNextMonthDay($day_of_month, $start);
+      }
+      else {
+        // This is a valid date, so let us start there.
+        $start->setDate($curr_year, $curr_month, $day_to_check);
+      }
+    }
+    // If the day of the month is in the past.
+    elseif ($start->format('d') > $day_to_check) {
+      // Find the next valid start date.
+      $start = $this->findNextMonthDay($day_of_month, $start);
+    }
+
+    // Loop through each month checking to see if the day of the month is a
+    // valid day, until the end date has been surpassed.
+    while ($start <= $end) {
+      // If we do not clone here we end up modifying the value of start in
+      // the array and get some funky dates returned.
+      $dates[] = clone $start;
+      // Find the next valid event date.
+      $start = $this->findNextMonthDay($day_of_month, $start);
+    }
+
+    return $dates;
+  }
+
+  /**
+   * Find the next day-of-month occurrence.
+   *
+   * @param int $day_of_month
+   *   The day of the month.
+   * @param Drupal\Core\Datetime\DrupalDateTime $date
+   *   The start date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The next occurrence of a specific day of the month.
+   */
+  public function findNextMonthDay($day_of_month, DrupalDateTime $date) {
+    $new_date = clone $date;
+
+    $curr_month = $new_date->format('m');
+    $curr_year = $new_date->format('Y');
+    $next_month = $curr_month;
+    $next_year = $curr_year;
+
+    do {
+      $next_month = ($next_month + 1) % 12 ?: 12;
+      $next_year = $next_month == 1 ? $next_year + 1 : $next_year;
+
+      // If the desired day of the month is the last day, calculate what that
+      // day is.
+      if ($day_of_month === '-1') {
+        $new_date->setDate($next_year, $next_month, '1');
+        $day_of_month = $new_date->format('t');
+      }
+    } while (checkdate($next_month, $day_of_month, $next_year) === FALSE);
+
+    $new_date->setDate($next_year, $next_month, $day_of_month);
+    return $new_date;
+  }
+
+  /**
+   * Find all the monthly occurrences of a specific weekday between two dates.
+   *
+   * @param string $occurrence
+   *   Which occurrence of the weekday to find.
+   * @param string $weekday
+   *   The name of the day of the week.
+   * @param Drupal\Core\Datetime\DrupalDateTime $start_date
+   *   The start date.
+   * @param Drupal\Core\Datetime\DrupalDateTime $end_date
+   *   The end date.
+   *
+   * @return array
+   *   An array of matching dates.
+   */
+  public function findWeekdayOccurrencesBetweenDates($occurrence, $weekday, DrupalDateTime $start_date, DrupalDateTime $end_date) {
+    $dates = [];
+
+    // Clone the date as we do not want to make changes to the original object.
+    $start = clone $start_date;
+
+    // If the start date is after the end date then we have an invalid range so
+    // just return nothing.
+    if ($start > $end_date) {
+      return $dates;
+    }
+
+    // Grab the occurrence of the weekday we want for this current month.
+    $start->modify($occurrence . ' ' . $weekday . ' of this month');
+
+    // Make sure we didn't just go back in time.
+    if ($start < $start_date) {
+      // Go straight to next month.
+      $start->modify($occurrence . ' ' . $weekday . ' of next month');
+    }
+
+    // Loop through a week at a time, storing the date in the array to return
+    // until the end date is surpassed.
+    while ($start <= $end_date) {
+      // If we do not clone here we end up modifying the value of start in
+      // the array and get some funky dates returned.
+      $dates[] = clone $start;
+      $start->modify($occurrence . ' ' . $weekday . ' of next month');
+    }
+
+    return $dates;
+  }
+
+  /**
+   * Create an event instance from an event series.
+   *
+   * @param Drupal\recurring_events\Entity\EventSeries $event
+   *   The stored event series entity.
+   * @param Drupal\Core\Datetime\DrupalDateTime $start_date
+   *   The start date and time of the event.
+   * @param Drupal\Core\Datetime\DrupalDateTime $end_date
+   *   The end date and time of the event.
+   *
+   * @return static
+   *   The created event instance entity object.
+   */
+  public function createEventInstance(EventSeries $event, DrupalDateTime $start_date, DrupalDateTime $end_date) {
+    $data = [
+      'event_series_id' => $event->id(),
+      'date' => [
+        'value' => $start_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
+        'end_value' => $end_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
+      ],
+    ];
+
+    \Drupal::moduleHandler()->alter('recurring_events_event_instance', $data);
+
+    $entity = \Drupal::entityTypeManager()
+      ->getStorage('eventinstance')
+      ->create($data);
+
+    $entity->save();
+
+    return $entity;
   }
 
 }

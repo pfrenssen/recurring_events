@@ -48,3 +48,14 @@ function hook_recurring_events_month_days_alter(array &$month_days = []) {
   // No events can take place on the 17th of a month.
   unset($month_days[17]);
 }
+
+/**
+ * Alter the event instance entity prior to saving it when creating a series.
+ *
+ * @param array $event_instance
+ *   An array of data to be stored against a event instance.
+ */
+function hook_recurring_events_event_instance_alter(array &$event_instance = []) {
+  // Change the series ID.
+  $event_instance['event_series_id'] = 12;
+}

@@ -107,7 +107,6 @@ class EventSeriesForm extends ContentEntityForm {
     ];
 
     if ($editing) {
-      $form['#entity_builders'][] = '::updateRecurringDates';
       if ($this->step === 1) {
         $diff_array = $this->creationService->buildDiffArray($original, $form_state);
 
