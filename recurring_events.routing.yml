@@ -1,3 +1,11 @@
+# View an EventSeries.
+entity.eventseries.canonical:
+  path: '/events/series/{eventseries}'
+  defaults:
+    _entity_view: 'eventseries'
+  requirements:
+    _entity_access: 'eventseries.view'
+
 # Add an EventSeries.
 entity.eventseries.add_form:
   path: '/events/add'
@@ -52,6 +60,9 @@ entity.eventseries.clone_form:
 # Event Series table list route.
 entity.eventseries.collection:
   path: '/events/series'
+  defaults:
+    _entity_list: 'eventseries'
+    _title: 'Event Series'
   requirements:
   # Checks for permission directly.
     _permission: 'access eventseries overview'

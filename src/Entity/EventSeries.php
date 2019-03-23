@@ -73,6 +73,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Event entity"),
  *   handlers = {
  *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
+ *     "list_builder" = "Drupal\recurring_events\EventSeriesListBuilder",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
@@ -451,6 +452,33 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
+  }
+
+  /**
+   * Get series start.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the series start date.
+   */
+  public function getSeriesStart() {
+    $date = NULL;
+    $instances = $this->get('event_instances')->referencedEntities();
+    if (!empty($instances)) {
+      $date = NULL;
+      foreach ($instances as $instance) {
+        if (!empty($instance)) {
+          if (is_null($date)) {
+            $date = $instance->date->start_date;
+          }
+          else {
+            if ($instance->date->start_date->getTimestamp() < $date->getTimestamp()) {
+              $date = $instance->date->start_date;
+            }
+          }
+        }
+      }
+    }
+    return $date;
   }
 
   /**

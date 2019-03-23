@@ -44,6 +44,7 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       ->set('interval', $form_state->getValue('interval'))
       ->set('min_time', $form_state->getValue('min_time'))
       ->set('max_time', $form_state->getValue('max_time'))
+      ->set('date_format', $form_state->getValue('date_format'))
       ->set('time_format', $form_state->getValue('time_format'))
       ->set('days', implode(',', array_filter($form_state->getValue('days'))))
       ->save();
@@ -89,14 +90,25 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('max_time'),
     ];
 
-    $url = Url::fromUri('https://secure.php.net/manual/en/function.date.php');
-    $link = Link::fromTextAndUrl($this->t('PHP time format'), $url);
+    $php_date_url = Url::fromUri('https://secure.php.net/manual/en/function.date.php');
+    $php_date_link = Link::fromTextAndUrl($this->t('PHP date/time format'), $php_date_url);
+
+    $form['date_format'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Event Series Date Format'),
+      '#required' => TRUE,
+      '#description' => $this->t('Enter the @link used when listing event dates. Default is F jS, Y h:iA.', [
+        '@link' => $php_date_link->toString(),
+      ]),
+      '#default_value' => $config->get('date_format'),
+    ];
+
     $form['time_format'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Event Series Time Format'),
       '#required' => TRUE,
       '#description' => $this->t('Enter the @link used when selecting times. Default is h:i A.', [
-        '@link' => $link->toString(),
+        '@link' => $php_date_link->toString(),
       ]),
       '#default_value' => $config->get('time_format'),
     ];

@@ -530,7 +530,7 @@ class EventCreationService {
     }
 
     // Create a message to indicate how many instances were changed.
-    $this->messenger->addMessage($this->translation->translate('A total of @items event instances were created as part of this event series.', [
+    $this->messenger->addMessage($this->translation->translate('A total of %items event instances were created as part of this event series.', [
       '@items' => count($event_instances),
     ]));
     $event->set('event_instances', $event_instances);
