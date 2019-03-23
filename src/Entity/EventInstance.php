@@ -334,15 +334,15 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setTranslatable(FALSE)
       ->setRevisionable(TRUE)
       ->setRequired(TRUE)
-      ->setDisplayOptions('view', array(
+      ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'string',
         'weight' => -4,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'daterange_default',
         'weight' => -4,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
