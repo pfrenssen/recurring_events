@@ -400,7 +400,7 @@ class EventCreationService {
     }
     else {
       // If there are date differences, we need to clear out the instances.
-      $create_instances = $this->checkForRecurConfigChanges($entity, $form_state);
+      $create_instances = $this->checkForRecurConfigChanges($event, $form_state);
       if ($create_instances) {
         // Find all the instances and delete them.
         $instances = $event->event_instances->referencedEntities();
@@ -408,7 +408,7 @@ class EventCreationService {
           foreach ($instances as $index => $instance) {
             $instance->delete();
           }
-          $this->messenger->addStatus($this->translation->translate('Successfully removed %count event instances', [
+          $this->messenger->addStatus($this->translation->translate('A total of %count existing event instances were removed', [
             '%count' => count($instances),
           ]));
         }
@@ -784,7 +784,7 @@ class EventCreationService {
    */
   public function createEventInstance(EventSeries $event, DrupalDateTime $start_date, DrupalDateTime $end_date) {
     $data = [
-      'event_series_id' => $event->id(),
+      'eventseries_id' => $event->id(),
       'date' => [
         'value' => $start_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
         'end_value' => $end_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
