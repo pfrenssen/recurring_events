@@ -8,6 +8,8 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\Messenger;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * EventCreationService class.
@@ -36,6 +38,13 @@ class EventCreationService {
   protected $loggerFactory;
 
   /**
+   * The messenger service.
+   *
+   * @var Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
    * Class constructor.
    *
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
@@ -44,11 +53,14 @@ class EventCreationService {
    *   The database connection.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
    *   The logger factory.
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
    */
-  public function __construct(TranslationInterface $translation, Connection $database, LoggerChannelFactoryInterface $logger) {
+  public function __construct(TranslationInterface $translation, Connection $database, LoggerChannelFactoryInterface $logger, Messenger $messenger) {
     $this->translation = $translation;
     $this->database = $database;
     $this->loggerFactory = $logger->get('recurring_events');
+    $this->messenger = $messenger;
   }
 
   /**
@@ -58,7 +70,8 @@ class EventCreationService {
     return new static(
       $container->get('string_translation'),
       $container->get('database'),
-      $container->get('logger.factory')
+      $container->get('logger.factory'),
+      $container->get('messenger')
     );
   }
 
@@ -141,7 +154,7 @@ class EventCreationService {
     $config = [];
 
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    $utc_timezone = new \DateTimeZone(DATETIME_STORAGE_TIMEZONE);
+    $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
     $user_input = $form_state->getUserInput();
 
     $config['type'] = $user_input['recur_type'];
@@ -149,12 +162,12 @@ class EventCreationService {
     switch ($config['type']) {
       case 'weekly':
         $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T12:00:00';
-        $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+        $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
         $start_date->setTimezone($user_timezone);
         $start_date->setTime(0, 0, 0);
 
         $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
-        $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
+        $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
         $start_date->setTimezone($user_timezone);
         $end_date->setTime(0, 0, 0);
 
@@ -168,12 +181,12 @@ class EventCreationService {
 
       case 'monthly':
         $start_timestamp = $user_input['monthly_recurring_date'][0]['value']['date'] . 'T12:00:00';
-        $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+        $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
         $start_date->setTimezone($user_timezone);
         $start_date->setTime(0, 0, 0);
 
         $end_timestamp = $user_input['monthly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
-        $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
+        $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
         $start_date->setTimezone($user_timezone);
         $end_date->setTime(0, 0, 0);
 
@@ -215,12 +228,12 @@ class EventCreationService {
             }
 
             $start_timestamp = implode('T', $custom_date['value']);
-            $start_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
+            $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
             // Convert the DateTime object back to UTC timezone.
             $start_date->setTimezone($utc_timezone);
 
             $end_timestamp = implode('T', $custom_date['end_value']);
-            $end_date = DrupalDateTime::createFromFormat(DATETIME_DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
+            $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
             // Convert the DateTime object back to UTC timezone.
             $end_date->setTimezone($utc_timezone);
 
@@ -264,18 +277,18 @@ class EventCreationService {
       switch ($entity_config['type']) {
         case 'weekly':
         case 'monthly':
-          if ($entity_config['start_date']->format(DATETIME_DATETIME_STORAGE_FORMAT) !== $form_config['start_date']->format(DATETIME_DATETIME_STORAGE_FORMAT)) {
+          if ($entity_config['start_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT) !== $form_config['start_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT)) {
             $diff['start_date'] = [
               'label' => $this->translation->translate('Start Date'),
-              'stored' => $entity_config['start_date']->format('Y-m-d'),
-              'override' => $form_config['start_date']->format('Y-m-d'),
+              'stored' => $entity_config['start_date']->format(DateTimeItemInterface::DATE_STORAGE_FORMAT),
+              'override' => $form_config['start_date']->format(DateTimeItemInterface::DATE_STORAGE_FORMAT),
             ];
           }
-          if ($entity_config['end_date']->format(DATETIME_DATETIME_STORAGE_FORMAT) !== $form_config['end_date']->format(DATETIME_DATETIME_STORAGE_FORMAT)) {
+          if ($entity_config['end_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT) !== $form_config['end_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT)) {
             $diff['end_date'] = [
               'label' => $this->translation->translate('End Date'),
-              'stored' => $entity_config['end_date']->format('Y-m-d'),
-              'override' => $form_config['end_date']->format('Y-m-d'),
+              'stored' => $entity_config['end_date']->format(DateTimeItemInterface::DATE_STORAGE_FORMAT),
+              'override' => $form_config['end_date']->format(DateTimeItemInterface::DATE_STORAGE_FORMAT),
             ];
           }
           if ($entity_config['time'] !== $form_config['time']) {
@@ -367,6 +380,45 @@ class EventCreationService {
     }
 
     return $diff;
+  }
+
+  /**
+   * Create an event based on the form submitted values.
+   *
+   * @param Drupal\recurring_events\Entity\EventSeries $event
+   *   The stored event series entity.
+   * @param Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of an updated event series entity.
+   */
+  public static function saveEvent(EventSeries $event, FormStateInterface $form_state) {
+    // We only need a revision if this is an existing entity.
+    if ($event->isNew()) {
+      $create_instances = TRUE;
+      // We have to save the event series first so we can use the ID to store
+      // against the event instances we create.
+      $event->save();
+    }
+    else {
+      // If there are date differences, we need to clear out the instances.
+      $create_instances = $this->checkForRecurConfigChanges($entity, $form_state);
+      if ($create_instances) {
+        // Find all the instances and delete them.
+        $instances = $event->event_instances->referencedEntities();
+        if (!empty($instances)) {
+          foreach ($instances as $index => $instance) {
+            $instance->delete();
+          }
+          $this->messenger->addStatus($this->translation->translate('Successfully removed %count event instances', [
+            '%count' => count($instances),
+          ]));
+        }
+      }
+    }
+
+    // Only create instances if date changes have been made or the event is new.
+    if ($create_instances) {
+      $this->createInstances($event, $form_state);
+    }
   }
 
 }

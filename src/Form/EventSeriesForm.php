@@ -8,7 +8,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\recurring_events\EventCreationService;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\Datetime\DateFormatter;
 
 /**
  * Form controller for the eventseries entity create form.
@@ -39,13 +40,29 @@ class EventSeriesForm extends ContentEntityForm {
   protected $storage;
 
   /**
+   * The messenger service.
+   *
+   * @var Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
+   * The date formatter service.
+   *
+   * @var Drupal\Core\Datetime\DateFormatter
+   */
+  protected $dateFormatter;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('recurring_events.event_creation_service'),
       $container->get('entity_type.manager')->getStorage('eventseries'),
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('messenger'),
+      $container->get('date.formatter')
     );
   }
 
@@ -58,10 +75,16 @@ class EventSeriesForm extends ContentEntityForm {
    *   The storage interface.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
+   *   The date formatter service.
    */
-  public function __construct(EventCreationService $creation_service, EntityStorageInterface $storage, EntityManagerInterface $entity_manager) {
+  public function __construct(EventCreationService $creation_service, EntityStorageInterface $storage, EntityManagerInterface $entity_manager, Messenger $messenger, DateFormatter $date_formatter) {
     $this->creationService = $creation_service;
     $this->storage = $storage;
+    $this->messenger = $messenger;
+    $this->dateFormatter = $date_formatter;
     parent::__construct($entity_manager);
   }
 
@@ -81,36 +104,6 @@ class EventSeriesForm extends ContentEntityForm {
       'visible' => [
         ':input[name="recur_type"]' => ['value' => 'custom'],
       ],
-    ];
-
-    $form['advanced']['#attributes']['class'][] = 'entity-meta';
-
-    $form['meta'] = [
-      '#type' => 'details',
-      '#group' => 'advanced',
-      '#weight' => -10,
-      '#title' => $this->t('Status'),
-      '#attributes' => ['class' => ['entity-meta__header']],
-      '#tree' => TRUE,
-      '#access' => \Drupal::currentUser()->hasPermission('administer eventseries'),
-    ];
-    $form['meta']['published'] = [
-      '#type' => 'item',
-      '#markup' => $entity->isPublished() ? $this->t('Published') : $this->t('Not published'),
-      '#access' => !$entity->isNew(),
-      '#wrapper_attributes' => ['class' => ['entity-meta__title']],
-    ];
-    $form['meta']['changed'] = [
-      '#type' => 'item',
-      '#title' => $this->t('Last saved'),
-      '#markup' => !$entity->isNew() ? format_date($entity->getChangedTime(), 'short') : $this->t('Not saved yet'),
-      '#wrapper_attributes' => ['class' => ['entity-meta__last-saved']],
-    ];
-    $form['meta']['author'] = [
-      '#type' => 'item',
-      '#title' => $this->t('Author'),
-      '#markup' => $entity->getOwner()->getUsername(),
-      '#wrapper_attributes' => ['class' => ['entity-meta__author']],
     ];
 
     if ($editing) {
@@ -161,6 +154,36 @@ class EventSeriesForm extends ContentEntityForm {
       }
     }
 
+    $form['advanced']['#attributes']['class'][] = 'entity-meta';
+
+    $form['meta'] = [
+      '#type' => 'details',
+      '#group' => 'advanced',
+      '#weight' => -10,
+      '#title' => $this->t('Status'),
+      '#attributes' => ['class' => ['entity-meta__header']],
+      '#tree' => TRUE,
+      '#access' => \Drupal::currentUser()->hasPermission('administer eventseries'),
+    ];
+    $form['meta']['published'] = [
+      '#type' => 'item',
+      '#markup' => $entity->isPublished() ? $this->t('Published') : $this->t('Not published'),
+      '#access' => !$entity->isNew(),
+      '#wrapper_attributes' => ['class' => ['entity-meta__title']],
+    ];
+    $form['meta']['changed'] = [
+      '#type' => 'item',
+      '#title' => $this->t('Last saved'),
+      '#markup' => !$entity->isNew() ? $this->dateFormatter->format($entity->getChangedTime(), 'short') : $this->t('Not saved yet'),
+      '#wrapper_attributes' => ['class' => ['entity-meta__last-saved']],
+    ];
+    $form['meta']['author'] = [
+      '#type' => 'item',
+      '#title' => $this->t('Author'),
+      '#markup' => $entity->getOwner()->getUsername(),
+      '#wrapper_attributes' => ['class' => ['entity-meta__author']],
+    ];
+
     return $form;
   }
 
@@ -183,6 +206,21 @@ class EventSeriesForm extends ContentEntityForm {
         $form_state->setRebuild(TRUE);
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save(array $form, FormStateInterface $form_state) {
+    $form_state->setRedirect('entity.eventseries.collection');
+    $entity = $this->getEntity();
+
+    $this->messenger->addStatus($this->t('Successfully saved the %name event series', [
+      '%name' => $entity->title->value,
+    ]));
+
+    $this->creationService->saveEvent($entity, $form_state);
+    parent::save($form, $form_state);
   }
 
 }

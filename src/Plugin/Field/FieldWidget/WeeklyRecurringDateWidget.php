@@ -6,6 +6,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\datetime_range\Plugin\Field\FieldWidget\DateRangeDefaultWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Plugin implementation of the 'weekly recurring date' widget.
@@ -35,14 +36,14 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
 
     $element['value']['#title'] = t('Create Events Between');
     $element['value']['#weight'] = 1;
-    $element['value']['#date_date_format'] = DATETIME_DATE_STORAGE_FORMAT;
+    $element['value']['#date_date_format'] = DateTimeItemInterface::DATE_STORAGE_FORMAT;
     $element['value']['#date_date_element'] = 'date';
     $element['value']['#date_time_format'] = '';
     $element['value']['#date_time_element'] = 'none';
 
     $element['end_value']['#title'] = t('And');
     $element['end_value']['#weight'] = 2;
-    $element['end_value']['#date_date_format'] = DATETIME_DATE_STORAGE_FORMAT;
+    $element['end_value']['#date_date_format'] = DateTimeItemInterface::DATE_STORAGE_FORMAT;
     $element['end_value']['#date_date_element'] = 'date';
     $element['end_value']['#date_time_format'] = '';
     $element['end_value']['#date_time_element'] = 'none';
@@ -144,7 +145,7 @@ class WeeklyRecurringDateWidget extends DateRangeDefaultWidget {
     $upper = $upper_hour + $upper_minute;
 
     $range = range($lower, $upper, $interval);
-    $utc_timezone = new \DateTimeZone(DATETIME_STORAGE_TIMEZONE);
+    $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
 
     foreach ($range as $time) {
       $time_option = DrupalDateTime::createFromTimestamp($time, $utc_timezone);

@@ -5,6 +5,7 @@ namespace Drupal\recurring_events\Plugin\Field\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Plugin implementation of the 'monthly recurring date' widget.
@@ -128,7 +129,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
   protected function getMonthDayOptions() {
     $days = [];
     $start = date('Y') . '-01-01';
-    $date = DrupalDateTime::createFromFormat('Y-m-d', $start);
+    $date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATE_STORAGE_FORMAT, $start);
 
     for ($x = 1; $x <= 31; $x++) {
       $days[$x] = $date->format('jS');
