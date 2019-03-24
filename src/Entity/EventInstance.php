@@ -330,7 +330,7 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['date'] = BaseFieldDefinition::create('daterange')
-      ->setLabel(t('Event Description'))
+      ->setLabel(t('Event Date'))
       ->setTranslatable(FALSE)
       ->setRevisionable(TRUE)
       ->setRequired(TRUE)
@@ -375,6 +375,16 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
+  }
+
+  /**
+   * Get event series.
+   *
+   * @return Drupal\recurring_events\EventInterface
+   *   The event series.
+   */
+  public function getEventSeries() {
+    return $this->get('eventseries_id')->entity;
   }
 
 }

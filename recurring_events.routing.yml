@@ -88,7 +88,47 @@ entity.eventinstance.canonical:
       eventinstance:
         type: entity:eventinstance
 
-# Admin Menu Strucutre.
+# Edit an EventInstance.
+entity.eventinstance.edit_form:
+  path: '/events/{eventinstance}/edit'
+  defaults:
+    _entity_form: eventinstance.edit
+    _title: 'Edit Event Instance'
+  requirements:
+    _entity_access: 'eventinstance.edit'
+    eventinstance: \d+
+  options:
+    parameters:
+      eventinstance:
+        type: entity:eventinstance
+
+# Delete an EventInstance.
+entity.eventinstance.delete_form:
+  path: '/events/{eventinstance}/delete'
+  defaults:
+    _entity_form: eventinstance.delete
+    _title: 'Delete Event Instance'
+  requirements:
+    _entity_access: 'eventinstance.delete'
+    eventinstance: \d+
+  options:
+    parameters:
+      eventinstance:
+        type: entity:eventinstance
+
+# Event Instance table list route.
+entity.eventinstance.collection:
+  path: '/events'
+  defaults:
+    _entity_list: 'eventinstance'
+    _title: 'Events'
+  requirements:
+  # Checks for permission directly.
+    _permission: 'access eventinstance overview'
+
+# Admin Pages.
+
+# Admin Menu Structure.
 events.admin.overview:
   path: '/admin/structure/events'
   defaults:
