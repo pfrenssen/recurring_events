@@ -19,28 +19,28 @@ class EventCreationService {
   /**
    * The translation interface.
    *
-   * @var Drupal\Core\StringTranslation\TranslationInterface
+   * @var \Drupal\Core\StringTranslation\TranslationInterface
    */
   private $translation;
 
   /**
    * The database connection.
    *
-   * @var Drupal\Core\Database\Connection
+   * @var \Drupal\Core\Database\Connection
    */
   private $database;
 
   /**
    * Logger Factory.
    *
-   * @var Drupal\Core\Logger\LoggerChannelFactoryInterface
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
    */
   protected $loggerFactory;
 
   /**
    * The messenger service.
    *
-   * @var Drupal\Core\Messenger\Messenger
+   * @var \Drupal\Core\Messenger\Messenger
    */
   protected $messenger;
 

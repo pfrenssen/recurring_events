@@ -12,9 +12,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactory;
 
 /**
- * Provides a listing of eventseries items.
+ * Provides a listing of eventinstance items.
  */
-class EventSeriesListBuilder extends EntityListBuilder {
+class EventInstanceListBuilder extends EntityListBuilder {
 
   /**
    * The date formatter service.
@@ -38,7 +38,7 @@ class EventSeriesListBuilder extends EntityListBuilder {
   protected $config;
 
   /**
-   * Constructs a new EventSeriesListBuilder object.
+   * Constructs a new EventInstanceListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
@@ -77,18 +77,8 @@ class EventSeriesListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header = [];
     $header += [
-      'name' => $this->t('Series Name'),
-      'type' => [
-        'data' => $this->t('Recur Type'),
-      ],
-      'instances' => [
-        'data' => $this->t('Instances'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
-      ],
-      'starts' => [
-        'data' => $this->t('Series Starts'),
-        'class' => [RESPONSIVE_PRIORITY_LOW],
-      ],
+      'name' => $this->t('Event Name'),
+      'date' => $this->t('Date'),
       'author' => [
         'data' => $this->t('Author'),
         'class' => [RESPONSIVE_PRIORITY_LOW],
@@ -116,16 +106,11 @@ class EventSeriesListBuilder extends EntityListBuilder {
     /** @var \Drupal\recurring_events\EventInterface $entity */
     $row['name']['data'] = [
       '#type' => 'link',
-      '#title' => $entity->label(),
+      '#title' => $entity->getEventSeries()->label(),
       '#url' => $entity->toUrl(),
     ];
-    $row['type'] = $entity->recur_type->value;
-    $row['instances'] = count($entity->event_instances->getValue());
-    $row['starts'] = $this->t('None');
-    if (!empty($entity->getSeriesStart())) {
-      $config = $this->config->get('recurring_events.eventseries.config');
-      $row['starts'] = $entity->getSeriesStart()->format($config->get('date_format'));
-    }
+    $config = $this->config->get('recurring_events.eventseries.config');
+    $row['date'] = $entity->date->start_date->format($config->get('date_format'));
     $row['author']['data'] = [
       '#theme' => 'username',
       '#account' => $entity->getOwner(),

@@ -73,6 +73,7 @@ use Drupal\user\UserInterface;
  *   label = @Translation("Event Instance entity"),
  *   handlers = {
  *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
+ *     "list_builder" = "Drupal\recurring_events\EventInstanceListBuilder",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {

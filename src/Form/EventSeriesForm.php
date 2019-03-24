@@ -28,28 +28,28 @@ class EventSeriesForm extends ContentEntityForm {
   /**
    * The event creation service.
    *
-   * @var Drupal\recurring_events\EventCreationService
+   * @var \Drupal\recurring_events\EventCreationService
    */
   protected $creationService;
 
   /**
    * The entity storage interface.
    *
-   * @var Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $storage;
 
   /**
    * The messenger service.
    *
-   * @var Drupal\Core\Messenger\Messenger
+   * @var \Drupal\Core\Messenger\Messenger
    */
   protected $messenger;
 
   /**
    * The date formatter service.
    *
-   * @var Drupal\Core\Datetime\DateFormatter
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
   protected $dateFormatter;
 
@@ -67,7 +67,7 @@ class EventSeriesForm extends ContentEntityForm {
   }
 
   /**
-   * Construct a EventSeriesEditForm.
+   * Construct a EventSeriesForm.
    *
    * @param \Drupal\recurring_events\EventCreationService $creation_service
    *   The event creation service.

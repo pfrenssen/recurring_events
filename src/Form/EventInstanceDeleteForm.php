@@ -26,7 +26,7 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
   /**
    * The messenger service.
    *
-   * @var Drupal\Core\Messenger\Messenger
+   * @var \Drupal\Core\Messenger\Messenger
    */
   protected $messenger;
 
@@ -41,7 +41,7 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
   }
 
   /**
-   * Construct a EventSeriesEditForm.
+   * Construct a EventInstanceDeleteForm.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
