@@ -433,11 +433,13 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setSetting('target_type', 'eventinstance')
       ->setTranslatable(FALSE)
       ->setDisplayOptions('view', [
-        'type' => 'entity_reference_entity_view',
+        'type' => 'recurring_events_eventinstance_date',
         'label' => 'above',
         'weight' => 10,
         'settings' => [
-          'view_mode' => 'inline_date',
+          'link' => TRUE,
+          'date_format' => 'F jS, Y h:iA',
+          'separator' => ' - ',
         ],
       ])
       ->setDisplayConfigurable('view', TRUE)
