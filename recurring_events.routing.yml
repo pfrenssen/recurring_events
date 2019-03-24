@@ -1,3 +1,5 @@
+# Event Series.
+
 # View an EventSeries.
 entity.eventseries.canonical:
   path: '/events/series/{eventseries}'
@@ -5,6 +7,10 @@ entity.eventseries.canonical:
     _entity_view: 'eventseries'
   requirements:
     _entity_access: 'eventseries.view'
+  options:
+    parameters:
+      eventseries:
+        type: entity:eventseries
 
 # Add an EventSeries.
 entity.eventseries.add_form:
@@ -66,6 +72,21 @@ entity.eventseries.collection:
   requirements:
   # Checks for permission directly.
     _permission: 'access eventseries overview'
+
+
+# Event Instances.
+
+# View an EventInstance.
+entity.eventinstance.canonical:
+  path: '/events/{eventinstance}'
+  defaults:
+    _entity_view: 'eventinstance'
+  requirements:
+    _entity_access: 'eventinstance.view'
+  options:
+    parameters:
+      eventinstance:
+        type: entity:eventinstance
 
 # Admin Menu Strucutre.
 events.admin.overview:

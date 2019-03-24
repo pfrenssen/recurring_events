@@ -327,6 +327,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
         'type' => 'string_textfield',
         'weight' => -6,
       ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'weight' => 10,
+      ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setRevisionable(TRUE)
@@ -342,6 +346,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',
         'weight' => -4,
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'weight' => 10,
       ])
       ->setDisplayConfigurable('form', TRUE);
 
@@ -369,7 +377,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
           ],
         ],
         'weight' => 1,
-      ]);
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'weight' => 10,
+      ]);;
 
     $fields['weekly_recurring_date'] = BaseFieldDefinition::create('weekly_recurring_date')
       ->setLabel(t('Weekly Recurring Date'))
@@ -421,8 +433,12 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setSetting('target_type', 'eventinstance')
       ->setTranslatable(FALSE)
       ->setDisplayOptions('view', [
+        'type' => 'entity_reference_entity_view',
         'label' => 'above',
         'weight' => 10,
+        'settings' => [
+          'view_mode' => 'inline_date',
+        ],
       ])
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayConfigurable('form', FALSE)

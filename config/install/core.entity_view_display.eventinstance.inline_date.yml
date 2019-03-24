@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - recurring_events
+  config:
+    - core.entity_view_mode.eventinstance.inline_date
+  module:
+    - recurring_events
+id: eventinstace.inline_date
+targetEntityType: eventinstance
+bundle: eventinstance
+mode: inline_date
+content:
+  date:
+    weight: 0
+    label: above
+    settings:
+      separator: '-'
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: daterange_default
+hidden:
+  body: true
