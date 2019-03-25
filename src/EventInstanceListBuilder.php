@@ -78,6 +78,10 @@ class EventInstanceListBuilder extends EntityListBuilder {
     $header = [];
     $header += [
       'name' => $this->t('Event Name'),
+      'series' => [
+        'data' => $this->t('Series'),
+        'class' => [RESPONSIVE_PRIORITY_LOW],
+      ],
       'date' => $this->t('Date'),
       'author' => [
         'data' => $this->t('Author'),
@@ -108,6 +112,11 @@ class EventInstanceListBuilder extends EntityListBuilder {
       '#type' => 'link',
       '#title' => $entity->getEventSeries()->label(),
       '#url' => $entity->toUrl(),
+    ];
+    $row['series']['data'] = [
+      '#type' => 'link',
+      '#title' => $this->t('View Series'),
+      '#url' => $entity->getEventSeries()->toUrl(),
     ];
     $config = $this->config->get('recurring_events.eventseries.config');
     $row['date'] = $entity->date->start_date->format($config->get('date_format'));

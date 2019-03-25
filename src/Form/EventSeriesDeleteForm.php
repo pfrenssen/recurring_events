@@ -155,6 +155,11 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
     if (!$entity->isDefaultTranslation()) {
       $this->untranslatedEvent->removeTranslation($entity->language()->getId());
       $this->untranslatedEvent->save();
+      $this->messenger->addMessage($this->t('@language translation of the @type %label has been deleted.', [
+        '@language' => $entity->language()->getName(),
+        '@type' => 'Event',
+        '%label' => $this->untranslatedEvent->title->value,
+      ]));
       $form_state->setRedirectUrl($this->untranslatedEvent->toUrl('canonical'));
     }
     else {
@@ -179,29 +184,7 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
 
       $form_state->setRedirect('entity.eventseries.collection');
     }
-    $this->messenger->addMessage($this->getDeletionMessage());
     $this->logDeletionMessage();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getDeletionMessage() {
-    /** @var \Drupal\omega_events\EventInterface $entity */
-    $entity = $this->getEntity();
-
-    if (!$entity->isDefaultTranslation()) {
-      return $this->t('@language translation of the @type %label has been deleted.', [
-        '@language' => $entity->language()->getName(),
-        '@type' => 'Event',
-        '%label' => $this->untranslatedEvent->title->value,
-      ]);
-    }
-
-    return $this->t('The @type %title has been deleted.', [
-      '@type' => 'Event',
-      '%title' => $this->untranslatedEvent->title->value,
-    ]);
   }
 
 }
