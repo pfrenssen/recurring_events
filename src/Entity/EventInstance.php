@@ -376,31 +376,29 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setDisplayConfigurable('form', TRUE);
 
     // Inherited fields from eventseries entity.
-    $properties['title'] = DataDefinition::create('string')
+    $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
       ->setDescription(t('The title as inherited from the series.'))
       ->setComputed(TRUE)
-      ->setClass('\Drupal\recurring_events\InheritedSeriesField')
+      ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')
       ->setSettings([
-        'source field' => 'title',
-        'plugin' => 'InheritedData',
+        'plugin' => 'title_inherit',
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => -10,
       ]);
 
-    $properties['description'] = DataDefinition::create('text_long')
+    /* $properties['description'] = DataDefinition::create('text_long')
       ->setLabel(t('Description'))
       ->setDescription(t('The description as inherited from the series.'))
       ->setComputed(TRUE)
-      ->setClass('\Drupal\recurring_events\InheritedSeriesField')
+      ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')
       ->setSettings([
-        'source field' => 'body',
-        'plugin' => 'AppendedData',
-      ]);
-
-    // IDEA: In the event instance admin settings, display all fields that are
-    // ->setComputed(TRUE) and allow users to select the plugin used to compute
-    // the field. Have all computed fields ->setClass() to some factory plugin
-    // which then uses the selected plugin (stored in config?) to perform the
-    // necessary tasks to return the appropriate data.
+        'plugin' => 'body_append',
+      ]); */
     return $fields;
   }
 
