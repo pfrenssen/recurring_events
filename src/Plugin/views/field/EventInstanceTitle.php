@@ -2,8 +2,7 @@
 
 namespace Drupal\recurring_events\Plugin\views\field;
 
-use Drupal\views\Plugin\views\field\FieldPluginBase;
-use Drupal\views\ResultRow;
+use Drupal\views\Plugin\views\field\EntityField;
 
 /**
  * Field handler to show the inherited event instance title.
@@ -12,21 +11,6 @@ use Drupal\views\ResultRow;
  *
  * @ViewsField("eventinstance_title")
  */
-class EventInstanceTitle extends FieldPluginBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function query() {
-    // Leave empty to avoid a query on this field.
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function render(ResultRow $values) {
-    $event = $values->_entity;
-    return $event->getInheritedTitle();
-  }
+class EventInstanceTitle extends EntityField {
 
 }

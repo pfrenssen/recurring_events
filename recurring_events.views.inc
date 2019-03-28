@@ -36,6 +36,7 @@ function recurring_events_views_data_alter(array &$data) {
       'title' => t('Event instance title'),
       'help' => t('The inherited title of an event instance.'),
       'id' => 'eventinstance_title',
+      'field_name' => 'title',
     ],
   ];
 
@@ -46,6 +47,7 @@ function recurring_events_views_data_alter(array &$data) {
       'title' => t('Event instance description'),
       'help' => t('The inherited description of an event instance.'),
       'id' => 'eventinstance_description',
+      'field_name' => 'description',
     ],
   ];
 }
