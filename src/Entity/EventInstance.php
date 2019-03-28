@@ -81,7 +81,6 @@ use Drupal\user\UserInterface;
  *       "delete" = "Drupal\recurring_events\Form\EventInstanceDeleteForm",
  *       "default" = "Drupal\recurring_events\Form\EventInstanceForm",
  *       "clone" = "Drupal\recurring_events\Form\EventInstanceCloneForm",
- *       "contact" = "Drupal\recurring_events\Form\EventInstanceContactRegistrationsForm",
  *     },
  *     "access" = "Drupal\recurring_events\EventInstanceAccessControlHandler",
  *   },
@@ -113,7 +112,6 @@ use Drupal\user\UserInterface;
  *     "version-history" = "/events/{eventinstance}/revisions",
  *     "revision" = "/events/{eventinstance}/revisions/{eventinstance_revision}/view",
  *     "clone-form" = "/events/{eventinstance}/clone",
- *     "contact-form" = "/events/{eventinstance}/registration/contact",
  *   },
  *   field_ui_base_route = "eventinstance.settings",
  * )

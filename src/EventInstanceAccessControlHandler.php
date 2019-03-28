@@ -37,9 +37,6 @@ class EventInstanceAccessControlHandler extends EntityAccessControlHandler {
 
       case 'clone':
         return AccessResult::allowedIfHasPermission($account, 'clone eventinstance entity');
-
-      case 'contact':
-        return AccessResult::allowedIfHasPermission($account, 'contact eventinstance registration entities');
     }
     return AccessResult::allowed();
   }

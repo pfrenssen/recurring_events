@@ -19,6 +19,27 @@ administer eventseries entity:
   description: 'Make changes to the event series entity type.'
   restrict access: true
 
+# Event Instance Entities.
+view eventinstance entity:
+  title: 'View eventinstance entity'
+  description: 'View existing event instance entities'
+view unpublished eventinstance entity:
+  title: 'View unpublished eventinstance entity'
+  description: 'View exisiting unpublished event instance entities'
+edit eventinstance entity:
+  title: 'Edit eventinstance entity'
+  description: 'Modify existing event instance entities'
+delete eventinstance entity:
+  title: 'Delete eventinstance entity'
+  description: 'Delete existing event instance entities'
+clone eventinstance entity:
+  title: 'Clone eventinstance entity'
+  description: 'Clone existing event instance entities'
+administer eventinstance entity:
+  title: 'Administer eventinstance entity'
+  description: 'Make changes to the event instance entity type.'
+  restrict access: true
+
 # Event Series Administration.
 administer eventseries:
   title: 'Administer eventseries'

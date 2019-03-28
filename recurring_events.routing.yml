@@ -54,7 +54,7 @@ entity.eventseries.clone_form:
   path: '/events/series/{eventseries}/clone'
   defaults:
     _entity_form: eventseries.clone
-    _title_callback: '\Drupal\recurring_events\Controller\EventSeriesController::getCloneTitle'
+    _title: 'Clone Event Series'
   requirements:
     _entity_access: 'eventseries.clone'
     eventseries: \d+
@@ -111,6 +111,20 @@ entity.eventinstance.delete_form:
   requirements:
     _entity_access: 'eventinstance.delete'
     eventinstance: \d+
+  options:
+    parameters:
+      eventinstance:
+        type: entity:eventinstance
+
+# Clone an EventInstance.
+entity.eventinstance.clone_form:
+  path: '/events/{eventinstance}/clone'
+  defaults:
+    # Calls the form.clone controller, defined in the Event Instance entity.
+    _entity_form: eventinstance.clone
+    _title: Clone Event Instance
+  requirements:
+    _entity_access: 'eventinstance.clone'
   options:
     parameters:
       eventinstance:
