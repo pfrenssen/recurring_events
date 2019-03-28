@@ -38,36 +38,12 @@ function recurring_events_views_data_alter(array &$data) {
       'id' => 'eventinstance_title',
       'field_name' => 'title',
     ],
-    'filter' => [
-      'title' => t('Event instance title'),
-      'help' => t('The inherited title of an event instance.'),
-      'id' => 'eventinstance_title',
-      'field_name' => 'title',
-    ],
-    'sort' => [
-      'title' => t('Event instance title'),
-      'help' => t('The inherited title of an event instance.'),
-      'id' => 'eventinstance_title',
-      'field_name' => 'title',
-    ],
   ];
 
   // Create a field to show the inherited description of an event instance.
   $data['eventinstance_field_data']['eventinstance_description'] = [
     'title' => t('Event instance description'),
     'field' => [
-      'title' => t('Event instance description'),
-      'help' => t('The inherited description of an event instance.'),
-      'id' => 'eventinstance_description',
-      'field_name' => 'description',
-    ],
-    'filter' => [
-      'title' => t('Event instance description'),
-      'help' => t('The inherited description of an event instance.'),
-      'id' => 'eventinstance_description',
-      'field_name' => 'description',
-    ],
-    'sort' => [
       'title' => t('Event instance description'),
       'help' => t('The inherited description of an event instance.'),
       'id' => 'eventinstance_description',
