@@ -110,7 +110,7 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
 
     switch ($method) {
       case 'inherit':
-        $text = $series->{$field}->value;
+        $text = $series->{$field}->value ?? '';
         break;
 
       case 'prepend':
@@ -118,7 +118,15 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
           throw new \InvalidArgumentException("The definition's 'entity field' key must be set to prepend data.");
         }
         $entity_field = $this->getEntityField();
-        $text = $instance->{$entity_field}->value . $this::SEPARATOR . $series->{$field}->value;
+
+        $fields = [];
+        if (!empty($instance->{$entity_field}->value)) {
+          $fields[] = $instance->{$entity_field}->value;
+        }
+        if (!empty($series->{$field}->value)) {
+          $fields[] = $series->{$field}->value;
+        }
+        $text = implode($this::SEPARATOR, $fields);
         break;
 
       case 'append':
@@ -126,7 +134,15 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
           throw new \InvalidArgumentException("The definition's 'entity field' key must be set to append data.");
         }
         $entity_field = $this->getEntityField();
-        $text = $series->{$field}->value . $this::SEPARATOR . $instance->{$entity_field}->value;
+
+        $fields = [];
+        if (!empty($series->{$field}->value)) {
+          $fields[] = $series->{$field}->value;
+        }
+        if (!empty($instance->{$entity_field}->value)) {
+          $fields[] = $instance->{$entity_field}->value;
+        }
+        $text = implode($this::SEPARATOR, $fields);
         break;
 
       default:
