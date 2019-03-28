@@ -110,7 +110,7 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
 
     switch ($method) {
       case 'inherit':
-        $text = $series->{$field}->value ?? '';
+        $value = $series->{$field}->value ?? '';
         break;
 
       case 'prepend':
@@ -126,7 +126,7 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
         if (!empty($series->{$field}->value)) {
           $fields[] = $series->{$field}->value;
         }
-        $text = implode($this::SEPARATOR, $fields);
+        $value = implode($this::SEPARATOR, $fields);
         break;
 
       case 'append':
@@ -142,7 +142,24 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
         if (!empty($instance->{$entity_field}->value)) {
           $fields[] = $instance->{$entity_field}->value;
         }
-        $text = implode($this::SEPARATOR, $fields);
+        $value = implode($this::SEPARATOR, $fields);
+        break;
+
+      case 'fallback':
+        if (empty($this->getEntityField())) {
+          throw new \InvalidArgumentException("The definition's 'entity field' key must be set to fallback to series data.");
+        }
+        $entity_field = $this->getEntityField();
+
+        $value = '';
+
+        if (!empty($instance->{$entity_field}->value)) {
+          $value = $instance->{$entity_field}->value;
+        }
+        elseif (!empty($series->{$field}->value)) {
+          $value = $series->{$field}->value;
+        }
+
         break;
 
       default:
@@ -150,7 +167,7 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
 
     }
 
-    return $text;
+    return $value;
   }
 
 }
