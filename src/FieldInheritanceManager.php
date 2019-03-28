@@ -10,7 +10,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  * Provides a FieldInheritance plugin manager.
  *
  * @see \Drupal\recurring_events\Annotation\FieldInheritance
- * @see \Drupal\recurring_events\FieldInheritanceInterface
+ * @see \Drupal\recurring_events\FieldInheritancePluginInterface
  * @see plugin_api
  */
 class FieldInheritanceManager extends DefaultPluginManager {
@@ -31,7 +31,7 @@ class FieldInheritanceManager extends DefaultPluginManager {
       'Plugin/FieldInheritance',
       $namespaces,
       $module_handler,
-      'Drupal\recurring_events\FieldInheritanceInterface',
+      'Drupal\recurring_events\FieldInheritancePluginInterface',
       'Drupal\recurring_events\Annotation\FieldInheritance'
     );
     $this->alterInfo('field_inheritance_info');

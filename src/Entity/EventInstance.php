@@ -382,7 +382,9 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setComputed(TRUE)
       ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')
       ->setSettings([
-        'plugin' => 'title_inherit',
+        'source field' => 'title',
+        'method' => 'inherit',
+        'plugin' => 'text_inheritance',
       ])
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('view', [

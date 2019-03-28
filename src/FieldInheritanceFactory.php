@@ -2,102 +2,58 @@
 
 namespace Drupal\recurring_events;
 
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\Core\Field\FieldItemList;
+use Drupal\Core\TypedData\ComputedItemListTrait;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\TypedData\TypedDataInterface;
-use Drupal\Core\TypedData\TypedData;
-use Drupal\Core\Language\LanguageInterface;
 
 /**
  * The FieldInheritanceFactory class.
  */
-class FieldInheritanceFactory extends TypedData implements CacheableDependencyInterface {
+class FieldInheritanceFactory extends FieldItemList {
+
+  use ComputedItemListTrait;
 
   /**
-   * Cached value.
+   * Constructs a TypedData object given its definition and context.
    *
-   * @var object|null
-   */
-  protected $value = NULL;
-
-  /**
-   * The langcode of the field values held in the object.
+   * @param \Drupal\Core\Field\BaseFieldDefinition $definition
+   *   The data definition.
+   * @param string $name
+   *   (optional) The name of the created property, or NULL if it is the root
+   *   of a typed data tree. Defaults to NULL.
+   * @param \Drupal\Core\TypedData\TypedDataInterface $parent
+   *   (optional) The parent object of the data property, or NULL if it is the
+   *   root of a typed data tree. Defaults to NULL.
    *
-   * @var string
+   * @see \Drupal\Core\TypedData\TypedDataManager::create()
    */
-  protected $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
+  public function __construct(BaseFieldDefinition $definition, $name = NULL, TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
 
-    if ($definition->getSetting('plugin') === NULL) {
+    if ($this->getSetting('plugin') === NULL) {
       throw new \InvalidArgumentException("The definition's 'plugin' key has to specify the plugin to use to inherit data.");
     }
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getValue() {
-    $manager = $this->getManager();
-    $plugin = $manager->createInstance($definition->getSetting('plugin'), $definition->getSettings());
-    die('dasdsadsa');
-    return $plugin->getValue();
-  }
+    if ($this->getSetting('method') === NULL) {
+      throw new \InvalidArgumentException("The definition's 'method' key has to specify the method to use to inherit data. Valid options are inherit, prepend, replace, and append.");
+    }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setLangcode($langcode) {
-    $this->langcode = $langcode;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setValue($value, $notify = TRUE) {
-    $this->value = $value;
-    // Notify the parent of any changes.
-    if ($notify && isset($this->parent)) {
-      $this->parent->onChange($this->name);
+    if ($this->getSetting('source field') === NULL) {
+      throw new \InvalidArgumentException("The definition's 'source field' key has to specify the field from which to inherit data.");
     }
   }
 
   /**
-   * {@inheritdoc}
+   * Compute the list property from state.
    */
-  public function getCacheTags() {
-    $this->getValue();
-    return $this->processed->getCacheTags();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheContexts() {
-    $this->getValue();
-    return $this->processed->getCacheContexts();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheMaxAge() {
-    $this->getValue();
-    return $this->processed->getCacheMaxAge();
-  }
-
-  /**
-   * Returns the renderer service.
-   *
-   * @return \Drupal\Core\Render\RendererInterface
-   *   The renderer service.
-   */
-  protected function getRenderer() {
-    return \Drupal::service('renderer');
+  protected function computeValue() {
+    $entity = $this->getEntity();
+    $manager = $this->getManager();
+    $configuration = $this->getSettings() + ['entity' => $entity];
+    $plugin = $manager->createInstance($this->getSetting('plugin'), $configuration);
+    $value = $plugin->computeValue();
+    $this->list[0] = $this->createItem(0, $value);
   }
 
   /**
