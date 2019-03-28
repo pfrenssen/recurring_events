@@ -70,7 +70,7 @@ use Drupal\user\UserInterface;
  *
  * @ContentEntityType(
  *   id = "eventseries",
- *   label = @Translation("Event entity"),
+ *   label = @Translation("Event series entity"),
  *   handlers = {
  *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
  *     "list_builder" = "Drupal\recurring_events\EventSeriesListBuilder",
@@ -497,6 +497,16 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       }
     }
     return $date;
+  }
+
+  /**
+   * Get the number of instances.
+   *
+   * @return int
+   *   A count of instances.
+   */
+  public function getInstanceCount() {
+    return count($this->get('event_instances')->getValue());
   }
 
   /**

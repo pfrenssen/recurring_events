@@ -120,7 +120,7 @@ class EventSeriesListBuilder extends EntityListBuilder {
       '#url' => $entity->toUrl(),
     ];
     $row['type'] = $entity->recur_type->value;
-    $row['instances'] = count($entity->event_instances->getValue());
+    $row['instances'] = $entity->getInstanceCount();
     $row['starts'] = $this->t('None');
     if (!empty($entity->getSeriesStart())) {
       $config = $this->config->get('recurring_events.eventseries.config');
