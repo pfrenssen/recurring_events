@@ -89,8 +89,7 @@ class EventCreationService {
   public function checkForRecurConfigChanges(EventSeries $event, FormStateInterface $form_state) {
     $entity_config = $this->convertEntityConfigToArray($event);
     $form_config = $this->convertFormConfigToArray($form_state);
-
-    return !($entity_config === $form_config);
+    return !(serialize($entity_config) === serialize($form_config));
   }
 
   /**
@@ -187,7 +186,7 @@ class EventCreationService {
 
         $end_timestamp = $user_input['monthly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
         $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
-        $start_date->setTimezone($user_timezone);
+        $end_date->setTimezone($user_timezone);
         $end_date->setTime(0, 0, 0);
 
         $config['start_date'] = $start_date;

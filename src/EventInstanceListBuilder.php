@@ -118,7 +118,7 @@ class EventInstanceListBuilder extends EntityListBuilder {
       '#title' => $this->t('View Series'),
       '#url' => $entity->getEventSeries()->toUrl(),
     ];
-    $config = $this->config->get('recurring_events.eventseries.config');
+    $config = $this->config->get('recurring_events.eventinstance.config');
     $row['date'] = $entity->date->start_date->format($config->get('date_format'));
     $row['author']['data'] = [
       '#theme' => 'username',

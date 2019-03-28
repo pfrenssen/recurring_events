@@ -11,4 +11,12 @@ namespace Drupal\recurring_events\Plugin\FieldInheritance;
  * )
  */
 class TextLongFieldInheritancePlugin extends FieldInheritancePluginBase {
+
+  /**
+   * Concatenation separator.
+   *
+   * @var string
+   */
+  const SEPARATOR = "\r\n\r\n";
+
 }

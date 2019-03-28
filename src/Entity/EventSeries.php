@@ -338,7 +338,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(TRUE);
 
     $fields['body'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Event Description'))
+      ->setLabel(t('Body'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setRequired(TRUE)

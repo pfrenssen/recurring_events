@@ -53,7 +53,7 @@ class EventSeriesSettingsForm extends ConfigFormBase {
   }
 
   /**
-   * Define the form used for Events settings.
+   * Define the form used for EventSeries settings.
    *
    * @param array $form
    *   An associative array containing the structure of the form.

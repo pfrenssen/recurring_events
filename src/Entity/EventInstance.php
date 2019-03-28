@@ -319,7 +319,7 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setReadOnly(TRUE);
 
     $fields['body'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Event Description'))
+      ->setLabel(t('Body'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setRequired(TRUE)
@@ -327,6 +327,9 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',
         'weight' => -4,
+      ])
+      ->setDisplayOptions('view', [
+        'type' => 'hidden',
       ])
       ->setDisplayConfigurable('form', TRUE);
 
@@ -408,7 +411,7 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setDisplayOptions('view', [
         'label' => 'above',
         'type' => 'text_long',
-        'weight' => -10,
+        'weight' => -9,
       ]);
     return $fields;
   }

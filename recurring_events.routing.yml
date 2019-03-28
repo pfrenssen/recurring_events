@@ -145,3 +145,12 @@ eventseries.settings:
     _title: 'Event Series Settings'
   requirements:
     _permission: 'administer eventseries entity'
+
+# Event Instance settings admin page.
+eventinstance.settings:
+  path: '/admin/structure/events/instance/settings'
+  defaults:
+    _form: '\Drupal\recurring_events\Form\EventInstanceSettingsForm'
+    _title: 'Event Instance Settings'
+  requirements:
+    _permission: 'administer eventinstance entity'

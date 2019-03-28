@@ -4,13 +4,19 @@ namespace Drupal\recurring_events\Plugin\FieldInheritance;
 
 use Drupal\Component\Plugin\PluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\recurring_events\FieldInheritancePluginInterface;
 
 /**
  * Abstract class FieldInheritancePluginBase.
  */
 abstract class FieldInheritancePluginBase extends PluginBase implements FieldInheritancePluginInterface {
+
+  /**
+   * Concatenation separator.
+   *
+   * @var string
+   */
+  const SEPARATOR = '';
 
   /**
    * The entity.
@@ -112,7 +118,7 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
           throw new \InvalidArgumentException("The definition's 'entity field' key must be set to prepend data.");
         }
         $entity_field = $this->getEntityField();
-        $text = $instance->{$entity_field}->value . ' ' . $series->{$field}->value;
+        $text = $instance->{$entity_field}->value . $this::SEPARATOR . $series->{$field}->value;
         break;
 
       case 'append':
@@ -120,7 +126,7 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
           throw new \InvalidArgumentException("The definition's 'entity field' key must be set to append data.");
         }
         $entity_field = $this->getEntityField();
-        $text = $series->{$field}->value . ' ' . $instance->{$entity_field}->value;
+        $text = $series->{$field}->value . $this::SEPARATOR . $instance->{$entity_field}->value;
         break;
 
       default:
