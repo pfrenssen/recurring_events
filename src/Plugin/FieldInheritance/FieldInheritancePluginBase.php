@@ -80,16 +80,12 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
         $text = $instance->{$field}->value . ' ' . $series->{$field}->value;
         break;
 
-      case 'replace':
-        $text = $instance->{$field}->value;
-        break;
-
       case 'append':
         $text = $series->{$field}->value . ' ' . $instance->{$field}->value;
         break;
 
       default:
-        throw new \InvalidArgumentException("The definition's 'method' key must be one of: inherit, prepend, replace or append.");
+        throw new \InvalidArgumentException("The definition's 'method' key must be one of: inherit, prepend, or append.");
 
     }
     return $text;
