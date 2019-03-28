@@ -20,7 +20,28 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
   protected $entity;
 
   /**
-   * Constructs a ReusableFormPluginBase object.
+   * The method used to inherit.
+   *
+   * @var string
+   */
+  protected $method;
+
+  /**
+   * The source field used to inherit.
+   *
+   * @var string
+   */
+  protected $sourceField;
+
+  /**
+   * The entity field used to inherit.
+   *
+   * @var string
+   */
+  protected $entityField;
+
+  /**
+   * Constructs a FieldInheritancePluginBase object.
    *
    * @param array $configuration
    *   The plugin configuration.
@@ -34,6 +55,9 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
     $this->entity = $configuration['entity'];
     $this->method = $configuration['method'];
     $this->sourceField = $configuration['source field'];
+    if (!empty($configuration['entity field'])) {
+      $this->entityField = $configuration['entity field'];
+    }
   }
 
   /**
@@ -48,17 +72,24 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
   }
 
   /**
-   * {@inheritdoc}
+   * Get the configuration method.
    */
   public function getMethod() {
     return $this->method;
   }
 
   /**
-   * {@inheritdoc}
+   * Get the configuration source field.
    */
   public function getSourceField() {
     return $this->sourceField;
+  }
+
+  /**
+   * Get the configuration entity field.
+   */
+  public function getEntityField() {
+    return $this->entityField;
   }
 
   /**
@@ -77,17 +108,26 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
         break;
 
       case 'prepend':
-        $text = $instance->{$field}->value . ' ' . $series->{$field}->value;
+        if (empty($this->getEntityField())) {
+          throw new \InvalidArgumentException("The definition's 'entity field' key must be set to prepend data.");
+        }
+        $entity_field = $this->getEntityField();
+        $text = $instance->{$entity_field}->value . ' ' . $series->{$field}->value;
         break;
 
       case 'append':
-        $text = $series->{$field}->value . ' ' . $instance->{$field}->value;
+        if (empty($this->getEntityField())) {
+          throw new \InvalidArgumentException("The definition's 'entity field' key must be set to append data.");
+        }
+        $entity_field = $this->getEntityField();
+        $text = $series->{$field}->value . ' ' . $instance->{$entity_field}->value;
         break;
 
       default:
         throw new \InvalidArgumentException("The definition's 'method' key must be one of: inherit, prepend, or append.");
 
     }
+
     return $text;
   }
 

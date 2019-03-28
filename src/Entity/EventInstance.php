@@ -393,14 +393,23 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
         'weight' => -10,
       ]);
 
-    /* $properties['description'] = DataDefinition::create('text_long')
+    $fields['description'] = BaseFieldDefinition::create('text_long')
       ->setLabel(t('Description'))
       ->setDescription(t('The description as inherited from the series.'))
       ->setComputed(TRUE)
       ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')
       ->setSettings([
-        'plugin' => 'body_append',
-      ]); */
+        'source field' => 'body',
+        'entity field' => 'body',
+        'method' => 'append',
+        'plugin' => 'text_long_inheritance',
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'text_long',
+        'weight' => -10,
+      ]);
     return $fields;
   }
 

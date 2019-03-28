@@ -10,5 +10,5 @@ namespace Drupal\recurring_events\Plugin\FieldInheritance;
  *   name = @Translation("Text Field Inheritance"),
  * )
  */
-class TextFieldInheritance extends FieldInheritancePluginBase {
+class TextFieldInheritancePlugin extends FieldInheritancePluginBase {
 }
