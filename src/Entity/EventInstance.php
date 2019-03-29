@@ -340,6 +340,10 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
         'label' => 'above',
         'type' => 'string',
         'weight' => -4,
+        'settings' => [
+          'date_format' => 'F jS, Y h:iA',
+          'separator' => '-',
+        ],
       ])
       ->setDisplayOptions('form', [
         'type' => 'daterange_default',
