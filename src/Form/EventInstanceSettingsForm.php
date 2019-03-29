@@ -2,7 +2,7 @@
 
 namespace Drupal\recurring_events\Form;
 
-use Drupal\Core\Form\ConfigFormBase;;
+use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Link;

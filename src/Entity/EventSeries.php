@@ -381,7 +381,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayOptions('view', [
         'label' => 'above',
         'weight' => 10,
-      ]);;
+      ]);
 
     $fields['weekly_recurring_date'] = BaseFieldDefinition::create('weekly_recurring_date')
       ->setLabel(t('Weekly Recurring Date'))
