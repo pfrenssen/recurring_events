@@ -122,16 +122,19 @@ class EventSeriesListBuilder extends EntityListBuilder {
     $row['type'] = $entity->recur_type->value;
     $row['instances'] = $entity->getInstanceCount();
     $row['starts'] = $this->t('None');
+    $timezone = new \DateTimeZone(drupal_get_user_timezone());
     if (!empty($entity->getSeriesStart())) {
       $config = $this->config->get('recurring_events.eventseries.config');
-      $row['starts'] = $entity->getSeriesStart()->format($config->get('date_format'));
+      $start_date = $entity->getSeriesStart();
+      $start_date->setTimezone($timezone);
+      $row['starts'] = $start_date->format($config->get('date_format'));
     }
     $row['author']['data'] = [
       '#theme' => 'username',
       '#account' => $entity->getOwner(),
     ];
     $row['status'] = $entity->isPublished() ? $this->t('Published') : $this->t('Unpublished');
-    $row['changed'] = $this->dateFormatter->format($entity->getChangedTime(), 'short');
+    $row['changed'] = $this->dateFormatter->format($entity->getChangedTime(), 'short', '', $timezone->getName());
 
     if ($this->languageManager->isMultilingual()) {
       $row['language'] = $this->languageManager->getLanguageName($entity->language()->getId());
