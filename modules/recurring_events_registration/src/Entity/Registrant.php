@@ -147,7 +147,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
     $fields['eventseries_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Event Series ID'))
       ->setDescription(t('The ID of the eventseries entity.'))
-      ->setSetting('target_type', 'event');
+      ->setSetting('target_type', 'eventseries');
 
     $fields['eventinstance_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Event Instance ID'))

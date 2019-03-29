@@ -38,7 +38,7 @@ eventinstance.listing:
 
 # Events Series settings admin page.
 eventseries.admin.structure.settings:
-  title: 'Event Series'
+  title: 'Event Series Settings'
   description: 'Configure Event Series Entity'
   route_name:  eventseries.settings
   parent: events.admin.overview
@@ -46,7 +46,7 @@ eventseries.admin.structure.settings:
 
 # Events Instances settings admin page.
 eventinstance.admin.structure.settings:
-  title: 'Event Instances'
+  title: 'Event Instance Settings'
   description: 'Configure Event Instance Entity'
   route_name:  eventinstance.settings
   parent: events.admin.overview

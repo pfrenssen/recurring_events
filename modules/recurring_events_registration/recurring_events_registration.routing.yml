@@ -1,0 +1,18 @@
+# Registrant table list route.
+entity.registrant.collection:
+  path: '/registrants'
+  defaults:
+    _entity_list: 'registrant'
+    _title: 'Registrants'
+  requirements:
+    _permission: 'access registrant overview'
+
+
+# Registrant settings admin page.
+registrant.settings:
+  path: '/admin/structure/events/registrant/settings'
+  defaults:
+    _form: '\Drupal\recurring_events_registration\Form\RegistrantSettingsForm'
+    _title: 'Registrant Settings'
+  requirements:
+    _permission: 'administer registrant entity'
