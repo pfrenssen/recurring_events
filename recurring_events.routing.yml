@@ -151,6 +151,15 @@ events.admin.overview:
   requirements:
     _permission: 'access administration pages'
 
+# Global admin content page.
+events.admin.content:
+  path: '/admin/content/events'
+  defaults:
+    _title: 'Events'
+    _controller: '\Drupal\recurring_events\Controller\EventController::contentPage'
+  requirements:
+    _permission: 'access administration pages'
+
 # Event Series settings admin page.
 eventseries.settings:
   path: '/admin/structure/events/series/settings'

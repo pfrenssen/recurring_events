@@ -69,4 +69,11 @@ class EventController extends ControllerBase implements ContainerInjectionInterf
     return $this->systemManager->getBlockContents();
   }
 
+  /**
+   * The page callback for the admin content page.
+   */
+  public function contentPage() {
+    return $this->systemManager->getBlockContents();
+  }
+
 }
