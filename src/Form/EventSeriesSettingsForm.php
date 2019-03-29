@@ -47,6 +47,7 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       ->set('date_format', $form_state->getValue('date_format'))
       ->set('time_format', $form_state->getValue('time_format'))
       ->set('days', implode(',', array_filter($form_state->getValue('days'))))
+      ->set('limit', $form_state->getValue('limit'))
       ->save();
 
     parent::submitForm($form, $form_state);
@@ -130,6 +131,14 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       '#options' => $days,
       '#description' => $this->t('Select the days of the week available when creating events.'),
       '#default_value' => explode(',', $config->get('days')),
+    ];
+
+    $form['limit'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Event Series Items'),
+      '#required' => TRUE,
+      '#description' => $this->t('Enter the number of items to show per page in the default event series listing table.'),
+      '#default_value' => $config->get('limit'),
     ];
 
     return parent::buildForm($form, $form_state);

@@ -42,6 +42,7 @@ class EventInstanceSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('recurring_events.eventinstance.config')
       ->set('date_format', $form_state->getValue('date_format'))
+      ->set('limit', $form_state->getValue('limit'))
       ->save();
 
     parent::submitForm($form, $form_state);
@@ -72,6 +73,14 @@ class EventInstanceSettingsForm extends ConfigFormBase {
         '@link' => $php_date_link->toString(),
       ]),
       '#default_value' => $config->get('date_format'),
+    ];
+
+    $form['limit'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Event Instance Items'),
+      '#required' => TRUE,
+      '#description' => $this->t('Enter the number of items to show per page in the default event instance listing table.'),
+      '#default_value' => $config->get('limit'),
     ];
 
     return parent::buildForm($form, $form_state);

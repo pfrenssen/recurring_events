@@ -56,6 +56,9 @@ class EventInstanceListBuilder extends EntityListBuilder {
     $this->dateFormatter = $date_formatter;
     $this->languageManager = $language_manager;
     $this->config = $config;
+
+    $config = $this->config->get('recurring_events.eventinstance.config');
+    $this->limit = $config->get('limit');
   }
 
   /**
@@ -140,7 +143,7 @@ class EventInstanceListBuilder extends EntityListBuilder {
    */
   protected function getEntityIds() {
     $query = $this->getStorage()->getQuery()
-      ->sort('changed', 'DESC');
+      ->sort('changed', 'ASC');
 
     // Only add the pager if a limit is specified.
     if ($this->limit) {

@@ -20,6 +20,9 @@ recurring_events.eventseries.config:
     days:
       type: string
       label: 'The days of the week available when creating event series'
+    limit:
+      type: integer
+      label: 'The items per page to show on event series listing'
 
 recurring_events.eventinstance.config:
   type: config_object
@@ -28,3 +31,6 @@ recurring_events.eventinstance.config:
     date_format:
       type: string
       label: 'The formatting of dates when displaying event instances'
+    limit:
+      type: integer
+      label: 'The items per page to show on event instance listing'

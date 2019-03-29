@@ -56,6 +56,9 @@ class EventSeriesListBuilder extends EntityListBuilder {
     $this->dateFormatter = $date_formatter;
     $this->languageManager = $language_manager;
     $this->config = $config;
+
+    $config = $this->config->get('recurring_events.eventinstance.config');
+    $this->limit = $config->get('limit');
   }
 
   /**
