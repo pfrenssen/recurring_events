@@ -1,0 +1,19 @@
+add registrant entities:
+  title: 'Create new Registrant entities'
+
+administer registrant entities:
+  title: 'Administer Registrant entities'
+  description: 'Allow to access the administration form to configure Registrant entities.'
+  restrict access: true
+
+delete registrant entities:
+  title: 'Delete Registrant entities'
+
+edit registrant entities:
+  title: 'Edit Registrant entities'
+
+view published registrant entities:
+  title: 'View published Registrant entities'
+
+view unpublished registrant entities:
+  title: 'View unpublished Registrant entities'

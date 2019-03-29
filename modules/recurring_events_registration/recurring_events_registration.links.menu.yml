@@ -1,0 +1,14 @@
+
+# Registrant menu items definition
+entity.registrant.collection:
+  title: 'Registrant list'
+  route_name: entity.registrant.collection
+  description: 'List Registrant entities'
+  parent: system.admin_structure
+  weight: 100
+
+registrant.admin.structure.settings:
+  title: 'Registrant settings'
+  description: 'Configure Registrant entities'
+  route_name: registrant.settings
+  parent: system.admin_structure
