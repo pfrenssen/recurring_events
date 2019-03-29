@@ -4,6 +4,9 @@ namespace Drupal\recurring_events_registration\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Messenger\Messenger;
 
 /**
  * Form controller for Registrant edit forms.
@@ -11,6 +14,36 @@ use Drupal\Core\Form\FormStateInterface;
  * @ingroup recurring_events_registration
  */
 class RegistrantForm extends ContentEntityForm {
+
+  /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity.manager'),
+      $container->get('messenger')
+    );
+  }
+
+  /**
+   * Construct a EventSeriesForm.
+   *
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager service.
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
+   */
+  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger) {
+    $this->messenger = $messenger;
+    parent::__construct($entity_manager);
+  }
 
   /**
    * {@inheritdoc}
@@ -34,13 +67,13 @@ class RegistrantForm extends ContentEntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Registrant.', [
+        $this->messenger->addMessage($this->t('Created the %label Registrant.', [
           '%label' => $entity->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Registrant.', [
+        $this->messenger->addMessage($this->t('Saved the %label Registrant.', [
           '%label' => $entity->label(),
         ]));
     }
