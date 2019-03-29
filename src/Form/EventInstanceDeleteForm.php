@@ -144,7 +144,7 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
       $entity->delete();
 
       $start_date = $entity->date->start_date;
-      \Drupal::logger('omega_events')->notice('@type: deleted event instance of %title scheduled to begin on %date.',
+      \Drupal::logger('recurring_events')->notice('@type: deleted event instance of %title scheduled to begin on %date.',
         [
           '@type' => $this->entity->bundle(),
           '%title' => $this->entity->getEventSeries()->title->value,

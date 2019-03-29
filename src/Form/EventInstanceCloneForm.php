@@ -7,7 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Form controller for the eventinstance entity clone form.
  *
- * @ingroup omega_events
+ * @ingroup recurring_events
  */
 class EventInstanceCloneForm extends EventInstanceForm {
 
