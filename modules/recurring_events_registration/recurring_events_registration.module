@@ -30,67 +30,20 @@ function recurring_events_registration_help($route_name, RouteMatchInterface $ro
  */
 function recurring_events_registration_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
   if ($entity_type->id() === 'eventseries') {
-    // TODO Registration fields to all be one custom field.
-    $fields['registration'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Enable Registration'))
-      ->setDescription(t('Select whether to enable registration for this series.'))
+    $fields['event_registration'] = BaseFieldDefinition::create('event_registration')
+      ->setName('event_registration')
+      ->setLabel(t('Event Registration'))
+      ->setDescription('The event registration configuration.')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setRevisionable(TRUE)
+      ->setTranslatable(FALSE)
       ->setCardinality(1)
+      ->setRequired(FALSE)
+      ->setTargetEntityTypeId('eventseries')
       ->setDisplayOptions('form', [
-        'type' => 'boolean_checkbox',
-        'settings' => [
-          'display_label' => TRUE,
-        ],
-        'weight' => 100,
-      ])
-      ->setDisplayOptions('view', [
-        'type' => 'hidden',
-      ]);
-
-    $fields['registration_type'] = BaseFieldDefinition::create('list_string')
-      ->setLabel(t('Registration Type'))
-      ->setDescription(t('Select which type of registration applies to this event.'))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setCardinality(1)
-      ->setSetting('allowed_values', [
-        'instance' => t('Individual Event Registration'),
-        'series' => t('Entire Series Registration'),
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'options_buttons',
-        'settings' => [
-          'allowed_values' => [
-            'instance' => t('Individual Event Registration'),
-            'series' => t('Entire Series Registration'),
-          ],
-        ],
-        'weight' => 101,
-      ]);
-
-    $fields['registration_dates'] = BaseFieldDefinition::create('list_string')
-      ->setLabel(t('Registration Dates'))
-      ->setDescription(t('Select whether to enable open or scheduled registration'))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setCardinality(1)
-      ->setSetting('allowed_values', [
-        'open' => t('Open Registration'),
-        'scheduled' => t('Scheduled Registration'),
-      ])
-      ->setDisplayOptions('form', [
-        'type' => 'options_buttons',
-        'settings' => [
-          'allowed_values' => [
-            'open' => t('Open Registration'),
-            'scheduled' => t('Scheduled Registration'),
-          ],
-        ],
-        'weight' => 102,
+        'type' => 'event_registration',
+        'weight' => 3,
       ]);
   }
 }
