@@ -154,4 +154,83 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
     return $element;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
+    foreach ($values as &$item) {
+      $item['value'] = $item['series_registration']['value'];
+      $item['end_value'] = $item['series_registration']['end_value'];
+      $item['time_amount'] = (int) $item['instance_registration']['time_amount'];
+      $item['time_type'] = $item['instance_registration']['time_type'];
+      $item['capacity'] = (int) $item['capacity'];
+      unset($item['series_registration']);
+      unset($item['instance_registration']);
+
+      if (empty($item['value'])) {
+        $item['value'] = '';
+      }
+
+      if (empty($item['end_value'])) {
+        $item['end_value'] = '';
+      }
+
+      if (empty($item['registration'])) {
+        $item['registration'] = 0;
+      }
+
+      if (empty($item['registration_type'])) {
+        $item['registration_type'] = '';
+      }
+
+      if (empty($item['registration_dates'])) {
+        $item['registration_dates'] = '';
+      }
+
+      if (empty($item['capacity'])) {
+        $item['capacity'] = 0;
+      }
+
+      if (empty($item['waitlist'])) {
+        $item['waitlist'] = '';
+      }
+
+      if (empty($item['time_amount'])) {
+        $item['time_amount'] = 0;
+      }
+
+      if (empty($item['time_type'])) {
+        $item['time_type'] = '';
+      }
+
+    }
+    $values = parent::massageFormValues($values, $form, $form_state);
+    return $values;
+  }
+
+  /**
+   * Validate callback to ensure that the start date <= the end date.
+   *
+   * @param array $element
+   *   An associative array containing the properties and children of the
+   *   generic form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array $complete_form
+   *   The complete form structure.
+   */
+  public function validateStartEnd(array &$element, FormStateInterface $form_state, array &$complete_form) {
+    $start_date = $element['series_registration']['value']['#value']['object'];
+    $end_date = $element['series_registration']['end_value']['#value']['object'];
+
+    if ($start_date instanceof DrupalDateTime && $end_date instanceof DrupalDateTime) {
+      if ($start_date->getTimestamp() !== $end_date->getTimestamp()) {
+        $interval = $start_date->diff($end_date);
+        if ($interval->invert === 1) {
+          $form_state->setError($element, $this->t('The @title end date cannot be before the start date', ['@title' => $element['#title']]));
+        }
+      }
+    }
+  }
+
 }
