@@ -70,7 +70,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
     ];
 
     $element['series_registration'] = [
-      '#type' => 'container',
+      '#type' => 'fieldset',
       '#title' => t('Series Registration'),
       '#weight' => 3,
       '#states' => [
@@ -91,7 +91,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
     $element['series_registration']['end_value']['#title'] = t('Registration Closes');
 
     $element['instance_registration'] = [
-      '#type' => 'container',
+      '#type' => 'fieldset',
       '#title' => t('Instance Registration'),
       '#weight' => 3,
       '#states' => [
