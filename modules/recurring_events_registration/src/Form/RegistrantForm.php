@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\recurring_events_registration\RegistrationCreationService;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Config\ConfigFactory;
 
 /**
  * Form controller for Registrant edit forms.
@@ -39,6 +40,14 @@ class RegistrantForm extends ContentEntityForm {
   protected $currentUser;
 
   /**
+   * The config factory service.
+   *
+   * @var \Drupal\Core\Config\ConfigFactory
+   */
+  protected $config;
+
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -46,7 +55,8 @@ class RegistrantForm extends ContentEntityForm {
       $container->get('entity.manager'),
       $container->get('messenger'),
       $container->get('recurring_events.registration_creation_service'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('config.factory')
     );
   }
 
@@ -61,11 +71,14 @@ class RegistrantForm extends ContentEntityForm {
    *   The registrant creation service.
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    *   The current user.
+   * @param \Drupal\Core\Config\ConfigFactory $config
+   *   The config factory service.
    */
-  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger, RegistrationCreationService $creation_service, AccountProxyInterface $current_user) {
+  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger, RegistrationCreationService $creation_service, AccountProxyInterface $current_user, ConfigFactory $config) {
     $this->messenger = $messenger;
     $this->creationService = $creation_service;
     $this->currentUser = $current_user;
+    $this->config = $config;
     parent::__construct($entity_manager);
   }
 
@@ -111,6 +124,7 @@ class RegistrantForm extends ContentEntityForm {
       '#attributes' => [
         'class' => ['event-register-notifications'],
       ],
+      // Do not show notifications if we are in edit mode.
       '#printed' => $editing,
     ];
 
@@ -183,16 +197,19 @@ class RegistrantForm extends ContentEntityForm {
       ],
     ];
 
-    $form['availability'] = [
-      '#type' => 'markup',
-      '#prefix' => '<span class="event-register-availability">',
-      '#markup' => $this->t('Spaces Available: @availability', ['@availability' => $availability]),
-      '#suffix' => '</span>',
-    ];
+    if ($this->config('recurring_events_registration.registrant.config')->get('show_capacity')) {
+      $form['availability'] = [
+        '#type' => 'markup',
+        '#prefix' => '<span class="event-register-availability">',
+        '#markup' => $this->t('Spaces Available: @availability', ['@availability' => $availability]),
+        '#suffix' => '</span>',
+        '#weight' => -99,
+      ];
+    }
 
-    $add_to_waitlist = '0';
+    $add_to_waitlist = 0;
 
-    $form['add_to_waitlist'] = [
+    $form['waitlist'] = [
       '#type' => 'hidden',
       '#value' => $add_to_waitlist,
       '#weight' => 98,
@@ -209,15 +226,15 @@ class RegistrantForm extends ContentEntityForm {
     ];
 
     if ($this->currentUser->hasPermission('modify registrant waitlist')) {
-      $form['add_to_waitlist']['#type'] = 'select';
-      $form['add_to_waitlist']['#options'] = [
+      $form['waitlist']['#type'] = 'select';
+      $form['waitlist']['#options'] = [
         '1' => $this->t('Yes'),
         '0' => $this->t('No'),
       ];
-      $form['add_to_waitlist']['#title'] = $this->t('Add user to waitlist');
+      $form['waitlist']['#title'] = $this->t('Add user to waitlist');
       $value = !$entity->isNew() ? $entity->getWaitlist() : $add_to_waitlist;
-      $form['add_to_waitlist']['#default_value'] = $value;
-      unset($form['add_to_waitlist']['#value']);
+      $form['waitlist']['#default_value'] = $value;
+      unset($form['waitlist']['#value']);
     }
 
     // Because the form gets personalized if you've registered before, we want
