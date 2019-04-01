@@ -1,5 +1,0 @@
-entity.registrant.add_form:
-  route_name: entity.registrant.add_form
-  title: 'Add Registrant'
-  appears_on:
-    - entity.registrant.collection

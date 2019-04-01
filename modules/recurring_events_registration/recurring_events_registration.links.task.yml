@@ -20,3 +20,8 @@ entity.registrant.delete_form:
   title: Delete
   weight: 10
 
+entity.registrant.add_form:
+  route_name: entity.registrant.add_form
+  base_route: entity.eventinstance.canonical
+  title: 'Register'
+  weight: 11
