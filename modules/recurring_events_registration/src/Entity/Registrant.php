@@ -194,7 +194,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
    * @param Drupal\recurring_events\EventInterface $event
    *   The event series entity.
    *
-   * @return Drupal\recurring_events_registration\Registrant
+   * @return Drupal\recurring_events_registration\Entity\RegistrantInterface
    *   The registrant entity.
    */
   public function setEventSeries(EventInterface $event) {
@@ -218,7 +218,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
    * @param Drupal\recurring_events\EventInterface $event
    *   The eventinstance entity.
    *
-   * @return Drupal\recurring_events_registration\Registrant
+   * @return Drupal\recurring_events_registration\Entity\RegistrantInterface
    *   The registrant entity.
    */
   public function setEventInstance(EventInterface $event) {
@@ -242,7 +242,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
    * @param string $type
    *   The type of registration, series or instance.
    *
-   * @return Drupal\omega_events\Registrant
+   * @return Drupal\recurring_events_registration\Entity\RegistrantInterface
    *   The registrant entity.
    */
   public function setRegistrationType($type) {
@@ -266,7 +266,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
    * @param int $waitlist
    *   Whether the registrant is on the waitlist.
    *
-   * @return Drupal\omega_events\Registrant
+   * @return Drupal\recurring_events_registration\Entity\RegistrantInterface
    *   The registrant entity.
    */
   public function setWaitlist($waitlist) {

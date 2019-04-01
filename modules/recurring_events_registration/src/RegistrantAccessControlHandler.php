@@ -21,10 +21,7 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\recurring_events_registration\Entity\RegistrantInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished registrant entities');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view published registrant entities');
+        return AccessResult::allowedIfHasPermission($account, 'view registrant entities');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit registrant entities');

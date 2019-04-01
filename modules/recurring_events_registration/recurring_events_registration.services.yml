@@ -1,0 +1,5 @@
+services:
+  recurring_events.registration_creation_service:
+    class: Drupal\recurring_events_registration\RegistrationCreationService
+    arguments: ['@string_translation', '@database', '@logger.factory', '@messenger', '@entity_type.manager']
+    
