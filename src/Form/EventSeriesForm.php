@@ -213,12 +213,13 @@ class EventSeriesForm extends ContentEntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $form_state->setRedirect('entity.eventseries.collection');
     $entity = $this->getEntity();
+    $original = $this->storage->loadUnchanged($entity->id());
 
     $this->messenger->addStatus($this->t('Successfully saved the %name event series', [
       '%name' => $entity->title->value,
     ]));
 
-    $this->creationService->saveEvent($entity, $form_state);
+    $this->creationService->saveEvent($original, $entity, $form_state);
     parent::save($form, $form_state);
   }
 

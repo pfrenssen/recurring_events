@@ -236,7 +236,7 @@ class RegistrantForm extends ContentEntityForm {
       '#weight' => 100,
     ];
 
-    if ($this->currentUser->hasPermission('modify registrant waitlist')) {
+    if ($this->currentUser->hasPermission('modify registrant waitlist') && $waitlist) {
       $form['add_to_waitlist']['#type'] = 'select';
       $form['add_to_waitlist']['#options'] = [
         1 => $this->t('Yes'),
