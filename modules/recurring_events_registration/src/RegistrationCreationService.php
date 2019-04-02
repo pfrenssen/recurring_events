@@ -7,6 +7,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\recurring_events\Entity\EventInstance;
+use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\Core\Entity\EntityTypeManager;
@@ -109,6 +110,16 @@ class RegistrationCreationService {
   public function setEvents(EventInstance $event_instance) {
     $this->eventInstance = $event_instance;
     $this->eventSeries = $event_instance->getEventSeries();
+  }
+
+  /**
+   * Set the event series, helpful to get a fresh copy of the entity.
+   *
+   * @param Drupal\recurring_events\Entity\EventSeries $event_series
+   *   The event series.
+   */
+  public function setEventSeries(EventSeries $event_series) {
+    $this->eventSeries = $event_series;
   }
 
   /**

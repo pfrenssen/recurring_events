@@ -48,6 +48,7 @@ class EventRegistration extends DateRangeItem {
 
     $schema['columns']['waitlist'] = [
       'type' => 'int',
+      'default' => 0,
       'unsigned' => TRUE,
     ];
 

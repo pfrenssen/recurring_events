@@ -156,8 +156,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
 
     $fields['waitlist'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Waitlist'))
-      ->setDescription(t('Whether this registrant is waitlisted.'))
-      ->setDefaultValue(TRUE);
+      ->setDescription(t('Whether this registrant is waitlisted.'));
 
     $fields['type'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Type'))

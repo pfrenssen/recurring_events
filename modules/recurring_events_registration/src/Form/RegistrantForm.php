@@ -10,6 +10,7 @@ use Drupal\Core\Messenger\Messenger;
 use Drupal\recurring_events_registration\RegistrationCreationService;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Entity\EntityFieldManager;
 
 /**
  * Form controller for Registrant edit forms.
@@ -46,6 +47,12 @@ class RegistrantForm extends ContentEntityForm {
    */
   protected $config;
 
+  /**
+   * The entity field manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManager
+   */
+  protected $fieldManager;
 
   /**
    * {@inheritdoc}
@@ -56,7 +63,8 @@ class RegistrantForm extends ContentEntityForm {
       $container->get('messenger'),
       $container->get('recurring_events.registration_creation_service'),
       $container->get('current_user'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('entity_field.manager')
     );
   }
 
@@ -73,12 +81,15 @@ class RegistrantForm extends ContentEntityForm {
    *   The current user.
    * @param \Drupal\Core\Config\ConfigFactory $config
    *   The config factory service.
+   * @param \Drupal\Core\Entity\EntityFieldManager $field_manager
+   *   The entity field manager service.
    */
-  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger, RegistrationCreationService $creation_service, AccountProxyInterface $current_user, ConfigFactory $config) {
+  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger, RegistrationCreationService $creation_service, AccountProxyInterface $current_user, ConfigFactory $config, EntityFieldManager $field_manager) {
     $this->messenger = $messenger;
     $this->creationService = $creation_service;
     $this->currentUser = $current_user;
     $this->config = $config;
+    $this->fieldManager = $field_manager;
     parent::__construct($entity_manager);
   }
 
@@ -97,6 +108,7 @@ class RegistrantForm extends ContentEntityForm {
       $editing = TRUE;
     }
     else {
+      // TODO: Use some more services.
       $event_id = \Drupal::routeMatch()->getParameter('eventinstance');
       $event_instance = \Drupal::entityTypeManager()->getStorage('eventinstance')->load($event_id);
       $editing = FALSE;
@@ -106,13 +118,12 @@ class RegistrantForm extends ContentEntityForm {
       throw new NotFoundHttpException();
     }
 
-    $this->creationService->setEvents($event_instance);
-
     $event_series = $event_instance->getEventSeries();
-
     $form_state->setTemporaryValue('series', $event_series);
     $form_state->setTemporaryValue('event', $event_instance);
 
+    // Use the registration creation service to grab relevant data.
+    $this->creationService->setEvents($event_instance);
     $availability = $this->creationService->retrieveAvailability();
     $waitlist = $this->creationService->hasWaitlist();
     $registration_open = $this->creationService->registrationIsOpen();
@@ -138,7 +149,7 @@ class RegistrantForm extends ContentEntityForm {
       'title' => [
         '#type' => 'markup',
         '#prefix' => '<h3 class="event-register-notice-title">',
-        '#markup' => $this->t('We cannot complete your registration'),
+        '#markup' => $this->t('Registration full.'),
         '#suffix' => '</h3>',
       ],
       'message' => [
@@ -207,9 +218,9 @@ class RegistrantForm extends ContentEntityForm {
       ];
     }
 
-    $add_to_waitlist = 0;
+    $add_to_waitlist = ($availability == 0 && $waitlist) ? 1 : 0;
 
-    $form['waitlist'] = [
+    $form['add_to_waitlist'] = [
       '#type' => 'hidden',
       '#value' => $add_to_waitlist,
       '#weight' => 98,
@@ -226,29 +237,115 @@ class RegistrantForm extends ContentEntityForm {
     ];
 
     if ($this->currentUser->hasPermission('modify registrant waitlist')) {
-      $form['waitlist']['#type'] = 'select';
-      $form['waitlist']['#options'] = [
-        '1' => $this->t('Yes'),
-        '0' => $this->t('No'),
+      $form['add_to_waitlist']['#type'] = 'select';
+      $form['add_to_waitlist']['#options'] = [
+        1 => $this->t('Yes'),
+        0 => $this->t('No'),
       ];
-      $form['waitlist']['#title'] = $this->t('Add user to waitlist');
+      $form['add_to_waitlist']['#title'] = $this->t('Add user to waitlist');
       $value = !$entity->isNew() ? $entity->getWaitlist() : $add_to_waitlist;
-      $form['waitlist']['#default_value'] = $value;
-      unset($form['waitlist']['#value']);
+      $form['add_to_waitlist']['#default_value'] = $value;
+      unset($form['add_to_waitlist']['#value']);
     }
 
-    // Because the form gets personalized if you've registered before, we want
-    // to prevent caching.
+    $this->hideFormFields($form, $form_state);
+
+    // Because the form gets modified depending on the number of registrations
+    // we need to prevent caching.
     $form['#cache'] = ['max-age' => 0];
     $form_state->setCached(FALSE);
-
     return $form;
+  }
+
+  /**
+   * Hide form fields depending on registration status.
+   *
+   * @var array $form
+   *   The form configuration array.
+   * @var Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state interface.
+   */
+  protected function hideFormFields(array &$form, FormStateInterface $form_state) {
+    $form_fields = $this->fieldManager->getFieldDefinitions('registrant', 'registrant');
+
+    $availability = $this->creationService->retrieveAvailability();
+    $waitlist = $this->creationService->hasWaitlist();
+    $registration_open = $this->creationService->registrationIsOpen();
+    $reg_type = $this->creationService->getRegistrationType();
+
+    // Prevent the form being displayed if registration is closed, or there are
+    // no spaces left, and no waitlist.
+    if (($availability === 0 && !$waitlist) || !$registration_open) {
+      foreach ($form_fields as $field_name => $field) {
+        if (isset($form[$field_name])) {
+          $form[$field_name]['#printed'] = TRUE;
+        }
+      }
+      $form['actions']['#printed'] = TRUE;
+      if (isset($form['availability'])) {
+        $form['availability']['#printed'] = TRUE;
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+
+    /* @var $entity \Drupal\omega_events\Entity\Registrant */
+    $entity = $this->entity;
+
+    // Only perform the checks if the entity is new.
+    if ($entity->isNew()) {
+
+      $event_series = $form_state->getTemporaryValue('series');
+      // We need to grab a fresh copy of the series to check for updates.
+      $event_series = \Drupal::entityTypeManager()->getStorage('event')->load($event_series->id());
+
+      // Grab the event instance so we can check if registration is open.
+      $event_instance = $form_state->getTemporaryValue('event');
+
+      // Use the registration creation service to grab relevant data.
+      $this->creationService->setEvents($event_instance);
+      // Just to be sure we have a fresh copy of the event series.
+      $this->creationService->setEventSeries($event_series);
+
+      $availability = $this->creationService->retrieveAvailability();
+      $waitlist = $this->creationService->hasWaitlist();
+      $registration_open = $this->creationService->registrationIsOpen();
+      $reg_type = $this->creationService->getRegistrationType();
+
+      $add_to_waitlist = $form_state->getValue('add_to_waitlist');
+
+      // Registration has closed.
+      if (!$registration_open) {
+        $form_state->setError($form, '');
+      }
+      // Capacity is full, there is a waitlist, but user was not being added to
+      // the waitlist.
+      elseif (!$add_to_waitlist && $availability == 0 && $waitlist) {
+        $form_state->setError($form, '');
+      }
+      // There are no spaces left, and there is no waitlist.
+      elseif ($availability == 0 && !$waitlist) {
+        $form_state->setError($form, '');
+      }
+    }
+    else {
+      if ($this->currentUser->hasPermission('modify registrant waitlist')) {
+        // Update the user's waitlist value.
+        $entity->setWaitlist($form_state->getValue('add_to_waitlist'));
+      }
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    // TODO: Saving a registration.
     $entity = $this->entity;
 
     $status = parent::save($form, $form_state);

@@ -192,7 +192,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       }
 
       if (empty($item['waitlist'])) {
-        $item['waitlist'] = '';
+        $item['waitlist'] = 0;
       }
 
       if (empty($item['time_amount'])) {
