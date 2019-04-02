@@ -285,6 +285,9 @@ class RegistrantForm extends ContentEntityForm {
       if (isset($form['availability'])) {
         $form['availability']['#printed'] = TRUE;
       }
+      if (isset($form['add_to_waitlist'])) {
+        $form['add_to_waitlist']['#printed'] = TRUE;
+      }
     }
   }
 
