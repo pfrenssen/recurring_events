@@ -11,6 +11,8 @@ use Drupal\recurring_events_registration\RegistrationCreationService;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityFieldManager;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Form controller for Registrant edit forms.
@@ -55,6 +57,20 @@ class RegistrantForm extends ContentEntityForm {
   protected $fieldManager;
 
   /**
+   * The route match service.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
+   * The entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -64,7 +80,9 @@ class RegistrantForm extends ContentEntityForm {
       $container->get('recurring_events.registration_creation_service'),
       $container->get('current_user'),
       $container->get('config.factory'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('current_route_match'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -83,13 +101,27 @@ class RegistrantForm extends ContentEntityForm {
    *   The config factory service.
    * @param \Drupal\Core\Entity\EntityFieldManager $field_manager
    *   The entity field manager service.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
    */
-  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger, RegistrationCreationService $creation_service, AccountProxyInterface $current_user, ConfigFactory $config, EntityFieldManager $field_manager) {
+  public function __construct(
+    EntityManagerInterface $entity_manager,
+    Messenger $messenger,
+    RegistrationCreationService $creation_service,
+    AccountProxyInterface $current_user,
+    ConfigFactory $config,
+    EntityFieldManager $field_manager,
+    RouteMatchInterface $route_match,
+    EntityTypeManagerInterface $entity_type_manager) {
     $this->messenger = $messenger;
     $this->creationService = $creation_service;
     $this->currentUser = $current_user;
     $this->config = $config;
     $this->fieldManager = $field_manager;
+    $this->routeMatch = $route_match;
+    $this->entityTypeManager = $entity_type_manager;
     parent::__construct($entity_manager);
   }
 
@@ -107,9 +139,8 @@ class RegistrantForm extends ContentEntityForm {
       $editing = TRUE;
     }
     else {
-      // TODO: Use some more services.
-      $event_id = \Drupal::routeMatch()->getParameter('eventinstance');
-      $event_instance = \Drupal::entityTypeManager()->getStorage('eventinstance')->load($event_id);
+      $event_id = $this->routeMatch->getParameter('eventinstance');
+      $event_instance = $this->entityTypeManager->getStorage('eventinstance')->load($event_id);
       $editing = FALSE;
     }
 
@@ -304,7 +335,7 @@ class RegistrantForm extends ContentEntityForm {
 
       $event_series = $form_state->getTemporaryValue('series');
       // We need to grab a fresh copy of the series to check for updates.
-      $event_series = \Drupal::entityTypeManager()->getStorage('eventseries')->load($event_series->id());
+      $event_series = $this->entityTypeManager->getStorage('eventseries')->load($event_series->id());
 
       // Grab the event instance so we can check if registration is open.
       $event_instance = $form_state->getTemporaryValue('event');
@@ -347,12 +378,11 @@ class RegistrantForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    // TODO: Saving a registration.
     $entity = $this->entity;
 
     $event_series = $form_state->getTemporaryValue('series');
     // We need to grab a fresh copy of the series to check for updates.
-    $event_series = \Drupal::entityTypeManager()->getStorage('eventseries')->load($event_series->id());
+    $event_series = $this->entityTypeManager->getStorage('eventseries')->load($event_series->id());
     $event_instance = $form_state->getTemporaryValue('event');
 
     // Use the registration creation service to grab relevant data.
