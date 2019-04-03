@@ -384,14 +384,14 @@ class EventCreationService {
   /**
    * Create an event based on the form submitted values.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $original
-   *   The original, unsaved event series entity.
    * @param Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
    * @param Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of an updated event series entity.
+   * @param Drupal\recurring_events\Entity\EventSeries $original
+   *   The original, unsaved event series entity.
    */
-  public function saveEvent(EventSeries $original, EventSeries $event, FormStateInterface $form_state) {
+  public function saveEvent(EventSeries $event, FormStateInterface $form_state, EventSeries $original = NULL) {
     // We only need a revision if this is an existing entity.
     if ($event->isNew()) {
       $create_instances = TRUE;
