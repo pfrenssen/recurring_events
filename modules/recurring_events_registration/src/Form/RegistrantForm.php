@@ -305,7 +305,7 @@ class RegistrantForm extends ContentEntityForm {
 
       $event_series = $form_state->getTemporaryValue('series');
       // We need to grab a fresh copy of the series to check for updates.
-      $event_series = \Drupal::entityTypeManager()->getStorage('event')->load($event_series->id());
+      $event_series = \Drupal::entityTypeManager()->getStorage('eventseries')->load($event_series->id());
 
       // Grab the event instance so we can check if registration is open.
       $event_instance = $form_state->getTemporaryValue('event');
@@ -351,21 +351,43 @@ class RegistrantForm extends ContentEntityForm {
     // TODO: Saving a registration.
     $entity = $this->entity;
 
-    $status = parent::save($form, $form_state);
+    $event_series = $form_state->getTemporaryValue('series');
+    // We need to grab a fresh copy of the series to check for updates.
+    $event_series = \Drupal::entityTypeManager()->getStorage('eventseries')->load($event_series->id());
+    $event_instance = $form_state->getTemporaryValue('event');
 
-    switch ($status) {
-      case SAVED_NEW:
-        $this->messenger->addMessage($this->t('Created the %label Registrant.', [
-          '%label' => $entity->label(),
-        ]));
-        break;
+    // Use the registration creation service to grab relevant data.
+    $this->creationService->setEvents($event_instance);
+    // Just to be sure we have a fresh copy of the event series.
+    $this->creationService->setEventSeries($event_series);
 
-      default:
-        $this->messenger->addMessage($this->t('Saved the %label Registrant.', [
-          '%label' => $entity->label(),
-        ]));
+    $availability = $this->creationService->retrieveAvailability();
+    $waitlist = $this->creationService->hasWaitlist();
+    $registration_open = $this->creationService->registrationIsOpen();
+    $reg_type = $this->creationService->getRegistrationType();
+    $registration = $this->creationService->hasRegistration();
+
+    $form_state->setRedirect('entity.eventinstance.canonical', ['eventinstance' => $event_instance->id()]);
+
+    if ($registration && $registration_open && ($availability > 0 || $waitlist)) {
+      $add_to_waitlist = (int) $form_state->getValue('add_to_waitlist');
+      $this->entity->setEventSeries($event_series);
+      $this->entity->setEventInstance($event_instance);
+      $this->entity->setWaitlist($add_to_waitlist);
+      $this->entity->setRegistrationType($reg_type);
+      parent::save($form, $form_state);
+
+      $message = $this->t('Registration successfully created.');
+      if ($add_to_waitlist) {
+        $message = $this->t('Successfully registered to the waitlist.');
+      }
+
+      $this->messenger->addMessage($message);
     }
-    $form_state->setRedirect('entity.registrant.canonical', ['registrant' => $entity->id()]);
+    else {
+      $this->messenger->addMessage($this->t('Unfortunately, registration is not available at this time.'));
+    }
+
   }
 
 }

@@ -8,6 +8,8 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
+use Drupal\recurring_events\Entity\EventInstance;
+use Drupal\recurring_events\Entity\EventSeries;
 
 /**
  * Defines the Registrant entity.
@@ -180,7 +182,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
   /**
    * Get the event series.
    *
-   * @return Drupal\recurring_events\EventInterface
+   * @return Drupal\recurring_events\Entity\EventSeries
    *   The event series entity.
    */
   public function getEventSeries() {
@@ -190,13 +192,13 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
   /**
    * Set the event series ID.
    *
-   * @param Drupal\recurring_events\EventInterface $event
+   * @param Drupal\recurring_events\Entity\EventSeries $event
    *   The event series entity.
    *
    * @return Drupal\recurring_events_registration\Entity\RegistrantInterface
    *   The registrant entity.
    */
-  public function setEventSeries(EventInterface $event) {
+  public function setEventSeries(EventSeries $event) {
     $this->set('eventseries_id', $event->id());
     return $this;
   }
@@ -204,7 +206,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
   /**
    * Get the event.
    *
-   * @return Drupal\recurring_events\EventInterface
+   * @return Drupal\recurring_events\Entity\EventInstance
    *   The eventinstance entity.
    */
   public function getEventInstance() {
@@ -214,13 +216,13 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
   /**
    * Set the event ID.
    *
-   * @param Drupal\recurring_events\EventInterface $event
+   * @param Drupal\recurring_events\Entity\EventInstance $event
    *   The eventinstance entity.
    *
    * @return Drupal\recurring_events_registration\Entity\RegistrantInterface
    *   The registrant entity.
    */
-  public function setEventInstance(EventInterface $event) {
+  public function setEventInstance(EventInstance $event) {
     $this->set('eventinstance_id', $event->id());
     return $this;
   }
