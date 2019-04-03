@@ -21,6 +21,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     $header['lastname'] = $this->t('Last Name');
     $header['email'] = $this->t('Email');
     $header['phone'] = $this->t('Phone');
+    $header['waitlist'] = $this->t('Waitlist');
     return $header + parent::buildHeader();
   }
 
@@ -34,6 +35,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     $row['lastname'] = $entity->get('field_last_name')->value;
     $row['email'] = $entity->get('field_email')->value;
     $row['phone'] = $entity->get('field_phone')->value;
+    $row['waitlist'] = $entity->get('waitlist')->value ? $this->t('Yes') : $this->t('No');
     return $row + parent::buildRow($entity);
   }
 

@@ -48,6 +48,46 @@ class EventInstanceForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildForm($form, $form_state);
+
+    /* @var $entity \Drupal\recurring_events\Entity\EventInstance */
+    $event = $this->entity;
+
+    $form['notifications'] = [
+      '#type' => 'container',
+      '#weight' => -100,
+      '#attributes' => [
+        'class' => ['event-notifications'],
+      ],
+    ];
+
+    $form['notifications']['edit_message'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['event-notification-message'],
+      ],
+      'title' => [
+        '#type' => 'markup',
+        '#prefix' => '<h3 class="event-notice-title">',
+        '#markup' => $this->t('Data Inheritance'),
+        '#suffix' => '</h3>',
+      ],
+      'message' => [
+        '#type' => 'markup',
+        '#prefix' => '<p class="event-message">',
+        '#markup' => $this->t('Some of the data for event instances is inherited from the event series that the instance belongs to. @link.', [
+          '@link' => $event->getEventSeries()->toLink($this->t('Edit the series'), 'edit-form')->toString(),
+        ]),
+        '#suffix' => '</p>',
+      ],
+    ];
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $form_state->setRedirect('entity.eventinstance.collection');
     parent::save($form, $form_state);

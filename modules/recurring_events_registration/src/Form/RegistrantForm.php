@@ -97,7 +97,6 @@ class RegistrantForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
     $form = parent::buildForm($form, $form_state);
 
     /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
@@ -133,7 +132,7 @@ class RegistrantForm extends ContentEntityForm {
       '#type' => 'container',
       '#weight' => -100,
       '#attributes' => [
-        'class' => ['event-register-notifications'],
+        'class' => ['event-notifications'],
       ],
       // Do not show notifications if we are in edit mode.
       '#printed' => $editing,
@@ -144,17 +143,17 @@ class RegistrantForm extends ContentEntityForm {
       '#type' => 'container',
       '#access' => ($availability == 0 && $waitlist && $registration_open),
       '#attributes' => [
-        'class' => ['event-register-notification-message'],
+        'class' => ['event-notification-message'],
       ],
       'title' => [
         '#type' => 'markup',
-        '#prefix' => '<h3 class="event-register-notice-title">',
+        '#prefix' => '<h3 class="event-notice-title">',
         '#markup' => $this->t('Registration full.'),
         '#suffix' => '</h3>',
       ],
       'message' => [
         '#type' => 'markup',
-        '#prefix' => '<p class="event-register-message">',
+        '#prefix' => '<p class="event-message">',
         '#markup' => $this->t('Unfortunately, there are no spaces left for this @type. However, we can add you to the waitlist. If a space becomes available, you will be notified via email and automatically registered.', [
           '@type' => $reg_type === 'series' ? 'series' : 'event',
         ]),
@@ -166,18 +165,18 @@ class RegistrantForm extends ContentEntityForm {
     $form['notifications']['availability_notification'] = [
       '#type' => 'container',
       '#attributes' => [
-        'class' => ['event-register-notification-message'],
+        'class' => ['event-notification-message'],
       ],
       '#access' => ($availability == 0 && !$waitlist && $registration_open),
       'title' => [
         '#type' => 'markup',
-        '#prefix' => '<h3 class="event-register-notice-title">',
+        '#prefix' => '<h3 class="event-notice-title">',
         '#markup' => $this->t('We cannot complete your registration.'),
         '#suffix' => '</h3>',
       ],
       'message' => [
         '#type' => 'markup',
-        '#prefix' => '<p class="event-register-message">',
+        '#prefix' => '<p class="event-message">',
         '#markup' => $this->t('Unfortunately, this @type is at capacity and there are no spaces available.', [
           '@type' => $reg_type === 'series' ? 'series' : 'event',
         ]),
@@ -189,18 +188,18 @@ class RegistrantForm extends ContentEntityForm {
     $form['notifications']['registration_closed'] = [
       '#type' => 'container',
       '#attributes' => [
-        'class' => ['event-register-notification-message'],
+        'class' => ['event-notification-message'],
       ],
       '#access' => !$registration_open,
       'title' => [
         '#type' => 'markup',
-        '#prefix' => '<h3 class="event-register-notice-title">',
+        '#prefix' => '<h3 class="event-notice-title">',
         '#markup' => $this->t('Registration is closed.'),
         '#suffix' => '</h3>',
       ],
       'message' => [
         '#type' => 'markup',
-        '#prefix' => '<p class="event-register-message">',
+        '#prefix' => '<p class="event-message">',
         '#markup' => $this->t('Unfortunately, registration for this @type is closed.', [
           '@type' => $reg_type === 'series' ? 'series' : 'event',
         ]),
@@ -211,7 +210,7 @@ class RegistrantForm extends ContentEntityForm {
     if ($this->config('recurring_events_registration.registrant.config')->get('show_capacity')) {
       $form['availability'] = [
         '#type' => 'markup',
-        '#prefix' => '<span class="event-register-availability">',
+        '#prefix' => '<span class="event-availability">',
         '#markup' => $this->t('Spaces Available: @availability', ['@availability' => $availability]),
         '#suffix' => '</span>',
         '#weight' => -99,
@@ -230,7 +229,7 @@ class RegistrantForm extends ContentEntityForm {
 
     $form['back_link'] = [
       '#type' => 'markup',
-      '#prefix' => '<span class="event-register-back-link">',
+      '#prefix' => '<span class="event-back-link">',
       '#markup' => $link->toString(),
       '#suffix' => '</span>',
       '#weight' => 100,
@@ -375,11 +374,22 @@ class RegistrantForm extends ContentEntityForm {
       $this->entity->setEventInstance($event_instance);
       $this->entity->setWaitlist($add_to_waitlist);
       $this->entity->setRegistrationType($reg_type);
-      parent::save($form, $form_state);
+      $status = parent::save($form, $form_state);
 
-      $message = $this->t('Registration successfully created.');
-      if ($add_to_waitlist) {
-        $message = $this->t('Successfully registered to the waitlist.');
+      switch ($status) {
+        case SAVED_NEW:
+          $message = $this->t('Registrant successfully created.');
+          if ($add_to_waitlist) {
+            $message = $this->t('Successfully registered to the waitlist.');
+          }
+          break;
+
+        default:
+          $message = $this->t('Registrant successfully updated.');
+          if ($add_to_waitlist) {
+            $message = $this->t('Successfully updated waitlist registrant.');
+          }
+          break;
       }
 
       $this->messenger->addMessage($message);
