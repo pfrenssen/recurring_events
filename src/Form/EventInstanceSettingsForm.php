@@ -65,7 +65,13 @@ class EventInstanceSettingsForm extends ConfigFormBase {
     $php_date_url = Url::fromUri('https://secure.php.net/manual/en/function.date.php');
     $php_date_link = Link::fromTextAndUrl($this->t('PHP date/time format'), $php_date_url);
 
-    $form['date_format'] = [
+    $form['display'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Event Display'),
+      '#open' => TRUE,
+    ];
+
+    $form['display']['date_format'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Event Instance Date Format'),
       '#required' => TRUE,
@@ -75,7 +81,7 @@ class EventInstanceSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('date_format'),
     ];
 
-    $form['limit'] = [
+    $form['display']['limit'] = [
       '#type' => 'number',
       '#title' => $this->t('Event Instance Items'),
       '#required' => TRUE,

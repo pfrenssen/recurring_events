@@ -185,7 +185,7 @@ class RegistrantForm extends ContentEntityForm {
       'message' => [
         '#type' => 'markup',
         '#prefix' => '<p class="event-message">',
-        '#markup' => $this->t('Unfortunately, there are no spaces left for this @type. However, we can add you to the waitlist. If a space becomes available, you will be notified via email and automatically registered.', [
+        '#markup' => $this->t('Unfortunately, there are no spaces left for this @type. However, we can add you to the waitlist. If a space becomes available, the first registrant on the waitlist will be automatically registered.', [
           '@type' => $reg_type === 'series' ? 'series' : 'event',
         ]),
         '#suffix' => '</p>',

@@ -67,7 +67,13 @@ class EventSeriesSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('recurring_events.eventseries.config');
 
-    $form['interval'] = [
+    $form['creation'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Event Creation'),
+      '#open' => TRUE,
+    ];
+
+    $form['creation']['interval'] = [
       '#type' => 'number',
       '#title' => $this->t('Event Series Time Intervals'),
       '#required' => TRUE,
@@ -75,7 +81,7 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('interval'),
     ];
 
-    $form['min_time'] = [
+    $form['creation']['min_time'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Event Series Minimum Time'),
       '#required' => TRUE,
@@ -83,7 +89,7 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('min_time'),
     ];
 
-    $form['max_time'] = [
+    $form['creation']['max_time'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Event Series Maximum Time'),
       '#required' => TRUE,
@@ -94,7 +100,7 @@ class EventSeriesSettingsForm extends ConfigFormBase {
     $php_date_url = Url::fromUri('https://secure.php.net/manual/en/function.date.php');
     $php_date_link = Link::fromTextAndUrl($this->t('PHP date/time format'), $php_date_url);
 
-    $form['date_format'] = [
+    $form['creation']['date_format'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Event Series Date Format'),
       '#required' => TRUE,
@@ -104,7 +110,7 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('date_format'),
     ];
 
-    $form['time_format'] = [
+    $form['creation']['time_format'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Event Series Time Format'),
       '#required' => TRUE,
@@ -124,7 +130,7 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       'sunday' => t('Sunday'),
     ];
 
-    $form['days'] = [
+    $form['creation']['days'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Event Series Days'),
       '#required' => TRUE,
@@ -133,7 +139,13 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       '#default_value' => explode(',', $config->get('days')),
     ];
 
-    $form['limit'] = [
+    $form['display'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Event Display'),
+      '#open' => TRUE,
+    ];
+
+    $form['display']['limit'] = [
       '#type' => 'number',
       '#title' => $this->t('Event Series Items'),
       '#required' => TRUE,
