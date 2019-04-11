@@ -11,9 +11,3 @@ delete registrant entities:
 
 edit registrant entities:
   title: 'Edit Registrant entities'
-
-view published registrant entities:
-  title: 'View published Registrant entities'
-
-view unpublished registrant entities:
-  title: 'View unpublished Registrant entities'

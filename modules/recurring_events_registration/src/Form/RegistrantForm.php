@@ -77,7 +77,7 @@ class RegistrantForm extends ContentEntityForm {
     return new static(
       $container->get('entity.manager'),
       $container->get('messenger'),
-      $container->get('recurring_events.registration_creation_service'),
+      $container->get('recurring_events_registration.creation_service'),
       $container->get('current_user'),
       $container->get('config.factory'),
       $container->get('entity_field.manager'),

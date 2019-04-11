@@ -98,14 +98,33 @@ class RegistrantSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Emails'),
     ];
 
-    $email_token_help = $this->t('Available variables are: [site:name], [site:url], [user:display-name], [user:account-name], [user:mail], [site:login-url], [site:url-brief], [user:edit-url], [user:one-time-login-url], [user:cancel-url].');
+    $token_help = '';
+    $token_service = \Drupal::token();
+    $all_tokens = $token_service->getInfo();
+    $tokens = [];
+    $relevant_tokens = [
+      'eventseries',
+      'eventinstance',
+      'registrant',
+    ];
+    foreach ($relevant_tokens as $token_prefix) {
+      if (!empty($all_tokens['tokens'][$token_prefix])) {
+        foreach ($all_tokens['tokens'][$token_prefix] as $token_key => $value) {
+          $tokens[] = '[' . $token_prefix . ':' . $token_key . ']';
+        }
+      }
+    }
+
+    $token_help = $this->t('Available variables are: @tokens.', [
+      '@tokens' => implode(', ', $tokens),
+    ]);
 
     // Registration notifications.
     $form['notifications']['registration'] = [
       '#type' => 'details',
       '#title' => $this->t('Registration Notification'),
       '#open' => TRUE,
-      '#description' => $this->t('Enable and configure registration notifications') . ' ' . $email_token_help,
+      '#description' => $this->t('Enable and configure registration notifications') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['registration']['registration_notification'] = [
@@ -141,7 +160,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['notifications']['waitlist'] = [
       '#type' => 'details',
       '#title' => $this->t('Waitlist Notification'),
-      '#description' => $this->t('Enable and configure waitlist notifications') . ' ' . $email_token_help,
+      '#description' => $this->t('Enable and configure waitlist notifications') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['waitlist']['waitlist_notification'] = [
@@ -177,7 +196,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['notifications']['promotion'] = [
       '#type' => 'details',
       '#title' => $this->t('Promotion Notification'),
-      '#description' => $this->t('Enable and configure promotion notifications') . ' ' . $email_token_help,
+      '#description' => $this->t('Enable and configure promotion notifications') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['promotion']['promotion_notification'] = [
@@ -213,7 +232,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['notifications']['cancellation'] = [
       '#type' => 'details',
       '#title' => $this->t('Cancellation Notification'),
-      '#description' => $this->t('Enable and configure cancellation notifications') . ' ' . $email_token_help,
+      '#description' => $this->t('Enable and configure cancellation notifications') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['cancellation']['cancellation_notification'] = [
@@ -249,7 +268,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['notifications']['modification'] = [
       '#type' => 'details',
       '#title' => $this->t('Modification Notification'),
-      '#description' => $this->t('Enable and configure modification notifications') . ' ' . $email_token_help,
+      '#description' => $this->t('Enable and configure modification notifications') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['modification']['modification_notification'] = [

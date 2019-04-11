@@ -8,6 +8,7 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_help().
@@ -46,4 +47,49 @@ function recurring_events_registration_entity_base_field_info_alter(&$fields, En
         'weight' => 4,
       ]);
   }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function recurring_events_registration_theme() {
+  $theme = [];
+
+  $theme['registrant'] = [
+    'render element' => 'elements',
+    'template' => 'registrant',
+  ];
+
+  return $theme;
+}
+
+/**
+ * Implements template_preprocess_entity().
+ */
+function template_preprocess_registrant(array &$variables) {
+  // Set the registrant object to be accessible in the template.
+  $variables['registrant'] = $variables['elements']['#registrant'];
+
+  // Set a class on the registrant to differentiate between viewmodes.
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $variables['attributes']['class'][] = 'registrant-' . $variables['view_mode'];
+
+  // Allow field groups to be rendered too.
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function recurring_events_registration_mail($key, &$message, $params) {
+  $options = [
+    'langcode' => $message['langcode'],
+  ];
+
+  $message['from'] = \Drupal::config('system.site')->get('mail');
+  $message['body'][] = $params['message'];
+
+  // TODO: Use the new NotificationService to set/get subjects/bodies etc.
 }

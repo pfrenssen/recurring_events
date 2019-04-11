@@ -1,0 +1,349 @@
+<?php
+
+namespace Drupal\recurring_events_registration;
+
+use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Config\ConfigManagerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\Utility\Token;
+use Drupal\recurring_events_registration\Entity\RegistrantInterface;
+
+/**
+ * NotificationService class.
+ */
+class NotificationService {
+
+  /**
+   * The translation interface.
+   *
+   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   */
+  private $translation;
+
+  /**
+   * The configuration manager.
+   *
+   * @var \Drupal\Core\Config\ConfigManagerInterface
+   */
+  protected $configManager;
+  /**
+   * Logger Factory.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   */
+  protected $loggerFactory;
+
+  /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
+   * The registrant entity.
+   *
+   * @var \Drupal\recurring_events_registration\Entity\RegistrantInterface
+   */
+  protected $entity;
+
+  /**
+   * The email key.
+   *
+   * @var string
+   */
+  protected $key;
+
+  /**
+   * The email subject.
+   *
+   * @var string
+   */
+  protected $subject;
+
+  /**
+   * The email message.
+   *
+   * @var string
+   */
+  protected $message;
+
+  /**
+   * The config name.
+   *
+   * @var string
+   */
+  protected $configName;
+
+  /**
+   * Class constructor.
+   *
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
+   *   The translation interface.
+   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   *   The database connection.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
+   *   The logger factory.
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
+   */
+  public function __construct(TranslationInterface $translation, ConfigManagerInterface $config_manager, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token) {
+    $this->translation = $translation;
+    $this->configManager = $config_manager;
+    $this->loggerFactory = $logger->get('recurring_events_registration');
+    $this->messenger = $messenger;
+    $this->token = $token;
+    $this->configName = 'recurring_events_registration.registrant.config';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('string_translation'),
+      $container->get('config.manager'),
+      $container->get('logger.factory'),
+      $container->get('messenger')
+    );
+  }
+
+  /**
+   * Set the registrant entity.
+   *
+   * @param \Drupal\recurring_events_registration\Entity\RegistrantInterface $registrant
+   *   The registrant entity.
+   *
+   * @return self
+   *   The NotificationService object.
+   */
+  public function setEntity(RegistrantInterface $registrant) {
+    $this->entity = $registrant;
+    return $this;
+  }
+
+  /**
+   * Set the email key.
+   *
+   * @param string $key
+   *   The email key to use.
+   *
+   * @return self
+   *   The NotificationService object.
+   */
+  public function setKey($key) {
+    $this->key = $key;
+    return $this;
+  }
+
+  /**
+   * Set the email subject.
+   *
+   * @param string $subject
+   *   The email subject line.
+   *
+   * @return self
+   *   The NotificationService object.
+   */
+  public function setSubject($subject) {
+    $this->subject = $subject;
+    return $this;
+  }
+
+  /**
+   * Set the email message.
+   *
+   * @param string $message
+   *   The email message.
+   *
+   * @return self
+   *   The NotificationService object.
+   */
+  public function setMessage($message) {
+    $this->message = $message;
+    return $this;
+  }
+
+  /**
+   * Set the config name.
+   *
+   * @param string $name
+   *   The name of the config value to use.
+   *
+   * @return self
+   *   The NotificationService object.
+   */
+  public function setConfigName($name) {
+    $this->configName = $name;
+    return $this;
+  }
+
+  /**
+   * Get the key.
+   *
+   * @return string|bool
+   *   The key, or FALSE if not set.
+   */
+  protected function getKey() {
+    if (empty($this->key)) {
+      $this->messenger->addError($this->translation->translate('No key defined for @module notifications.', [
+        '@module' => 'recurring_events_registration',
+      ]));
+      $this->loggerFactory->error('No key defined @module notifications. Call @function before proceding.', [
+        '@module' => 'recurring_events_registration',
+        '@function' => 'NotificationService::setKey()',
+      ]);
+      return FALSE;
+    }
+    return $this->key;
+  }
+
+  /**
+   * Get the config name.
+   *
+   * @return string
+   *   The name of the config element.
+   */
+  protected function getConfigName() {
+    if (empty($this->configName)) {
+      $this->messenger->addError($this->translation->translate('No config name defined for @module notifications.', [
+        '@module' => 'recurring_events_registration',
+      ]));
+      $this->loggerFactory->error('No config name defined for @module notifications. Call @function before proceding.', [
+        '@module' => 'recurring_events_registration',
+        '@function' => 'NotificationService::setConfigName()',
+      ]);
+      return FALSE;
+    }
+    return $this->key;
+  }
+
+  /**
+   * Retrieve config value.
+   *
+   * @var string $name
+   *   The name of the config value to retrieve
+   *
+   * @return string|bool
+   *   Return the config value, or FALSE if not set.
+   */
+  protected function getConfigValue($name) {
+    $value = FALSE;
+    if (!is_null($this->config($this->getConfigName())->get($value))) {
+      return $this->config($this->getConfigName())->get($value);
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * Get the from address.
+   *
+   * @return string
+   *   The from address.
+   */
+  protected function getFrom() {
+    return $this->config('system.site')->get('mail');
+  }
+
+  /**
+   * Check notification is enabled.
+   *
+   * @return bool
+   *   Returns TRUE if enabled, FALSE otherwise.
+   */
+  public function isEnabled() {
+    $key = $this->getKey();
+    if ($key) {
+      $value = $key . '_enabled';
+      return (bool) $this->config($this->getConfigName())->get($value);
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get the email subject.
+   *
+   * @return string
+   *   The email subject line.
+   */
+  public function getSubject() {
+    $key = $this->getKey();
+    if ($key) {
+      $subject = $this->subject;
+      if (empty($this->subject)) {
+        $value = $key . '_subject';
+        $subject = $this->getConfigValue($value);
+        $this->setSubject($subject);
+      }
+
+      if (empty($subject)) {
+        $this->messenger->addError($this->translation->translate('No default subject configured for @key emails in @config_name.', [
+          '@key' => $key,
+          '@config_name' => $this->getConfigName(),
+        ]));
+        return '';
+      }
+      return $this->parseTokenizedString($subject);
+    }
+    return '';
+  }
+
+  /**
+   * Get the email message.
+   *
+   * @return string
+   *   The email message.
+   */
+  public function getMessage() {
+    $key = $this->getKey();
+    if ($key) {
+      $message = $this->message;
+      if (empty($this->message)) {
+        $value = $key . '_body';
+        $message = $this->getConfigValue($value);
+        $this->setMessage($message);
+      }
+
+      if (empty($message)) {
+        $this->messenger->addError($this->translation->translate('No default body configured for @key emails in @config_name.', [
+          '@key' => $key,
+          '@config_name' => $this->getConfigName(),
+        ]));
+        return '';
+      }
+      return $this->parseTokenizedString($message);
+    }
+    return '';
+  }
+
+  /**
+   * Parse a tokenized string.
+   *
+   * @var string $string
+   *   The string to parse.
+   *
+   * @return string
+   *   The parsed string.
+   */
+  public function parseTokenizedString($string) {
+    $data = [
+      'registrant' => $this->entity,
+      'eventinstance' => $this->entity->getEventInstance(),
+      'eventseries' => $this->entity->getEventSeries(),
+    ];
+    $string = $this->token->replace($string, $data);
+    return $string;
+  }
+
+}

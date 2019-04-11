@@ -7,6 +7,7 @@
 
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\Element;
 
 /**
  * Implements hook_help().
@@ -38,4 +39,57 @@ function recurring_events_entity_operation(EntityInterface $entity) {
   }
 
   return $operations;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function recurring_events_theme() {
+  $theme = [];
+
+  $theme['eventinstance'] = [
+    'render element' => 'elements',
+    'template' => 'eventinstance',
+  ];
+
+  $theme['eventseries'] = [
+    'render element' => 'elements',
+    'template' => 'eventseries',
+  ];
+
+  return $theme;
+}
+
+/**
+ * Implements template_preprocess_entity().
+ */
+function template_preprocess_eventinstance(array &$variables) {
+  // Set the eventinstance object to be accessible in the template.
+  $variables['eventinstance'] = $variables['elements']['#eventinstance'];
+
+  // Set a class on the eventinstance to differentiate between viewmodes.
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $variables['attributes']['class'][] = 'eventinstance-' . $variables['view_mode'];
+
+  // Allow field groups to be rendered too.
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements template_preprocess_entity().
+ */
+function template_preprocess_eventseries(array &$variables) {
+  // Set the eventseries object to be accessible in the template.
+  $variables['eventseries'] = $variables['elements']['#eventseries'];
+
+  // Set a class on the eventseries to differentiate between viewmodes.
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $variables['attributes']['class'][] = 'eventseries-' . $variables['view_mode'];
+
+  // Allow field groups to be rendered too.
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
 }
