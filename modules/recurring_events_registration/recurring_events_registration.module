@@ -88,8 +88,23 @@ function recurring_events_registration_mail($key, &$message, $params) {
     'langcode' => $message['langcode'],
   ];
 
-  $message['from'] = \Drupal::config('system.site')->get('mail');
-  $message['body'][] = $params['message'];
+  $service = \Drupal::service('recurring_events_registration.notification_service');
+  $service->setKey($key)->setEntity($params['registrant']);
 
-  // TODO: Use the new NotificationService to set/get subjects/bodies etc.
+  if ($service->isEnabled()) {
+    if (!empty($message['subject'])) {
+      $service->setSubject($message['subject']);
+    }
+    if (!empty($message['body'])) {
+      $service->setMessage($message['body']);
+    }
+    if (!empty($message['from'])) {
+      $service->setMessage($message['from']);
+    }
+
+    $message['from'] = $service->getFrom();
+    $message['subject'] = $service->getSubject();
+    $message['body'][] = $service->getMessage();
+  }
+  return FALSE;
 }

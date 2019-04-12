@@ -68,6 +68,21 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    $mail = \Drupal::service('plugin.manager.mail');
+
+    $params = [
+      'registrant' => $this,
+    ];
+    // TODO: What if no email address set, how do we try and send an email.
+    // Change email to be a basefield.
+    // $mail->mail('recurring_events_registration', $to, \Drupal::languageManager()->getDefaultLanguage()->getId()
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -119,10 +134,8 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Authored by'))
       ->setDescription(t('The user ID of author of the Registrant entity.'))
-      ->setRevisionable(TRUE)
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
-      ->setTranslatable(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'author',
@@ -137,6 +150,21 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
           'autocomplete_type' => 'tags',
           'placeholder' => '',
         ],
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['email'] = BaseFieldDefinition::create('email')
+      ->setLabel(t('Email Address'))
+      ->setDescription(t('The email address of the registrant'))
+      ->addConstraint('UserMailRequired')
+      ->setDisplayOptions('form', [
+        'type' => 'email_default',
+        'weight' => -6,
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'weight' => 10,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);

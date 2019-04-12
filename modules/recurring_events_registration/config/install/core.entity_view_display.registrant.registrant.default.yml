@@ -14,7 +14,7 @@ targetEntityType: registrant
 bundle: registrant
 mode: default
 content:
-  field_email:
+  email:
     weight: 3
     label: above
     settings: {  }

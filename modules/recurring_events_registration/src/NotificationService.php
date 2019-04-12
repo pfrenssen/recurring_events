@@ -77,6 +77,13 @@ class NotificationService {
   protected $message;
 
   /**
+   * The from address.
+   *
+   * @var string
+   */
+  protected $from;
+
+  /**
    * The config name.
    *
    * @var string
@@ -175,6 +182,20 @@ class NotificationService {
   }
 
   /**
+   * Set the email from address.
+   *
+   * @param string $from
+   *   The from email address.
+   *
+   * @return self
+   *   The NotificationService object.
+   */
+  public function setFrom($from) {
+    $this->from = $from;
+    return $this;
+  }
+
+  /**
    * Set the config name.
    *
    * @param string $name
@@ -253,7 +274,21 @@ class NotificationService {
    *   The from address.
    */
   protected function getFrom() {
-    return $this->config('system.site')->get('mail');
+    $key = $this->getKey();
+    if ($key) {
+      $from = $this->from;
+      if (empty($from)) {
+        $from = $this->config('system.site')->get('mail');
+        $this->setFrom($from);
+      }
+
+      if (empty($from)) {
+        $this->messenger->addError($this->translation->translate('No default from address configured. Please check the system.site mail config.'));
+        return '';
+      }
+      return $from;
+    }
+    return '';
   }
 
   /**
@@ -281,7 +316,7 @@ class NotificationService {
     $key = $this->getKey();
     if ($key) {
       $subject = $this->subject;
-      if (empty($this->subject)) {
+      if (empty($subject)) {
         $value = $key . '_subject';
         $subject = $this->getConfigValue($value);
         $this->setSubject($subject);
@@ -309,7 +344,7 @@ class NotificationService {
     $key = $this->getKey();
     if ($key) {
       $message = $this->message;
-      if (empty($this->message)) {
+      if (empty($message)) {
         $value = $key . '_body';
         $message = $this->getConfigValue($value);
         $this->setMessage($message);

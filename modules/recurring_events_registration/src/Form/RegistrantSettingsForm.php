@@ -93,9 +93,21 @@ class RegistrantSettingsForm extends ConfigFormBase {
       '#open' => TRUE,
     ];
 
+    $form['notifications']['email_notifications'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Send Email Notifications?'),
+      '#description' => $this->t('Send email notifications during registration or event updates?'),
+      '#default_value' => $config->get('email_notifications'),
+    ];
+
     $form['notifications']['emails'] = [
       '#type' => 'vertical_tabs',
       '#title' => $this->t('Emails'),
+      '#states' => [
+        'visible' => [
+          'input[name="email_notifications"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $token_help = '';

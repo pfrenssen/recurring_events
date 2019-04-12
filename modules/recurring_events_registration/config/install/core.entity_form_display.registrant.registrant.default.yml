@@ -13,7 +13,7 @@ targetEntityType: registrant
 bundle: registrant
 mode: default
 content:
-  field_email:
+  email:
     weight: 2
     settings:
       size: 60
