@@ -102,11 +102,13 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
    * {@inheritdoc}
    */
   public function computeValue() {
+    $this->validateArguments();
     $method = $this->getMethod();
     $field = $this->getSourceField();
 
     $instance = $this->entity;
     $series = $instance->getEventSeries();
+    $value = '';
 
     switch ($method) {
       case 'inherit':
@@ -114,9 +116,6 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
         break;
 
       case 'prepend':
-        if (empty($this->getEntityField())) {
-          throw new \InvalidArgumentException("The definition's 'entity field' key must be set to prepend data.");
-        }
         $entity_field = $this->getEntityField();
 
         $fields = [];
@@ -130,9 +129,6 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
         break;
 
       case 'append':
-        if (empty($this->getEntityField())) {
-          throw new \InvalidArgumentException("The definition's 'entity field' key must be set to append data.");
-        }
         $entity_field = $this->getEntityField();
 
         $fields = [];
@@ -146,9 +142,6 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
         break;
 
       case 'fallback':
-        if (empty($this->getEntityField())) {
-          throw new \InvalidArgumentException("The definition's 'entity field' key must be set to fallback to series data.");
-        }
         $entity_field = $this->getEntityField();
 
         $value = '';
@@ -161,13 +154,36 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
         }
 
         break;
+    }
+    return $value;
+  }
 
-      default:
-        throw new \InvalidArgumentException("The definition's 'method' key must be one of: inherit, prepend, or append.");
-
+  /**
+   * Validate the configuration arguments of the plugin.
+   */
+  protected function validateArguments() {
+    if (empty($this->getMethod())) {
+      throw new \InvalidArgumentException("The definition's 'method' key must be set to inherit data.");
     }
 
-    return $value;
+    if (empty($this->getSourceField())) {
+      throw new \InvalidArgumentException("The definition's 'source field' key must be set to inherit data.");
+    }
+
+    $method = $this->getMethod();
+    $entity_field_methods = [
+      'prepend',
+      'append',
+      'fallback',
+    ];
+
+    if (array_search($method, $entity_field_methods)) {
+      if (empty($this->getEntityField())) {
+        throw new \InvalidArgumentException("The definition's 'entity field' key must be set to prepend, append, or fallback to series data.");
+      }
+    }
+
+    return TRUE;
   }
 
 }

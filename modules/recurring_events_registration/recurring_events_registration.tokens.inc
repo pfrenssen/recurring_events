@@ -56,7 +56,7 @@ function recurring_events_registration_tokens($type, $tokens, array $data, array
           break;
 
         case 'reg_type':
-          $replacements[$original] = $creation_service->getRegistrationType();
+          $replacements[$original] = $creation_service->getRegistrationType() == 'series' ?: 'event';
           break;
       }
     }

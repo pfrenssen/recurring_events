@@ -2,16 +2,16 @@ show_capacity: true
 email_notifications: true
 registration_notification_enabled: true
 registration_notification_subject: "You've Successfully Registered"
-registration_notification_body: "Your registration for the [eventinstance:title] event was successful."
+registration_notification_body: "Your registration for the [eventinstance:title] [eventinstance:reg_type] was successful."
 waitlist_notification_enabled: true
 waitlist_notification_subject: "You've Been Added To The Waitlist"
-waitlist_notification_body: "You have been added to the waitlist for the [eventinstance:title] event."
+waitlist_notification_body: "You have been added to the waitlist for the [eventinstance:title] [eventinstance:reg_type]."
 promotion_notification_enabled: true
 promotion_notification_subject: "You've Been Added To The Registration List"
-promotion_notification_body: "You have been promoted from the waitlist to the registration list for the [eventinstance:title] event."
+promotion_notification_body: "You have been promoted from the waitlist to the registration list for the [eventinstance:title] [eventinstance:reg_type]."
 cancellation_notification_enabled: true
 cancellation_notification_subject: "An Event Has Been Cancelled"
-cancellation_notification_body: "Unfortunately, the [eventinstance:title] event has been cancelled."
+cancellation_notification_body: "Unfortunately, the [eventinstance:title] [eventinstance:reg_type] has been cancelled."
 modification_notification_enabled: true
 modification_notification_subject: "An Event Has Been Modified"
-modification_notification_body: "The [eventinstance:title] event has been modified, please check back for details."
+modification_notification_body: "The [eventinstance:title] [eventinstance:reg_type] has been modified, please check back for details."

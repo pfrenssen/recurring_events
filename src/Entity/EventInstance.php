@@ -382,7 +382,7 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
 
     // Inherited fields from eventseries entity.
     $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Title'))
+      ->setLabel(t('Inherited Series Title'))
       ->setDescription(t('The title as inherited from the series.'))
       ->setComputed(TRUE)
       ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')
@@ -399,7 +399,7 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ]);
 
     $fields['description'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Description'))
+      ->setLabel(t('Inherited Series Description'))
       ->setDescription(t('The description as inherited from the series.'))
       ->setComputed(TRUE)
       ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')

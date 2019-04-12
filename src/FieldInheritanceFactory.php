@@ -45,7 +45,7 @@ class FieldInheritanceFactory extends FieldItemList {
   }
 
   /**
-   * Compute the list property from state.
+   * Compute the field property from state.
    */
   protected function computeValue() {
     $entity = $this->getEntity();
