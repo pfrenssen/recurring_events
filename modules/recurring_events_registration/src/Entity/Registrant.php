@@ -70,14 +70,25 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
-    $mail = \Drupal::service('plugin.manager.mail');
+    if (!$update) {
+      $config = \Drupal::config('recurring_events_registration.registrant.config');
+      $send_email = $config->get('email_notifications');
+      if ($send_email) {
+        $params = [
+          'registrant' => $this,
+        ];
 
-    $params = [
-      'registrant' => $this,
-    ];
-    // TODO: What if no email address set, how do we try and send an email.
-    // Change email to be a basefield.
-    // $mail->mail('recurring_events_registration', $to, \Drupal::languageManager()->getDefaultLanguage()->getId()
+        $to = $this->email->value;
+
+        $key = 'registration_notification';
+
+        if ($this->getWaitlist()) {
+          $key = 'waitlist_notification';
+        }
+        $mail = \Drupal::service('plugin.manager.mail');
+        $mail->mail('recurring_events_registration', $key, $to, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
+      }
+    }
   }
 
   /**

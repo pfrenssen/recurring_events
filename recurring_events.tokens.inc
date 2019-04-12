@@ -73,9 +73,8 @@ function recurring_events_token_info() {
  */
 function recurring_events_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
   $replacements = [];
-  if ($type == 'recurring_events_registration' && !empty($data['eventinstance'])) {
+  if ($type == 'eventinstance' && !empty($data['eventinstance'])) {
     $event_instance = $data['eventinstance'];
-    $event_series = $event_instance->getEventSeries();
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'title':
@@ -96,6 +95,21 @@ function recurring_events_tokens($type, $tokens, array $data, array $options, Bu
         case 'url':
           $replacements[$original] = $event_instance->toUrl('canonical');
           break;
+      }
+    }
+  }
+  if ($type == 'eventseries' && !empty($data['eventseries'])) {
+    $event_series = $data['eventseries'];
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'title':
+          $replacements[$original] = $event_series->title->value;
+          break;
+
+        case 'description':
+          $replacements[$original] = $event_series->body->value;
+          break;
+
       }
     }
   }

@@ -3,7 +3,7 @@
 namespace Drupal\recurring_events_registration;
 
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\Core\Config\ConfigManagerInterface;
+use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Utility\Token;
@@ -22,11 +22,12 @@ class NotificationService {
   private $translation;
 
   /**
-   * The configuration manager.
+   * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var \Drupal\Core\Config\ConfigFactory
    */
-  protected $configManager;
+  protected $configFactory;
+
   /**
    * Logger Factory.
    *
@@ -95,8 +96,8 @@ class NotificationService {
    *
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
    *   The translation interface.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The database connection.
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   The config factory.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
    *   The logger factory.
    * @param \Drupal\Core\Messenger\Messenger $messenger
@@ -104,9 +105,9 @@ class NotificationService {
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
    */
-  public function __construct(TranslationInterface $translation, ConfigManagerInterface $config_manager, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token) {
+  public function __construct(TranslationInterface $translation, ConfigFactory $config_factory, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token) {
     $this->translation = $translation;
-    $this->configManager = $config_manager;
+    $this->configFactory = $config_factory;
     $this->loggerFactory = $logger->get('recurring_events_registration');
     $this->messenger = $messenger;
     $this->token = $token;
@@ -119,9 +120,10 @@ class NotificationService {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('string_translation'),
-      $container->get('config.manager'),
+      $container->get('config.factory'),
       $container->get('logger.factory'),
-      $container->get('messenger')
+      $container->get('messenger'),
+      $container->get('token')
     );
   }
 
@@ -246,7 +248,7 @@ class NotificationService {
       ]);
       return FALSE;
     }
-    return $this->key;
+    return $this->configName;
   }
 
   /**
@@ -260,11 +262,11 @@ class NotificationService {
    */
   protected function getConfigValue($name) {
     $value = FALSE;
-    if (!is_null($this->config($this->getConfigName())->get($value))) {
-      return $this->config($this->getConfigName())->get($value);
+    if (!is_null($this->configFactory->get($this->getConfigName())->get($name))) {
+      $value = $this->configFactory->get($this->getConfigName())->get($name);
     }
 
-    return FALSE;
+    return $value;
   }
 
   /**
@@ -273,12 +275,12 @@ class NotificationService {
    * @return string
    *   The from address.
    */
-  protected function getFrom() {
+  public function getFrom() {
     $key = $this->getKey();
     if ($key) {
       $from = $this->from;
       if (empty($from)) {
-        $from = $this->config('system.site')->get('mail');
+        $from = $this->configFactory->get('system.site')->get('mail');
         $this->setFrom($from);
       }
 
@@ -301,7 +303,7 @@ class NotificationService {
     $key = $this->getKey();
     if ($key) {
       $value = $key . '_enabled';
-      return (bool) $this->config($this->getConfigName())->get($value);
+      return (bool) $this->getConfigValue($value);
     }
     return FALSE;
   }
@@ -377,8 +379,7 @@ class NotificationService {
       'eventinstance' => $this->entity->getEventInstance(),
       'eventseries' => $this->entity->getEventSeries(),
     ];
-    $string = $this->token->replace($string, $data);
-    return $string;
+    return $this->token->replace($string, $data);
   }
 
 }

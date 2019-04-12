@@ -44,7 +44,7 @@ function recurring_events_registration_token_info() {
  */
 function recurring_events_registration_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
   $replacements = [];
-  if ($type == 'recurring_events_registration' && !empty($data['eventinstance'])) {
+  if ($type == 'eventinstance' && !empty($data['eventinstance'])) {
     $event_instance = $data['eventinstance'];
     $event_series = $event_instance->getEventSeries();
     $creation_service = \Drupal::service('recurring_events_registration.creation_service');
