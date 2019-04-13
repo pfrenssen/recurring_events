@@ -8,6 +8,9 @@ recurring_events_registration.registrant.config:
     limit:
       type: integer
       label: 'The items per page to show on registrant listing'
+    date_format:
+      type: string
+      label: 'The formatting of dates when displaying registrants'
     email_notifications:
       type: boolean
       label: 'Whether to enable email notifications'

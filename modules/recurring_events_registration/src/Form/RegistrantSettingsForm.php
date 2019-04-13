@@ -4,6 +4,8 @@ namespace Drupal\recurring_events_registration\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 /**
  * Class RegistrantSettingsForm.
@@ -41,6 +43,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $this->config('recurring_events_registration.registrant.config')
       ->set('show_capacity', $form_state->getValue('show_capacity'))
       ->set('limit', $form_state->getValue('limit'))
+      ->set('date_format', $form_state->getValue('date_format'))
       ->set('email_notifications', $form_state->getValue('email_notifications'))
       ->set('registration_notification_enabled', $form_state->getValue('registration_notification'))
       ->set('registration_notification_subject', $form_state->getValue('registration_notification_subject'))
@@ -88,18 +91,31 @@ class RegistrantSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('show_capacity'),
     ];
 
-    $form['view'] = [
+    $form['display'] = [
       '#type' => 'details',
-      '#title' => $this->t('Viewing Registrants'),
+      '#title' => $this->t('Registrant Display'),
       '#open' => TRUE,
     ];
 
-    $form['view']['limit'] = [
+    $form['display']['limit'] = [
       '#type' => 'number',
       '#title' => $this->t('Registrant Items'),
       '#required' => TRUE,
       '#description' => $this->t('Enter the number of items to show per page in the default registrant listing table.'),
       '#default_value' => $config->get('limit'),
+    ];
+
+    $php_date_url = Url::fromUri('https://secure.php.net/manual/en/function.date.php');
+    $php_date_link = Link::fromTextAndUrl($this->t('PHP date/time format'), $php_date_url);
+
+    $form['display']['date_format'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Registrant Date Format'),
+      '#required' => TRUE,
+      '#description' => $this->t('Enter the @link used when listing registrants. Default is F jS, Y h:iA.', [
+        '@link' => $php_date_link->toString(),
+      ]),
+      '#default_value' => $config->get('date_format'),
     ];
 
     $form['notifications'] = [

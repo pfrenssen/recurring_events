@@ -57,6 +57,9 @@ class RegistrantListBuilder extends EntityListBuilder {
    */
   public function buildHeader() {
     $header['id'] = $this->t('Registrant ID');
+    $header['series'] = $this->t('Series');
+    $header['instance'] = $this->t('Instance');
+    $header['type'] = $this->t('Type');
     foreach ($this->getCustomFields() as $machine_name => $field) {
       $header[$machine_name] = $field;
     }
@@ -70,7 +73,13 @@ class RegistrantListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    $series = $entity->getEventSeries();
+    $instance = $entity->getEventInstance();
+
     $row['id'] = $entity->id();
+    $row['series'] = $series->toLink($series->title->value);
+    $row['instance'] = $instance->toLink($instance->date->start_date->format($this->config->get('recurring_events_registration.registrant.config')->get('date_format')));
+    $row['type'] = $entity->getRegistrationType() == 'series' ? $this->t('Series') : $this->t('Instance');
     foreach ($this->getCustomFields() as $machine_name => $field) {
       $row[$machine_name] = $entity->get($machine_name)->value;
     }

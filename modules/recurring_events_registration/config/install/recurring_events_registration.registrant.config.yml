@@ -1,5 +1,6 @@
 show_capacity: true
 limit: 10
+date_format: 'F jS, Y h:iA'
 email_notifications: true
 registration_notification_enabled: true
 registration_notification_subject: 'You''ve Successfully Registered'
