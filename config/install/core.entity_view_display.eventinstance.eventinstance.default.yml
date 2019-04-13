@@ -1,0 +1,56 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - datetime_range
+    - recurring_events
+    - text
+id: eventinstance.eventinstance.default
+targetEntityType: eventinstance
+bundle: eventinstance
+mode: default
+content:
+  date:
+    label: above
+    type: daterange_default
+    weight: 2
+    settings:
+      fromto: both
+      separator: '-'
+      format_type: medium
+      timezone_override: ''
+    region: content
+    third_party_settings: {  }
+  description:
+    type: text_default
+    weight: 1
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  inherited_title:
+    type: string
+    weight: 0
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  owen_field:
+    type: text_default
+    weight: 3
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  title:
+    type: string
+    weight: 0
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden:
+  body: true
+  inherited_description: true
