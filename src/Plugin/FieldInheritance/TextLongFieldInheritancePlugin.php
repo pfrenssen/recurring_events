@@ -8,6 +8,9 @@ namespace Drupal\recurring_events\Plugin\FieldInheritance;
  * @FieldInheritance(
  *   id = "text_long_inheritance",
  *   name = @Translation("Text Long Field Inheritance"),
+ *   types = {
+ *     "text_long"
+ *   }
  * )
  */
 class TextLongFieldInheritancePlugin extends FieldInheritancePluginBase {

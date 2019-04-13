@@ -27,4 +27,11 @@ class FieldInheritance extends Plugin {
    */
   public $name;
 
+  /**
+   * An array of field types the inheritance plugin supports.
+   *
+   * @var array
+   */
+  public $types = [];
+
 }

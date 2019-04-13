@@ -111,6 +111,44 @@ class FieldInheritanceForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+    $values = $form_state->getValues();
+
+    if (!empty($values['sourceField']) && !empty($values['entityField'])) {
+      $series_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('eventseries', 'eventseries');
+      $instance_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('eventinstance', 'eventinstance');
+
+      if ($series_definitions[$values['sourceField']]->getType() !== $instance_definitions[$values['entityField']]->getType()) {
+        $message = $this->t('Source and entity field definition types must be the same to inherit data. Source - @source_name type: @source_type. Entity - @entity_name type: @entity_type', [
+          '@source_name' => $values['sourceField'],
+          '@source_type' => $series_definitions[$values['sourceField']]->getType(),
+          '@entity_name' => $values['entityField'],
+          '@entity_type' => $instance_definitions[$values['entityField']]->getType(),
+        ]);
+        $form_state->setErrorByName('sourceField', $message);
+        $form_state->setErrorByName('entityField', $message);
+      }
+
+      $plugin_definition = \Drupal::service('plugin.manager.field_inheritance')->getDefinition($values['plugin']);
+      $field_types = $plugin_definition['types'];
+
+      if (!in_array($series_definitions[$values['sourceField']]->getType(), $field_types)) {
+        $message = $this->t('The selected plugin @plugin does not support @source_type fields. The supported field types are: @field_types', [
+          '@plugin' => $values['plugin'],
+          '@source_type' => $series_definitions[$values['sourceField']]->getType(),
+          '@field_types' => implode(',', $field_types),
+        ]);
+        $form_state->setErrorByName('sourceField', $message);
+        $form_state->setErrorByName('plugin', $message);
+      }
+
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $field_inheritance = $this->entity;
     $status = $field_inheritance->save();
@@ -127,6 +165,7 @@ class FieldInheritanceForm extends EntityForm {
           '%label' => $field_inheritance->label(),
         ]));
     }
+    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
     $form_state->setRedirectUrl($field_inheritance->toUrl('collection'));
   }
 

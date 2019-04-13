@@ -47,6 +47,7 @@ class FieldInheritanceDeleteForm extends EntityConfirmFormBase {
         )
     );
 
+    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
