@@ -42,9 +42,9 @@ use Drupal\recurring_events\Entity\EventSeries;
  *     "uid" = "user_id",
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/events/registrant/{registrant}",
- *     "edit-form" = "/admin/structure/events/registrant/{registrant}/edit",
- *     "delete-form" = "/admin/structure/events/registrant/{registrant}/delete",
+ *     "canonical" = "/events/{eventinstance}/registrant/{registrant}",
+ *     "edit-form" = "/events/{eventinstance}/registrant/{registrant}/edit",
+ *     "delete-form" = "/events/{eventinstance}/registrant/{registrant}/delete",
  *     "anon-edit-form" = "/events/{eventinstance}/registrant/{registrant}/{uuid}/edit",
  *     "anon-delete-form" = "/events/{eventinstance}/registrant/{registrant}/{uuid}/delete"
  *   },

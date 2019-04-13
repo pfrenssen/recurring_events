@@ -40,6 +40,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('recurring_events_registration.registrant.config')
       ->set('show_capacity', $form_state->getValue('show_capacity'))
+      ->set('limit', $form_state->getValue('limit'))
       ->set('email_notifications', $form_state->getValue('email_notifications'))
       ->set('registration_notification_enabled', $form_state->getValue('registration_notification'))
       ->set('registration_notification_subject', $form_state->getValue('registration_notification_subject'))
@@ -85,6 +86,20 @@ class RegistrantSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Show Capacity?'),
       '#description' => $this->t('When users are registering for events, show the available capacity?'),
       '#default_value' => $config->get('show_capacity'),
+    ];
+
+    $form['view'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Viewing Registrants'),
+      '#open' => TRUE,
+    ];
+
+    $form['view']['limit'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Registrant Items'),
+      '#required' => TRUE,
+      '#description' => $this->t('Enter the number of items to show per page in the default registrant listing table.'),
+      '#default_value' => $config->get('limit'),
     ];
 
     $form['notifications'] = [
