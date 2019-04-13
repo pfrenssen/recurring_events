@@ -2,6 +2,8 @@
 
 namespace Drupal\recurring_events\Plugin\FieldInheritance;
 
+use Drupal\recurring_events\FieldInheritancePluginInterface;
+
 /**
  * String Inheritance plugin.
  *
@@ -13,7 +15,7 @@ namespace Drupal\recurring_events\Plugin\FieldInheritance;
  *   }
  * )
  */
-class StringFieldInheritancePlugin extends FieldInheritancePluginBase {
+class StringFieldInheritancePlugin extends FieldInheritancePluginBase implements FieldInheritancePluginInterface {
 
   /**
    * Concatenation separator.

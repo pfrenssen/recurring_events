@@ -2,6 +2,8 @@
 
 namespace Drupal\recurring_events\Plugin\FieldInheritance;
 
+use Drupal\recurring_events\FieldInheritancePluginInterface;
+
 /**
  * Text Long Inheritance plugin.
  *
@@ -13,7 +15,7 @@ namespace Drupal\recurring_events\Plugin\FieldInheritance;
  *   }
  * )
  */
-class TextLongFieldInheritancePlugin extends FieldInheritancePluginBase {
+class TextLongFieldInheritancePlugin extends FieldInheritancePluginBase implements FieldInheritancePluginInterface {
 
   /**
    * Concatenation separator.

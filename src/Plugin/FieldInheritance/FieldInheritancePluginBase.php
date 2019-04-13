@@ -104,56 +104,94 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
   public function computeValue() {
     $this->validateArguments();
     $method = $this->getMethod();
-    $field = $this->getSourceField();
 
-    $instance = $this->entity;
-    $series = $instance->getEventSeries();
     $value = '';
-
     switch ($method) {
       case 'inherit':
-        $value = $series->{$field}->value ?? '';
+        $value = $this->inheritData();
         break;
 
       case 'prepend':
-        $entity_field = $this->getEntityField();
-
-        $fields = [];
-        if (!empty($instance->{$entity_field}->value)) {
-          $fields[] = $instance->{$entity_field}->value;
-        }
-        if (!empty($series->{$field}->value)) {
-          $fields[] = $series->{$field}->value;
-        }
-        $value = implode($this::SEPARATOR, $fields);
+        $value = $this->prependData();
         break;
 
       case 'append':
-        $entity_field = $this->getEntityField();
-
-        $fields = [];
-        if (!empty($series->{$field}->value)) {
-          $fields[] = $series->{$field}->value;
-        }
-        if (!empty($instance->{$entity_field}->value)) {
-          $fields[] = $instance->{$entity_field}->value;
-        }
-        $value = implode($this::SEPARATOR, $fields);
+        $value = $this->appendData();
         break;
 
       case 'fallback':
-        $entity_field = $this->getEntityField();
-
-        $value = '';
-
-        if (!empty($instance->{$entity_field}->value)) {
-          $value = $instance->{$entity_field}->value;
-        }
-        elseif (!empty($series->{$field}->value)) {
-          $value = $series->{$field}->value;
-        }
-
+        $value = $this->fallbackData();
         break;
+    }
+    return $value;
+  }
+
+  /**
+   * Retrieve inherited data.
+   *
+   * @return string
+   *   The inherited data.
+   */
+  protected function inheritData() {
+    $series = $this->entity->getEventSeries();
+    return $series->{$this->getSourceField()}->value ?? '';
+  }
+
+  /**
+   * Retrieve prepended data.
+   *
+   * @return string
+   *   The prepended data.
+   */
+  protected function prependData() {
+    $series = $this->entity->getEventSeries();
+    $instance = $this->entity;
+
+    $fields = [];
+    if (!empty($instance->{$this->getEntityField()}->value)) {
+      $fields[] = $instance->{$this->getEntityField()}->value;
+    }
+    if (!empty($series->{$this->getSourceField()}->value)) {
+      $fields[] = $series->{$this->getSourceField()}->value;
+    }
+    return implode($this::SEPARATOR, $fields);
+  }
+
+  /**
+   * Retrieve appended data.
+   *
+   * @return string
+   *   The appended data.
+   */
+  protected function appendData() {
+    $series = $this->entity->getEventSeries();
+    $instance = $this->entity;
+
+    $fields = [];
+    if (!empty($series->{$this->getSourceField()}->value)) {
+      $fields[] = $series->{$this->getSourceField()}->value;
+    }
+    if (!empty($instance->{$this->getEntityField()}->value)) {
+      $fields[] = $instance->{$this->getEntityField()}->value;
+    }
+    return implode($this::SEPARATOR, $fields);
+  }
+
+  /**
+   * Retrieve fallback data.
+   *
+   * @return string
+   *   The fallback data.
+   */
+  protected function fallbackData() {
+    $series = $this->entity->getEventSeries();
+    $instance = $this->entity;
+
+    if (!empty($instance->{$this->getEntityField()}->value)) {
+      $value = $instance->{$this->getEntityField()}->value;
+    }
+    elseif (!empty($series->{$this->getSourceField()}->value)) {
+      $value = $series->{$this->getSourceField()}->value;
     }
     return $value;
   }
