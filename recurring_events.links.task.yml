@@ -55,13 +55,19 @@ eventinstance.clone_form:
   weight: 11
 
 # Event Series settings admin page.
-eventseries.settings_tab:
+entity.eventseries.settings:
   route_name: eventseries.settings
   title: Event Series Settings
   base_route: eventseries.settings
 
 # Event Instance settings admin page.
-eventinstance.settings_tab:
+entity.eventinstance.settings:
   route_name: eventinstance.settings
   title: Event Instance Settings
+  base_route: eventinstance.settings
+
+# Field Inheritance settings admin page.
+entity.field_inheritance.collection:
+  route_name: entity.field_inheritance.collection
+  title: Field Inheritance
   base_route: eventinstance.settings

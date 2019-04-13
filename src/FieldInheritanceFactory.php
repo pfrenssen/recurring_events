@@ -57,10 +57,10 @@ class FieldInheritanceFactory extends FieldItemList {
   }
 
   /**
-   * Returns the FieldInheritanceManager plugin manager.
+   * Returns the FieldInheritancePluginManager plugin manager.
    *
-   * @return \Drupal\recurring_events\FieldInheritanceManager
-   *   The FieldInheritanceManager plugin manager.
+   * @return \Drupal\recurring_events\FieldInheritancePluginManager
+   *   The FieldInheritancePluginManager plugin manager.
    */
   protected function getManager() {
     return \Drupal::service('plugin.manager.field_inheritance');

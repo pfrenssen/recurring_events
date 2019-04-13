@@ -133,7 +133,7 @@ class NotificationService {
    * @param \Drupal\recurring_events_registration\Entity\RegistrantInterface $registrant
    *   The registrant entity.
    *
-   * @return self
+   * @return $this
    *   The NotificationService object.
    */
   public function setEntity(RegistrantInterface $registrant) {
@@ -147,8 +147,7 @@ class NotificationService {
    * @param string $key
    *   The email key to use.
    *
-   * @return self
-   *   The NotificationService object.
+   * @return $this
    */
   public function setKey($key) {
     $this->key = $key;
@@ -161,8 +160,7 @@ class NotificationService {
    * @param string $subject
    *   The email subject line.
    *
-   * @return self
-   *   The NotificationService object.
+   * @return $this
    */
   public function setSubject($subject) {
     $this->subject = $subject;
@@ -175,8 +173,7 @@ class NotificationService {
    * @param string $message
    *   The email message.
    *
-   * @return self
-   *   The NotificationService object.
+   * @return $this
    */
   public function setMessage($message) {
     $this->message = $message;
@@ -189,8 +186,7 @@ class NotificationService {
    * @param string $from
    *   The from email address.
    *
-   * @return self
-   *   The NotificationService object.
+   * @return $this
    */
   public function setFrom($from) {
     $this->from = $from;
@@ -203,8 +199,7 @@ class NotificationService {
    * @param string $name
    *   The name of the config value to use.
    *
-   * @return self
-   *   The NotificationService object.
+   * @return $this
    */
   public function setConfigName($name) {
     $this->configName = $name;

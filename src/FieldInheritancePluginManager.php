@@ -13,10 +13,10 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  * @see \Drupal\recurring_events\FieldInheritancePluginInterface
  * @see plugin_api
  */
-class FieldInheritanceManager extends DefaultPluginManager {
+class FieldInheritancePluginManager extends DefaultPluginManager {
 
   /**
-   * Constructs a FieldInheritanceManager object.
+   * Constructs a FieldInheritancePluginManager object.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
