@@ -380,41 +380,6 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ])
       ->setDisplayConfigurable('form', TRUE);
 
-    // Inherited fields from eventseries entity.
-    $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Inherited Series Title'))
-      ->setDescription(t('The title as inherited from the series.'))
-      ->setComputed(TRUE)
-      ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')
-      ->setSettings([
-        'source field' => 'title',
-        'method' => 'inherit',
-        'plugin' => 'text_inheritance',
-      ])
-      ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -10,
-      ]);
-
-    $fields['description'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Inherited Series Description'))
-      ->setDescription(t('The description as inherited from the series.'))
-      ->setComputed(TRUE)
-      ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')
-      ->setSettings([
-        'source field' => 'body',
-        'entity field' => 'body',
-        'method' => 'append',
-        'plugin' => 'text_long_inheritance',
-      ])
-      ->setDisplayConfigurable('view', TRUE)
-      ->setDisplayOptions('view', [
-        'label' => 'above',
-        'type' => 'text_long',
-        'weight' => -9,
-      ]);
     return $fields;
   }
 

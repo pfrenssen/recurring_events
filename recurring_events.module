@@ -8,6 +8,8 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
  * Implements hook_help().
@@ -22,6 +24,37 @@ function recurring_events_help($route_name, RouteMatchInterface $route_match) {
       return $output;
 
     default:
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function recurring_events_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
+  if ($entity_type->id() === 'eventinstance') {
+    $inherited_fields = \Drupal::entityTypeManager()->getStorage('field_inheritance')->loadMultiple();
+    if (!empty($inherited_fields)) {
+      foreach ($inherited_fields as $field) {
+        $settings = [
+          'source field' => $field->sourceField(),
+          'method' => $field->type(),
+          'plugin' => $field->plugin(),
+        ];
+        if ($field->entityField()) {
+          $settings['entity field'] = $field->entityField();
+        }
+        // Get field definition to find field type.
+        $fields[$field->id()] = BaseFieldDefinition::create('string')
+          ->setLabel($field->label())
+          ->setName($field->id())
+          ->setDescription(t('The inherited field: @field', ['@field' => $field->label()]))
+          ->setComputed(TRUE)
+          ->setClass('\Drupal\recurring_events\FieldInheritanceFactory')
+          ->setSettings($settings)
+          ->setTargetEntityTypeId($entity_type->id())
+          ->setDisplayConfigurable('view', TRUE);
+      }
+    }
   }
 }
 
