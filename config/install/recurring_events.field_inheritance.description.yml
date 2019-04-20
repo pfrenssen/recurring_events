@@ -6,4 +6,4 @@ label: Description
 type: append
 sourceField: body
 entityField: body
-plugin: text_long_inheritance
+plugin: text_inheritance

@@ -52,8 +52,12 @@ class FieldInheritanceFactory extends FieldItemList {
     $manager = $this->getManager();
     $configuration = $this->getSettings() + ['entity' => $entity];
     $plugin = $manager->createInstance($this->getSetting('plugin'), $configuration);
-    $value = $plugin->computeValue();
-    $this->list[0] = $this->createItem(0, $value);
+    $values = $plugin->computeValue();
+    if (!empty($values)) {
+      foreach ($values as $key => $value) {
+        $this->list[$key] = $this->createItem($key, $value);
+      }
+    }
   }
 
   /**

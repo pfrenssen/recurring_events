@@ -11,17 +11,10 @@ use Drupal\recurring_events\FieldInheritancePluginInterface;
  *   id = "string_inheritance",
  *   name = @Translation("String Field Inheritance"),
  *   types = {
- *     "string"
+ *     "string",
+ *     "string_long"
  *   }
  * )
  */
 class StringFieldInheritancePlugin extends FieldInheritancePluginBase implements FieldInheritancePluginInterface {
-
-  /**
-   * Concatenation separator.
-   *
-   * @var string
-   */
-  const SEPARATOR = ' ';
-
 }

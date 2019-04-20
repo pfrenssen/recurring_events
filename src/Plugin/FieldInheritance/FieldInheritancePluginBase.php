@@ -12,13 +12,6 @@ use Drupal\recurring_events\FieldInheritancePluginInterface;
 abstract class FieldInheritancePluginBase extends PluginBase implements FieldInheritancePluginInterface {
 
   /**
-   * Concatenation separator.
-   *
-   * @var string
-   */
-  const SEPARATOR = '';
-
-  /**
    * The entity.
    *
    * @var \Drupal\Core\Entity\EntityInterface
@@ -134,7 +127,7 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
    */
   protected function inheritData() {
     $series = $this->entity->getEventSeries();
-    return $series->{$this->getSourceField()}->value ?? '';
+    return $series->{$this->getSourceField()}->getValue() ?? '';
   }
 
   /**
@@ -147,14 +140,14 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
     $series = $this->entity->getEventSeries();
     $instance = $this->entity;
 
-    $fields = [];
-    if (!empty($instance->{$this->getEntityField()}->value)) {
-      $fields[] = $instance->{$this->getEntityField()}->value;
+    $values = [];
+    if (!empty($instance->{$this->getEntityField()}->getValue())) {
+      $values = array_merge($values, $instance->{$this->getEntityField()}->getValue());
     }
-    if (!empty($series->{$this->getSourceField()}->value)) {
-      $fields[] = $series->{$this->getSourceField()}->value;
+    if (!empty($series->{$this->getSourceField()}->getValue())) {
+      $values = array_merge($values, $series->{$this->getSourceField()}->getValue());
     }
-    return implode($this::SEPARATOR, $fields);
+    return $values;
   }
 
   /**
@@ -167,14 +160,14 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
     $series = $this->entity->getEventSeries();
     $instance = $this->entity;
 
-    $fields = [];
-    if (!empty($series->{$this->getSourceField()}->value)) {
-      $fields[] = $series->{$this->getSourceField()}->value;
+    $values = [];
+    if (!empty($series->{$this->getSourceField()}->getValue())) {
+      $values = array_merge($values, $series->{$this->getSourceField()}->getValue());
     }
-    if (!empty($instance->{$this->getEntityField()}->value)) {
-      $fields[] = $instance->{$this->getEntityField()}->value;
+    if (!empty($instance->{$this->getEntityField()}->getValue())) {
+      $values = array_merge($values, $instance->{$this->getEntityField()}->getValue());
     }
-    return implode($this::SEPARATOR, $fields);
+    return $values;
   }
 
   /**
@@ -187,13 +180,13 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
     $series = $this->entity->getEventSeries();
     $instance = $this->entity;
 
-    if (!empty($instance->{$this->getEntityField()}->value)) {
-      $value = $instance->{$this->getEntityField()}->value;
+    if (!empty($instance->{$this->getEntityField()}->getValue())) {
+      $values = $instance->{$this->getEntityField()}->getValue();
     }
-    elseif (!empty($series->{$this->getSourceField()}->value)) {
-      $value = $series->{$this->getSourceField()}->value;
+    elseif (!empty($series->{$this->getSourceField()}->getValue())) {
+      $values = $series->{$this->getSourceField()}->getValue();
     }
-    return $value;
+    return $values;
   }
 
   /**
