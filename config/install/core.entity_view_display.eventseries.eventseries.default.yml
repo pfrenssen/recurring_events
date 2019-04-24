@@ -1,8 +1,6 @@
 langcode: en
 status: true
 dependencies:
-  config:
-    - field.field.eventseries.eventseries.field_owen_field
   module:
     - options
     - recurring_events
@@ -29,13 +27,6 @@ content:
       separator: ' - '
     region: content
     third_party_settings: {  }
-  field_owen_field:
-    weight: 11
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
   recur_type:
     label: above
     weight: 10

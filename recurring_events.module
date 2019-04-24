@@ -49,10 +49,9 @@ function recurring_events_entity_base_field_info_alter(&$fields, EntityTypeInter
 
         $type = 'string';
         if (!empty($field_definitions[$field->sourceField()])) {
+          $settings = array_merge($settings, $field_definitions[$field->sourceField()]->getSettings());
           $type = $field_definitions[$field->sourceField()]->getType();
         }
-
-        $settings = array_merge($settings, $field_definitions[$field->sourceField()]->getSettings());
 
         $class = '\Drupal\recurring_events\FieldInheritanceFactory';
         if ($type === 'entity_reference') {

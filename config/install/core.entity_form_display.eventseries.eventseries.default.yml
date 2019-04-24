@@ -1,12 +1,9 @@
 langcode: en
 status: true
 dependencies:
-  config:
-    - field.field.eventseries.eventseries.field_owen_field
   module:
     - datetime_range
     - recurring_events
-    - recurring_events_registration
     - text
 id: eventseries.eventseries.default
 targetEntityType: eventseries
@@ -28,20 +25,6 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  event_registration:
-    type: event_registration
-    weight: 4
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_owen_field:
-    weight: 121
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: text_textfield
-    region: content
   monthly_recurring_date:
     type: monthly_recurring_date
     weight: 3
