@@ -7,6 +7,8 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\recurring_events_registration\Entity\RegistrantInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\recurring_events\Entity\EventInstance;
 
 /**
  * The RegistrantController class.
@@ -37,6 +39,27 @@ class RegistrantController extends ControllerBase implements ContainerInjectionI
     return new static(
       $container->get('renderer')
     );
+  }
+
+  /**
+   * Check if registration is enabled.
+   *
+   * @param Drupal\recurring_events\Entity\EventInstance $eventinstance
+   *   The eventinstance entity.
+   *
+   * @return Drupal\Core\Access\AccessResultInterface
+   *   Whether access is allowed based on whether registration is enabled.
+   */
+  public static function hasRegistration(EventInstance $eventinstance) {
+    if (!empty($eventinstance)) {
+      $service = \Drupal::service('recurring_events_registration.creation_service');
+      $service->setEvents($eventinstance);
+      if ($service->hasRegistration()) {
+        return AccessResult::allowed();
+      }
+      return AccessResult::forbidden();
+    }
+    return AccessResult::neutral();
   }
 
   /**

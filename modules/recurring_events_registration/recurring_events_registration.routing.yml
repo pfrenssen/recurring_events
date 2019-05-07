@@ -25,7 +25,8 @@ entity.registrant.canonical:
     _title_callback: '\Drupal\recurring_events_registration\Controller\RegistrantController::getTitle'
   requirements:
     _entity_access: 'registrant.view'
-  parameters:
+  options:
+    parameters:
       eventinstance:
         type: entity:eventinstance
       registrant:
@@ -40,7 +41,8 @@ entity.registrant.add_form:
     _title: 'Add Registration'
   requirements:
     _entity_create_access: 'registrant'
-  parameters:
+  options:
+    parameters:
       eventinstance:
         type: entity:eventinstance
 
@@ -53,7 +55,8 @@ entity.registrant.edit_form:
     _title: 'Edit Registration'
   requirements:
     _entity_access: 'registrant.update'
-  parameters:
+  options:
+    parameters:
       eventinstance:
         type: entity:eventinstance
       registrant:
@@ -68,7 +71,8 @@ entity.registrant.delete_form:
     _title: 'Cancel Registration'
   requirements:
     _entity_access: 'registrant.delete'
-  parameters:
+  options:
+    parameters:
       eventinstance:
         type: entity:eventinstance
       registrant:
@@ -83,7 +87,8 @@ entity.registrant.anon_edit_form:
   requirements:
     _access: 'TRUE'
     uuid: '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
-  parameters:
+  options:
+    parameters:
       eventinstance:
         type: entity:eventinstance
       uuid:
@@ -98,20 +103,23 @@ entity.registrant.anon_delete_form:
   requirements:
     _access: 'TRUE'
     uuid: '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
-  parameters:
+  options:
+    parameters:
       eventinstance:
         type: entity:eventinstance
       uuid:
         type: string
 
 # Registrant listing.
-entity.registrant.add_form:
+entity.registrant.instance_listing:
   path: '/events/{eventinstance}/registrations'
   defaults:
-    _entity_form: registrant.add
-    _title: 'Registrations'
+    _entity_list: 'registrant'
+    _title: 'Registrants'
   requirements:
-    _entity_access: 'registrant.list'
-  parameters:
+    _permission: 'access registrant overview'
+    _custom_access:  '\Drupal\recurring_events_registration\Controller\RegistrantController::hasRegistration'
+  options:
+    parameters:
       eventinstance:
         type: entity:eventinstance
