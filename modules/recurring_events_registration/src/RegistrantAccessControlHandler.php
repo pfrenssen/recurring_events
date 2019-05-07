@@ -38,7 +38,16 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add registrant entities');
+    $params = \Drupal::request()->attributes->all();
+    if (!empty($params['eventinstance'])) {
+      $service = \Drupal::service('recurring_events_registration.creation_service');
+      $service->setEvents($params['eventinstance']);
+      if ($service->hasRegistration()) {
+        return AccessResult::allowedIfHasPermission($account, 'add registrant entities');
+      }
+    }
+
+    return AccessResult::neutral();
   }
 
 }
