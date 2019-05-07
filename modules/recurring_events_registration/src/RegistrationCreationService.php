@@ -258,7 +258,7 @@ class RegistrationCreationService {
    * Retreive all waitlisted users.
    *
    * @return array
-   *   An array of waitlist users
+   *   An array of Drupal\recurring_events_registration\Entity\Registrant users.
    */
   public function retrieveWaitlistedParties() {
     $parties = [];
@@ -272,13 +272,14 @@ class RegistrationCreationService {
   /**
    * Retreive first user on the waitlist.
    *
-   * @return object
+   * @return Drupal\recurring_events_registration\Entity\Registrant
    *   A fully loaded registrant entity.
    */
   public function retrieveFirstWaitlistParty() {
     $waitlisted_users = $this->retrieveWaitlistedParties();
     if (!empty($waitlisted_users)) {
       $first = reset($waitlisted_users);
+      \Drupal::moduleHandler()->alter('recurring_events_registration_first_waitlist', $first);
       return $first;
     }
     return NULL;
@@ -451,6 +452,39 @@ class RegistrationCreationService {
       }
     }
     return $reg_dates;
+  }
+
+  /**
+   * Promote a registrant from the waitlist.
+   */
+  public function promoteFromWaitlist() {
+    if (!$this->hasWaitlist()) {
+      return;
+    }
+
+    if ($this->retrieveAvailability() > 0) {
+      $first_waitlist = $this->retrieveFirstWaitlistParty();
+      if (!empty($first_waitlist)) {
+        $first_waitlist->setWaitlist('0');
+        $first_waitlist->save();
+
+        // Optionally send an email notification.
+        $config = \Drupal::config('recurring_events_registration.registrant.config');
+        $send_email = $config->get('email_notifications');
+        if ($send_email) {
+          $params = [
+            'registrant' => $first_waitlist,
+          ];
+
+          $to = $first_waitlist->email->value;
+
+          $key = 'promotion_notification';
+
+          $mail = \Drupal::service('plugin.manager.mail');
+          $mail->mail('recurring_events_registration', $key, $to, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
+        }
+      }
+    }
   }
 
 }

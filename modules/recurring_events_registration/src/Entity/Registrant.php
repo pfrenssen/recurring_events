@@ -168,7 +168,6 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
     $fields['email'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email Address'))
       ->setDescription(t('The email address of the registrant'))
-      ->addConstraint('UserMailRequired')
       ->setDisplayOptions('form', [
         'type' => 'email_default',
         'weight' => -6,
