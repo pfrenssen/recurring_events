@@ -320,7 +320,6 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
       ->setLabel(t('Body'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
-      ->setRequired(TRUE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',
