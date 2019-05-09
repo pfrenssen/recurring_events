@@ -53,7 +53,7 @@ class RegistrantController extends ControllerBase implements ContainerInjectionI
   public static function hasRegistration(EventInstance $eventinstance) {
     if (!empty($eventinstance)) {
       $service = \Drupal::service('recurring_events_registration.creation_service');
-      $service->setEvents($eventinstance);
+      $service->setEventInstance($eventinstance);
       if ($service->hasRegistration()) {
         return AccessResult::allowed();
       }

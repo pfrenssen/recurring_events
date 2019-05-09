@@ -152,7 +152,7 @@ class RegistrantForm extends ContentEntityForm {
     $form_state->setTemporaryValue('event', $event_instance);
 
     // Use the registration creation service to grab relevant data.
-    $this->creationService->setEvents($event_instance);
+    $this->creationService->setEventInstance($event_instance);
     $availability = $this->creationService->retrieveAvailability();
     $waitlist = $this->creationService->hasWaitlist();
     $registration_open = $this->creationService->registrationIsOpen();
@@ -340,7 +340,7 @@ class RegistrantForm extends ContentEntityForm {
       $event_instance = $form_state->getTemporaryValue('event');
 
       // Use the registration creation service to grab relevant data.
-      $this->creationService->setEvents($event_instance);
+      $this->creationService->setEventInstance($event_instance);
       // Just to be sure we have a fresh copy of the event series.
       $this->creationService->setEventSeries($event_series);
 
@@ -385,7 +385,7 @@ class RegistrantForm extends ContentEntityForm {
     $event_instance = $form_state->getTemporaryValue('event');
 
     // Use the registration creation service to grab relevant data.
-    $this->creationService->setEvents($event_instance);
+    $this->creationService->setEventInstance($event_instance);
     // Just to be sure we have a fresh copy of the event series.
     $this->creationService->setEventSeries($event_series);
 

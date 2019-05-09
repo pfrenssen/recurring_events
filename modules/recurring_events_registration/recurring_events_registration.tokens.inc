@@ -48,7 +48,7 @@ function recurring_events_registration_tokens($type, $tokens, array $data, array
     $event_instance = $data['eventinstance'];
     $event_series = $event_instance->getEventSeries();
     $creation_service = \Drupal::service('recurring_events_registration.creation_service');
-    $creation_service->setEvents($event_instance);
+    $creation_service->setEventInstance($event_instance);
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'reg_url':

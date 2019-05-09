@@ -84,7 +84,7 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
     $form_state->setRedirectUrl($eventinstance->toUrl('canonical'));
 
     $service = \Drupal::service('recurring_events_registration.creation_service');
-    $service->setEvents($eventinstance);
+    $service->setEventInstance($eventinstance);
     if ($service->hasWaitlist() && $entity->waitlist->value == '0') {
       $service->promoteFromWaitlist();
     }

@@ -41,7 +41,7 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler {
     $params = \Drupal::request()->attributes->all();
     if (!empty($params['eventinstance'])) {
       $service = \Drupal::service('recurring_events_registration.creation_service');
-      $service->setEvents($params['eventinstance']);
+      $service->setEventInstance($params['eventinstance']);
       if ($service->hasRegistration()) {
         return AccessResult::allowedIfHasPermission($account, 'add registrant entities');
       }

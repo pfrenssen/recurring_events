@@ -107,7 +107,7 @@ class RegistrationCreationService {
    * @param Drupal\recurring_events\Entity\EventInstance $event_instance
    *   The event instance.
    */
-  public function setEvents(EventInstance $event_instance) {
+  public function setEventInstance(EventInstance $event_instance) {
     $this->eventInstance = $event_instance;
     $this->eventSeries = $event_instance->getEventSeries();
   }
@@ -133,7 +133,7 @@ class RegistrationCreationService {
    *   The user ID for whom to retrieve registrants.
    *
    * @return array
-   *   An array of email contacts.
+   *   An array of registrants.
    */
   public function retrieveRegisteredParties($include_nonwaitlisted = TRUE, $include_waitlisted = TRUE, $uid = FALSE) {
     $parties = [];
@@ -163,6 +163,26 @@ class RegistrationCreationService {
         $properties['eventinstance_id'] = $this->eventInstance->id();
         break;
     }
+    $results = $this->storage->loadByProperties($properties);
+
+    if (!empty($results)) {
+      $parties = $results;
+    }
+    return $parties;
+  }
+
+  /**
+   * Retreive all registered parties for a series.
+   *
+   * @return array
+   *   An array of registrants.
+   */
+  public function retrieveAllSeriesRegisteredParties() {
+    $parties = [];
+    $properties = [
+      'eventseries_id' => $this->eventSeries->id(),
+    ];
+
     $results = $this->storage->loadByProperties($properties);
 
     if (!empty($results)) {
@@ -468,21 +488,8 @@ class RegistrationCreationService {
         $first_waitlist->setWaitlist('0');
         $first_waitlist->save();
 
-        // Optionally send an email notification.
-        $config = \Drupal::config('recurring_events_registration.registrant.config');
-        $send_email = $config->get('email_notifications');
-        if ($send_email) {
-          $params = [
-            'registrant' => $first_waitlist,
-          ];
-
-          $to = $first_waitlist->email->value;
-
-          $key = 'promotion_notification';
-
-          $mail = \Drupal::service('plugin.manager.mail');
-          $mail->mail('recurring_events_registration', $key, $to, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
-        }
+        $key = 'promotion_notification';
+        recurring_events_registration_send_notification($key, $first_waitlist);
       }
     }
   }

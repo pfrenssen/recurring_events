@@ -167,7 +167,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
       '#type' => 'details',
       '#title' => $this->t('Registration Notification'),
       '#open' => TRUE,
-      '#description' => $this->t('Enable and configure registration notifications') . ' ' . $token_help,
+      '#description' => $this->t('Enable and configure registration notifications.') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['registration']['registration_notification'] = [
@@ -203,7 +203,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['notifications']['waitlist'] = [
       '#type' => 'details',
       '#title' => $this->t('Waitlist Notification'),
-      '#description' => $this->t('Enable and configure waitlist notifications') . ' ' . $token_help,
+      '#description' => $this->t('Enable and configure waitlist notifications.') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['waitlist']['waitlist_notification'] = [
@@ -239,7 +239,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['notifications']['promotion'] = [
       '#type' => 'details',
       '#title' => $this->t('Promotion Notification'),
-      '#description' => $this->t('Enable and configure promotion notifications') . ' ' . $token_help,
+      '#description' => $this->t('Enable and configure promotion notifications.') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['promotion']['promotion_notification'] = [
@@ -275,7 +275,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['notifications']['cancellation'] = [
       '#type' => 'details',
       '#title' => $this->t('Cancellation Notification'),
-      '#description' => $this->t('Enable and configure cancellation notifications') . ' ' . $token_help,
+      '#description' => $this->t('Enable and configure cancellation notifications.') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['cancellation']['cancellation_notification'] = [
@@ -311,7 +311,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['notifications']['modification'] = [
       '#type' => 'details',
       '#title' => $this->t('Modification Notification'),
-      '#description' => $this->t('Enable and configure modification notifications') . ' ' . $token_help,
+      '#description' => $this->t('Enable and configure modification notifications.') . ' ' . $token_help,
       '#group' => 'emails',
     ];
     $form['notifications']['modification']['modification_notification'] = [

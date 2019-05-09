@@ -141,7 +141,15 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
         $entity->getEventSeries()->save();
       }
 
+      // Allow other modules to react prior to deleting a specific instance
+      // after a date configuration change.
+      \Drupal::moduleHandler()->invokeAll('recurring_events_pre_delete_instance', [$entity]);
+
       $entity->delete();
+
+      // Allow other modules to react after deleting a specific instance after a
+      // date configuration change.
+      \Drupal::moduleHandler()->invokeAll('recurring_events_post_delete_instance', [$entity]);
 
       $start_date = $entity->date->start_date;
       \Drupal::logger('recurring_events')->notice('@type: deleted event instance of %title scheduled to begin on %date.',

@@ -200,7 +200,7 @@ class EventSeriesForm extends ContentEntityForm {
 
     if ($trigger['#id'] !== 'edit-confirm' && $editing) {
       $original = $this->storage->loadUnchanged($entity->id());
-      if ($this->creationService->checkForRecurConfigChanges($original, $form_state)) {
+      if ($this->creationService->checkForFormRecurConfigChanges($original, $form_state)) {
         $this->step = 1;
         $form_state->setRebuild(TRUE);
       }

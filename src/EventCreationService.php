@@ -76,7 +76,7 @@ class EventCreationService {
   }
 
   /**
-   * Check whether there have been recurring configuration changes.
+   * Check whether there have been form recurring configuration changes.
    *
    * @param Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
@@ -86,10 +86,27 @@ class EventCreationService {
    * @return bool
    *   TRUE if recurring config changes, FALSE otherwise.
    */
-  public function checkForRecurConfigChanges(EventSeries $event, FormStateInterface $form_state) {
+  public function checkForFormRecurConfigChanges(EventSeries $event, FormStateInterface $form_state) {
     $entity_config = $this->convertEntityConfigToArray($event);
     $form_config = $this->convertFormConfigToArray($form_state);
     return !(serialize($entity_config) === serialize($form_config));
+  }
+
+  /**
+   * Check whether there have been original recurring configuration changes.
+   *
+   * @param Drupal\recurring_events\Entity\EventSeries $event
+   *   The stored event series entity.
+   * @param Drupal\recurring_events\Entity\EventSeries $original
+   *   The original stored event series entity.
+   *
+   * @return bool
+   *   TRUE if recurring config changes, FALSE otherwise.
+   */
+  public function checkForOriginalRecurConfigChanges(EventSeries $event, EventSeries $original) {
+    $entity_config = $this->convertEntityConfigToArray($event);
+    $original_config = $this->convertEntityConfigToArray($original);
+    return !(serialize($entity_config) === serialize($original_config));
   }
 
   /**
@@ -137,6 +154,9 @@ class EventCreationService {
         $config['custom_dates'] = $event->getCustomDates();
         break;
     }
+
+    \Drupal::moduleHandler()->alter('recurring_events_entity_config_array', $config);
+
     return $config;
   }
 
@@ -244,6 +264,8 @@ class EventCreationService {
         }
         break;
     }
+
+    \Drupal::moduleHandler()->alter('recurring_events_form_config_array', $config);
 
     return $config;
   }
@@ -378,6 +400,8 @@ class EventCreationService {
       }
     }
 
+    \Drupal::moduleHandler()->alter('recurring_events_diff_array', $diff);
+
     return $diff;
   }
 
@@ -401,18 +425,32 @@ class EventCreationService {
     }
     else {
       // If there are date differences, we need to clear out the instances.
-      $create_instances = $this->checkForRecurConfigChanges($original, $form_state);
+      $create_instances = $this->checkForFormRecurConfigChanges($original, $form_state);
       if ($create_instances) {
+        // Allow other modules to react prior to the deletion of all instances.
+        \Drupal::moduleHandler()->invokeAll('recurring_events_save_pre_instances_deletion', [$event, $form_state]);
+
         // Find all the instances and delete them.
         $instances = $event->event_instances->referencedEntities();
         if (!empty($instances)) {
           foreach ($instances as $index => $instance) {
+            // Allow other modules to react prior to deleting a specific
+            // instance after a date configuration change.
+            \Drupal::moduleHandler()->invokeAll('recurring_events_save_pre_instance_deletion', [$event, $instance]);
+
             $instance->delete();
+
+            // Allow other modules to react after deleting a specific instance
+            // after a date configuration change.
+            \Drupal::moduleHandler()->invokeAll('recurring_events_save_post_instance_deletion', [$event, $instance]);
           }
           $this->messenger->addStatus($this->translation->translate('A total of %count existing event instances were removed', [
             '%count' => count($instances),
           ]));
         }
+
+        // Allow other modules to react after the deletion of all instances.
+        \Drupal::moduleHandler()->invokeAll('recurring_events_save_post_instances_deletion', [$event, $form_state]);
       }
     }
 
