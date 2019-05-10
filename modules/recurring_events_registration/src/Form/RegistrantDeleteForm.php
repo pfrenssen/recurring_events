@@ -4,6 +4,7 @@ namespace Drupal\recurring_events_registration\Form;
 
 use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Provides a form for deleting Registrant entities.
