@@ -104,7 +104,7 @@ class EventRegistration extends DateRangeItem {
       ->setDescription(t('Enter the number of registrants that can attend the event.'));
 
     $properties['waitlist'] = DataDefinition::create('boolean')
-      ->setLabel(t('Wailist'))
+      ->setLabel(t('Waitlist'))
       ->setDescription(t('Select whether to enable a waitlist.'));
 
     $properties['time_amount'] = DataDefinition::create('integer')

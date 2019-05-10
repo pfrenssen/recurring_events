@@ -72,6 +72,9 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
     parent::postSave($storage, $update);
     if (!$update) {
       $key = 'registration_notification';
+      if ($this->getWaitlist()) {
+        $key = 'waitlist_notification';
+      }
       recurring_events_registration_send_notification($key, $this);
     }
   }

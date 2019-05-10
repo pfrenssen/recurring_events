@@ -40,27 +40,22 @@ class RegistrantSettingsForm extends ConfigFormBase {
    *   The current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('recurring_events_registration.registrant.config')
+    $config = $this->config('recurring_events_registration.registrant.config')
       ->set('show_capacity', $form_state->getValue('show_capacity'))
       ->set('limit', $form_state->getValue('limit'))
       ->set('date_format', $form_state->getValue('date_format'))
-      ->set('email_notifications', $form_state->getValue('email_notifications'))
-      ->set('registration_notification_enabled', $form_state->getValue('registration_notification'))
-      ->set('registration_notification_subject', $form_state->getValue('registration_notification_subject'))
-      ->set('registration_notification_body', $form_state->getValue('registration_notification_body'))
-      ->set('waitlist_notification_enabled', $form_state->getValue('waitlist_notification'))
-      ->set('waitlist_notification_subject', $form_state->getValue('waitlist_notification_subject'))
-      ->set('waitlist_notification_body', $form_state->getValue('waitlist_notification_body'))
-      ->set('promotion_notification_enabled', $form_state->getValue('promotion_notification'))
-      ->set('promotion_notification_subject', $form_state->getValue('promotion_notification_subject'))
-      ->set('promotion_notification_body', $form_state->getValue('promotion_notification_body'))
-      ->set('cancellation_notification_enabled', $form_state->getValue('cancellation_notification'))
-      ->set('cancellation_notification_subject', $form_state->getValue('cancellation_notification_subject'))
-      ->set('cancellation_notification_body', $form_state->getValue('cancellation_notification_body'))
-      ->set('modification_notification_enabled', $form_state->getValue('modification_notification'))
-      ->set('modification_notification_subject', $form_state->getValue('modification_notification_subject'))
-      ->set('modification_notification_body', $form_state->getValue('modification_notification_body'))
-      ->save();
+      ->set('email_notifications', $form_state->getValue('email_notifications'));
+
+    $notification_types = [];
+    \Drupal::moduleHandler()->alter('recurring_events_registration_notification_types', $notification_types);
+
+    foreach ($notification_types as $type => $notification) {
+      $config
+        ->set($type . '_notification_enabled', $form_state->getValue($type . '_notification'))
+        ->set($type . '_notification_subject', $form_state->getValue($type . '_notification_subject'))
+        ->set($type . '_notification_body', $form_state->getValue($type . '_notification_body'));
+    }
+    $config->save();
 
     parent::submitForm($form, $form_state);
   }
@@ -162,186 +157,46 @@ class RegistrantSettingsForm extends ConfigFormBase {
       '@tokens' => implode(', ', $tokens),
     ]);
 
-    // Registration notifications.
-    $form['notifications']['registration'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Registration Notification'),
-      '#open' => TRUE,
-      '#description' => $this->t('Enable and configure registration notifications.') . ' ' . $token_help,
-      '#group' => 'emails',
-    ];
-    $form['notifications']['registration']['registration_notification'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Registration Notification'),
-      '#description' => $this->t('Send an email to a registrant to confirm they were registered for an event?'),
-      '#default_value' => $config->get('registration_notification_enabled'),
-    ];
-    $form['notifications']['registration']['registration_notification_subject'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Subject'),
-      '#default_value' => $config->get('registration_notification_subject'),
-      '#maxlength' => 180,
-      '#states' => [
-        'visible' => [
-          'input[name="registration_notification"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $form['notifications']['registration']['registration_notification_body'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('Body'),
-      '#default_value' => $config->get('registration_notification_body'),
-      '#rows' => 15,
-      '#states' => [
-        'visible' => [
-          'input[name="registration_notification"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
+    $notification_types = [];
+    \Drupal::moduleHandler()->alter('recurring_events_registration_notification_types', $notification_types);
 
-    // Waitlist notifications.
-    $form['notifications']['waitlist'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Waitlist Notification'),
-      '#description' => $this->t('Enable and configure waitlist notifications.') . ' ' . $token_help,
-      '#group' => 'emails',
-    ];
-    $form['notifications']['waitlist']['waitlist_notification'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Waitlist Notification'),
-      '#description' => $this->t('Send an email to a registrant to confirm they were added to the waitlist?'),
-      '#default_value' => $config->get('waitlist_notification_enabled'),
-    ];
-    $form['notifications']['waitlist']['waitlist_notification_subject'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Subject'),
-      '#default_value' => $config->get('waitlist_notification_subject'),
-      '#maxlength' => 180,
-      '#states' => [
-        'visible' => [
-          'input[name="waitlist_notification"]' => ['checked' => TRUE],
+    foreach ($notification_types as $type => $notification) {
+      $form['notifications'][$type] = [
+        '#type' => 'details',
+        '#title' => $notification['name'],
+        '#open' => TRUE,
+        '#description' => $token_help,
+        '#group' => 'emails',
+      ];
+      $form['notifications'][$type][$type . '_notification'] = [
+        '#type' => 'checkbox',
+        '#title' => $notification['name'],
+        '#description' => $notification['description'],
+        '#default_value' => $config->get($type . '_notification_enabled'),
+      ];
+      $form['notifications'][$type][$type . '_notification_subject'] = [
+        '#type' => 'textfield',
+        '#title' => $this->t('Subject'),
+        '#default_value' => $config->get($type . '_notification_subject'),
+        '#maxlength' => 180,
+        '#states' => [
+          'visible' => [
+            'input[name="' . $type . '_notification"]' => ['checked' => TRUE],
+          ],
         ],
-      ],
-    ];
-    $form['notifications']['waitlist']['waitlist_notification_body'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('Body'),
-      '#default_value' => $config->get('waitlist_notification_body'),
-      '#rows' => 15,
-      '#states' => [
-        'visible' => [
-          'input[name="waitlist_notification"]' => ['checked' => TRUE],
+      ];
+      $form['notifications'][$type][$type . '_notification_body'] = [
+        '#type' => 'textarea',
+        '#title' => $this->t('Body'),
+        '#default_value' => $config->get($type . '_notification_body'),
+        '#rows' => 15,
+        '#states' => [
+          'visible' => [
+            'input[name="' . $type . '_notification"]' => ['checked' => TRUE],
+          ],
         ],
-      ],
-    ];
-
-    // Promotion notifications.
-    $form['notifications']['promotion'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Promotion Notification'),
-      '#description' => $this->t('Enable and configure promotion notifications.') . ' ' . $token_help,
-      '#group' => 'emails',
-    ];
-    $form['notifications']['promotion']['promotion_notification'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Promotion Notification'),
-      '#description' => $this->t('Send an email to a registrant to confirm they were promoted from the wailist?'),
-      '#default_value' => $config->get('promotion_notification_enabled'),
-    ];
-    $form['notifications']['promotion']['promotion_notification_subject'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Subject'),
-      '#default_value' => $config->get('promotion_notification_subject'),
-      '#maxlength' => 180,
-      '#states' => [
-        'visible' => [
-          'input[name="promotion_notification"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $form['notifications']['promotion']['promotion_notification_body'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('Body'),
-      '#default_value' => $config->get('promotion_notification_body'),
-      '#rows' => 15,
-      '#states' => [
-        'visible' => [
-          'input[name="promotion_notification"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-
-    // Cancellation notifications.
-    $form['notifications']['cancellation'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Cancellation Notification'),
-      '#description' => $this->t('Enable and configure cancellation notifications.') . ' ' . $token_help,
-      '#group' => 'emails',
-    ];
-    $form['notifications']['cancellation']['cancellation_notification'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Cancellation Notification'),
-      '#description' => $this->t('Send an email to a registrant to confirm an event cancellation?'),
-      '#default_value' => $config->get('cancellation_notification_enabled'),
-    ];
-    $form['notifications']['cancellation']['cancellation_notification_subject'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Subject'),
-      '#default_value' => $config->get('cancellation_notification_subject'),
-      '#maxlength' => 180,
-      '#states' => [
-        'visible' => [
-          'input[name="cancellation_notification"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $form['notifications']['cancellation']['cancellation_notification_body'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('Body'),
-      '#default_value' => $config->get('cancellation_notification_body'),
-      '#rows' => 15,
-      '#states' => [
-        'visible' => [
-          'input[name="cancellation_notification"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-
-    // Modification notifications.
-    $form['notifications']['modification'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Modification Notification'),
-      '#description' => $this->t('Enable and configure modification notifications.') . ' ' . $token_help,
-      '#group' => 'emails',
-    ];
-    $form['notifications']['modification']['modification_notification'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Modification Notification'),
-      '#description' => $this->t('Send an email to a registrant to confirm an event modification?'),
-      '#default_value' => $config->get('modification_notification_enabled'),
-    ];
-    $form['notifications']['modification']['modification_notification_subject'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Subject'),
-      '#default_value' => $config->get('modification_notification_subject'),
-      '#maxlength' => 180,
-      '#states' => [
-        'visible' => [
-          'input[name="modification_notification"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    $form['notifications']['modification']['modification_notification_body'] = [
-      '#type' => 'textarea',
-      '#title' => $this->t('Body'),
-      '#default_value' => $config->get('modification_notification_body'),
-      '#rows' => 15,
-      '#states' => [
-        'visible' => [
-          'input[name="modification_notification"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
+      ];
+    }
 
     return parent::buildForm($form, $form_state);
   }

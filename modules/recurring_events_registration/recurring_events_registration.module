@@ -115,6 +115,42 @@ function recurring_events_registration_mail($key, &$message, $params) {
 }
 
 /**
+ * Implements hook_recurring_events_registration_notification_types_alter().
+ */
+function recurring_events_registration_recurring_events_registration_notification_types_alter(array &$notification_types) {
+  $notification_types += [
+    'registration' => [
+      'name' => t('Registration Notification'),
+      'description' => t('Send an email to a registrant to confirm they were registered for an event?'),
+    ],
+    'waitlist' => [
+      'name' => t('Waitlist Notification'),
+      'description' => t('Send an email to a registrant to confirm they were added to the waitlist?'),
+    ],
+    'promotion' => [
+      'name' => t('Promotion Notification'),
+      'description' => t('Send an email to a registrant to confirm they were promoted from the waitlist?'),
+    ],
+    'instance_deletion' => [
+      'name' => t('Instance Deletion Notification'),
+      'description' => t('Send an email to a registrant to confirm an instance deletion?'),
+    ],
+    'series_deletion' => [
+      'name' => t('Series Deletion Notification'),
+      'description' => t('Send an email to a registrant to confirm a series deletion?'),
+    ],
+    'instance_modification' => [
+      'name' => t('Instance Modification Notification'),
+      'description' => t('Send an email to a registrant to confirm an instance modification?'),
+    ],
+    'series_modification' => [
+      'name' => t('Series Modification Notification'),
+      'description' => t('Send an email to a registrant to confirm a series modification?'),
+    ],
+  ];
+}
+
+/**
  * Implements hook_recurring_events_save_pre_instances_deletion().
  */
 function recurring_events_registration_recurring_events_save_pre_instances_deletion(EventSeries $event_series, FormStateInterface $form_state) {
@@ -127,7 +163,7 @@ function recurring_events_registration_recurring_events_save_pre_instances_delet
     return;
   }
 
-  $key = 'modification_notification';
+  $key = 'series_modification_notification';
 
   // Send an email to all registrants.
   foreach ($registrants as $registrant) {
@@ -156,7 +192,7 @@ function recurring_events_registration_entity_update(EntityInterface $entity) {
       return;
     }
 
-    $key = 'modification_notification';
+    $key = 'instance_modification_notification';
 
     // Send an email to all registrants.
     foreach ($registrants as $registrant) {
@@ -177,7 +213,7 @@ function recurring_events_registration_recurring_events_pre_delete_instance(Even
     return;
   }
 
-  $key = 'cancellation_notification';
+  $key = 'instance_deletion_notification';
 
   // Send an email to all registrants.
   foreach ($registrants as $registrant) {
@@ -199,7 +235,7 @@ function recurring_events_registration_recurring_events_pre_delete_instances(Eve
     return;
   }
 
-  $key = 'cancellation_notification';
+  $key = 'series_deletion_notification';
 
   // Send an email to all registrants.
   foreach ($registrants as $registrant) {

@@ -11,9 +11,15 @@ waitlist_notification_body: 'You have been added to the waitlist for the [eventi
 promotion_notification_enabled: true
 promotion_notification_subject: 'You''ve Been Added To The Registration List'
 promotion_notification_body: 'You have been promoted from the waitlist to the registration list for the [eventinstance:title] [eventinstance:reg_type].'
-cancellation_notification_enabled: true
-cancellation_notification_subject: 'An Event Has Been Cancelled'
-cancellation_notification_body: 'Unfortunately, the [eventinstance:title] [eventinstance:reg_type] has been cancelled.'
-modification_notification_enabled: true
-modification_notification_subject: 'An Event Has Been Modified'
-modification_notification_body: 'The [eventinstance:title] [eventinstance:reg_type] has been modified, please check back for details.'
+instance_deletion_notification_enabled: true
+instance_deletion_notification_subject: 'An Event Has Been Deleted'
+instance_deletion_notification_body: 'Unfortunately, the [eventinstance:title] [eventinstance:reg_type] has been deleted.'
+series_deletion_notification_enabled: true
+series_deletion_notification_subject: 'An Event Series Has Been Deleted'
+series_deletion_notification_body: 'Unfortunately, the [eventinstance:title] [eventinstance:reg_type] has been deleted.'
+instance_modification_notification_enabled: true
+instance_modification_notification_subject: 'An Event Has Been Modified'
+instance_modification_notification_body: 'The [eventinstance:title] [eventinstance:reg_type] has been modified, please check back for details.'
+series_modification_notification_enabled: true
+series_modification_notification_subject: 'An Event Series Has Been Modified'
+series_modification_notification_body: 'The [eventinstance:title] [eventinstance:reg_type] has been modified, and all instances have been removed.'

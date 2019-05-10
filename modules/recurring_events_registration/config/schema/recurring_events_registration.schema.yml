@@ -41,21 +41,39 @@ recurring_events_registration.registrant.config:
     promotion_notification_body:
       type: string
       label: 'The email body for the promotion emails'
-    cancellation_notification_enabled:
+    instance_deletion_notification_enabled:
       type: boolean
-      label: 'Whether to enable cancellation email notifications'
-    cancellation_notification_subject:
+      label: 'Whether to enable instance deletion email notifications'
+    instance_deletion_notification_subject:
       type: string
-      label: 'The email subject for the cancellation emails'
-    cancellation_notification_body:
+      label: 'The email subject for the instance deletion emails'
+    instance_deletion_notification_body:
       type: string
-      label: 'The email body for the cancellation emails'
-    modification_notification_enabled:
+      label: 'The email body for the instance deletion emails'
+    series_deletion_notification_enabled:
       type: boolean
-      label: 'Whether to enable modification email notifications'
-    modification_notification_subject:
+      label: 'Whether to enable series deletion email notifications'
+    series_deletion_notification_subject:
       type: string
-      label: 'The email subject for the modification emails'
-    modification_notification_body:
+      label: 'The email subject for the series deletion emails'
+    series_deletion_notification_body:
       type: string
-      label: 'The email body for the modification emails'
+      label: 'The email body for the series deletion emails'
+    instance_modification_notification_enabled:
+      type: boolean
+      label: 'Whether to enable instance modification email notifications'
+    instance_modification_notification_subject:
+      type: string
+      label: 'The email subject for the instance modification emails'
+    instance_modification_notification_body:
+      type: string
+      label: 'The email body for the instance modification emails'
+    series_modification_notification_enabled:
+      type: boolean
+      label: 'Whether to enable series modification email notifications'
+    series_modification_notification_subject:
+      type: string
+      label: 'The email subject for the series modification emails'
+    series_modification_notification_body:
+      type: string
+      label: 'The email body for the series modification emails'

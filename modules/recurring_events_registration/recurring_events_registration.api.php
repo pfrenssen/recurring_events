@@ -27,3 +27,24 @@ function hook_recurring_events_registration_first_waitlist_alter(Registrant $reg
   $new_registrant = \Drupal::entityTypeManager()->getStorage('registrant')->load($id);
   return $new_registrant;
 }
+
+/**
+ * Alter the types of notification available in the registrant settings.
+ *
+ * The notification types array allows a developer to override which types are
+ * configurable in the registrant settings. The array should be formatted as
+ * such:
+ *  Key - the machine name of the notification type. This must be unique.
+ *  Value - an array containing two keys:
+ *    name - the translated name of the notification.
+ *    description - the translated description of the notification.
+ *
+ * @param array $notification_types
+ *   The notification types array.
+ */
+function hook_recurring_events_registration_notification_types_alter(array &$notification_types) {
+  $notification_types['rename'] = [
+    'name' => t('Event Rename Notification'),
+    'description' => t('Send an email to registrants when the event name changes?'),
+  ];
+}
