@@ -318,6 +318,10 @@ class RegistrantForm extends ContentEntityForm {
         $form['add_to_waitlist']['#printed'] = TRUE;
       }
     }
+
+    if (!$this->currentUser->hasPermission('modify registrant author')) {
+      $form['user_id']['#access'] = FALSE;
+    }
   }
 
   /**

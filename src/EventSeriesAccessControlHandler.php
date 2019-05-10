@@ -30,10 +30,16 @@ class EventSeriesAccessControlHandler extends EntityAccessControlHandler {
         return AccessResult::allowedIfHasPermission($account, 'view eventseries entity');
 
       case 'edit':
-        return AccessResult::allowedIfHasPermission($account, 'edit eventseries entity');
+        if ($account->id() !== $entity->getOwnerId()) {
+          return AccessResult::allowedIfHasPermission($account, 'edit eventseries entities');
+        }
+        return AccessResult::allowedIfHasPermission($account, 'edit own eventseries entity');
 
       case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete eventseries entity');
+        if ($account->id() !== $entity->getOwnerId()) {
+          return AccessResult::allowedIfHasPermission($account, 'delete eventseries entities');
+        }
+        return AccessResult::allowedIfHasPermission($account, 'delete own eventseries entity');
 
       case 'clone':
         return AccessResult::allowedIfHasPermission($account, 'clone eventseries entity');

@@ -25,10 +25,16 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler {
         return AccessResult::allowedIfHasPermission($account, 'view registrant entities');
 
       case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit registrant entities');
+        if ($account->id() !== $entity->getOwnerId()) {
+          return AccessResult::allowedIfHasPermission($account, 'edit registrant entities');
+        }
+        return AccessResult::allowedIfHasPermission($account, 'edit own registrant entities');
 
       case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete registrant entities');
+        if ($account->id() !== $entity->getOwnerId()) {
+          return AccessResult::allowedIfHasPermission($account, 'delete registrant entities');
+        }
+        return AccessResult::allowedIfHasPermission($account, 'delete own registrant entities');
 
       case 'anon-update':
       case 'anon-delete':
@@ -74,7 +80,7 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler {
       $uuid = $params['uuid'];
       // We should not be allowed to edit anonymously if the registrant belongs
       // to a user.
-      if ($registrant->user_id->target_id !== '0') {
+      if ($registrant->getOwnerId() !== '0') {
         return AccessResult::forbidden('This registrant cannot be edited using a UUID.');
       }
 

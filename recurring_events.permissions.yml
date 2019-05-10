@@ -11,9 +11,15 @@ view unpublished eventseries entity:
 edit eventseries entity:
   title: 'Edit eventseries entity'
   description: 'Modify existing event series entities'
+edit own eventseries entity:
+  title: 'Edit own eventseries entity'
+  description: 'Modify own existing event series entities'
 delete eventseries entity:
   title: 'Delete eventseries entity'
   description: 'Delete existing event series entities'
+delete own eventseries entity:
+  title: 'Delete own eventseries entity'
+  description: 'Delete own existing event series entities'
 clone eventseries entity:
   title: 'Clone eventseries entity'
   description: 'Clone existing event series entities'
@@ -32,9 +38,15 @@ view unpublished eventinstance entity:
 edit eventinstance entity:
   title: 'Edit eventinstance entity'
   description: 'Modify existing event instance entities'
+edit own eventinstance entity:
+  title: 'Edit own eventinstance entity'
+  description: 'Modify own existing event instance entities'
 delete eventinstance entity:
   title: 'Delete eventinstance entity'
   description: 'Delete existing event instance entities'
+delete own eventinstance entity:
+  title: 'Delete own eventinstance entity'
+  description: 'Delete own existing event instance entities'
 clone eventinstance entity:
   title: 'Clone eventinstance entity'
   description: 'Clone existing event instance entities'
