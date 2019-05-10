@@ -80,33 +80,37 @@ entity.registrant.delete_form:
 
 # Registrant anonymous edit route.
 entity.registrant.anon_edit_form:
-  path: '/events/{eventinstance}/registrant/{registrant}/{uuid}/edit'
+  path: '/events/{eventinstance}/registration/{registrant}/{uuid}/edit'
   defaults:
   # Calls the form.edit controller, defined in the Registrant entity.
     _entity_form: registrant.edit
   requirements:
-    _access: 'TRUE'
+    _entity_access: 'registrant.anon-update'
     uuid: '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
   options:
     parameters:
       eventinstance:
         type: entity:eventinstance
+      registrant:
+        type: entity:registrant
       uuid:
         type: string
 
 # Registrant anonymous delete route.
 entity.registrant.anon_delete_form:
-  path: '/events/{eventinstance}/registrant/{registrant}/{uuid}/delete'
+  path: '/events/{eventinstance}/registration/{registrant}/{uuid}/delete'
   defaults:
   # Calls the form.delete controller, defined in the Registrant entity.
     _entity_form: registrant.delete
   requirements:
-    _access: 'TRUE'
+    _entity_access: 'registrant.anon-delete'
     uuid: '[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}'
   options:
     parameters:
       eventinstance:
         type: entity:eventinstance
+      registrant:
+        type: entity:registrant
       uuid:
         type: string
 

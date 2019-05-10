@@ -174,7 +174,7 @@ function hook_recurring_events_pre_delete_instances(EventSeries $event_series) {
  * in that this hook fires after deleting instances by deleting the series
  * rather than as a result of changing series date configuration.
  */
-function hook_recurring_events_post_delete_instance(EventSeries $event_series) {
+function hook_recurring_events_post_delete_instances(EventSeries $event_series) {
 }
 
 /**

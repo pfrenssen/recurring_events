@@ -91,7 +91,7 @@ function recurring_events_tokens($type, $tokens, array $data, array $options, Bu
           break;
 
         case 'url':
-          $replacements[$original] = $event_instance->toUrl('canonical');
+          $replacements[$original] = $event_instance->toUrl('canonical')->setAbsolute(TRUE)->toString();
           break;
       }
     }

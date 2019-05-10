@@ -1,13 +1,20 @@
+# Registrant Entities.
 add registrant entities:
-  title: 'Create new Registrant entities'
-
-administer registrant entities:
-  title: 'Administer Registrant entities'
-  description: 'Allow to access the administration form to configure Registrant entities.'
-  restrict access: true
-
-delete registrant entities:
-  title: 'Delete Registrant entities'
-
+  title: 'Create new registrant entities'
+  description: 'Create new registrant entities'
 edit registrant entities:
-  title: 'Edit Registrant entities'
+  title: 'Edit registrant entities'
+  description: 'Edit registrant entities'
+delete registrant entities:
+  title: 'Delete registrant entities'
+  description: 'Delete registrant entities'
+edit registrant entities anonymously:
+  title: 'Edit registrant entities anonymously'
+  description: 'Modify a registrant using the UUID path'
+delete registrant entities anonymously:
+  title: 'Delete registrant entities anonymously'
+  description: 'Delete a registrant using the UUID path'
+administer registrant entities:
+  title: 'Administer registrant entities'
+  description: 'Allow to access the administration form to configure registrant entities.'
+  restrict access: true

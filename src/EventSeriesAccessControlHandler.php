@@ -23,6 +23,10 @@ class EventSeriesAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     switch ($operation) {
       case 'view':
+        $status = $entity->isPublished();
+        if (!$status) {
+          return AccessResult::allowedIfHasPermission($account, 'view unpublished eventseries entity');
+        }
         return AccessResult::allowedIfHasPermission($account, 'view eventseries entity');
 
       case 'edit':
