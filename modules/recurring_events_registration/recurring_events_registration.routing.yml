@@ -1,9 +1,9 @@
 # Registrant table list route.
 entity.registrant.collection:
-  path: '/registrants'
+  path: '/events/registrations'
   defaults:
     _entity_list: 'registrant'
-    _title: 'Registrants'
+    _title: 'Registrations'
   requirements:
     _permission: 'access registrant overview'
 

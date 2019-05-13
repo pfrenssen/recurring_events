@@ -260,7 +260,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
    *   The type of registration, series or instance.
    */
   public function getRegistrationType() {
-    return $this->get('type');
+    return $this->get('type')->value;
   }
 
   /**

@@ -8,6 +8,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactory;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\recurring_events_registration\RegistrationCreationService;
 
 /**
  * Defines a class to build a listing of Registrant entities.
@@ -24,6 +26,20 @@ class RegistrantListBuilder extends EntityListBuilder {
   protected $config;
 
   /**
+   * The request stack object.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $request;
+
+  /**
+   * The registration creation service.
+   *
+   * @var \Drupal\recurring_events_registration\RegistrationCreationService
+   */
+  protected $creationService;
+
+  /**
    * Constructs a new EventInstanceListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -32,13 +48,19 @@ class RegistrantListBuilder extends EntityListBuilder {
    *   The entity storage class.
    * @param \Drupal\Core\Config\ConfigFactory $config
    *   The config factory service.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request
+   *   The request object.
+   * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
+   *   The registration creation service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ConfigFactory $config) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ConfigFactory $config, RequestStack $request, RegistrationCreationService $creation_service) {
     parent::__construct($entity_type, $storage);
     $this->config = $config;
 
     $config = $this->config->get('recurring_events_registration.registrant.config');
     $this->limit = $config->get('limit');
+    $this->request = $request;
+    $this->creationService = $creation_service;
   }
 
   /**
@@ -48,7 +70,9 @@ class RegistrantListBuilder extends EntityListBuilder {
     return new static(
       $entity_type,
       $container->get('entity.manager')->getStorage($entity_type->id()),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('request_stack'),
+      $container->get('recurring_events_registration.creation_service')
     );
   }
 
@@ -109,8 +133,22 @@ class RegistrantListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   protected function getEntityIds() {
+    $request = $this->request->getCurrentRequest();
+    $params = $request->attributes->all();
+
     $query = $this->getStorage()->getQuery()
       ->sort('changed', 'DESC');
+
+    if ($params['_route'] === 'entity.registrant.instance_listing') {
+      $event_instance = $params['eventinstance'];
+      $this->creationService->setEventInstance($event_instance);
+      if ($this->creationService->getRegistrationType() === 'series') {
+        $query->condition('eventseries_id', $event_instance->getEventSeries()->id());
+      }
+      else {
+        $query->condition('eventinstance_id', $event_instance->id());
+      }
+    }
 
     // Only add the pager if a limit is specified.
     if ($this->limit) {
