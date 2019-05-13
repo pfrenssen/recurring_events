@@ -26,6 +26,9 @@ modify registrant waitlist:
 modify registrant author:
   title: 'Modify registrant author value'
   decription: 'Allow a role to set and override the author value of a registrant'
+contact registrants:
+  title: 'Contact registrants'
+  decription: 'Allow a role to set contact registrants'
 administer registrant entities:
   title: 'Administer registrant entities'
   description: 'Allow to access the administration form to configure registrant entities'

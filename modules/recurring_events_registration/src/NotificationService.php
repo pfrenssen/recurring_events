@@ -8,6 +8,7 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Utility\Token;
 use Drupal\recurring_events_registration\Entity\RegistrantInterface;
+use Drupal\Core\Extension\ModuleHandler;
 
 /**
  * NotificationService class.
@@ -48,6 +49,13 @@ class NotificationService {
    * @var \Drupal\Core\Utility\Token
    */
   protected $token;
+
+  /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandler
+   */
+  protected $moduleHandler;
 
   /**
    * The registrant entity.
@@ -92,6 +100,13 @@ class NotificationService {
   protected $configName;
 
   /**
+   * Whether this is a custom or configure email.
+   *
+   * @var bool
+   */
+  protected $custom = FALSE;
+
+  /**
    * Class constructor.
    *
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
@@ -104,13 +119,16 @@ class NotificationService {
    *   The messenger service.
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
+   * @param \Drupal\Core\Extension\ModuleHandler $module_handler
+   *   The module handler service.
    */
-  public function __construct(TranslationInterface $translation, ConfigFactory $config_factory, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token) {
+  public function __construct(TranslationInterface $translation, ConfigFactory $config_factory, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token, ModuleHandler $module_handler) {
     $this->translation = $translation;
     $this->configFactory = $config_factory;
     $this->loggerFactory = $logger->get('recurring_events_registration');
     $this->messenger = $messenger;
     $this->token = $token;
+    $this->moduleHandler = $module_handler;
     $this->configName = 'recurring_events_registration.registrant.config';
   }
 
@@ -123,7 +141,9 @@ class NotificationService {
       $container->get('config.factory'),
       $container->get('logger.factory'),
       $container->get('messenger'),
-      $container->get('token')
+      $container->get('token'),
+      $container->get('module_handler'),
+      $container->get('string_translation')
     );
   }
 
@@ -151,6 +171,9 @@ class NotificationService {
    */
   public function setKey($key) {
     $this->key = $key;
+    if ($this->key === 'custom') {
+      $this->custom = TRUE;
+    }
     return $this;
   }
 
@@ -296,6 +319,9 @@ class NotificationService {
    */
   public function isEnabled() {
     $key = $this->getKey();
+    if ($this->custom) {
+      return TRUE;
+    }
     if ($key) {
       $value = $key . '_enabled';
       return (bool) $this->getConfigValue($value);
@@ -375,6 +401,49 @@ class NotificationService {
       'eventseries' => $this->entity->getEventSeries(),
     ];
     return $this->token->replace($string, $data);
+  }
+
+  /**
+   * Get available tokens form element.
+   *
+   * @return array
+   *   A render array to render on the site.
+   */
+  public function getAvailableTokens() {
+    $relevant_tokens = [
+      'eventseries',
+      'eventinstance',
+      'registrant',
+    ];
+
+    if ($this->moduleHandler->moduleExists('token')) {
+      $token_help = [
+        '#theme' => 'token_tree_link',
+        '#token_types' => $relevant_tokens,
+      ];
+    }
+    else {
+      $all_tokens = $this->token->getInfo();
+      $tokens = [];
+      foreach ($relevant_tokens as $token_prefix) {
+        if (!empty($all_tokens['tokens'][$token_prefix])) {
+          foreach ($all_tokens['tokens'][$token_prefix] as $token_key => $value) {
+            $tokens[] = '[' . $token_prefix . ':' . $token_key . ']';
+          }
+        }
+      }
+
+      $token_text = $this->translation->translate('Available tokens are: @tokens', [
+        '@tokens' => implode(', ', $tokens),
+      ]);
+
+      $token_help = [
+        '#type' => 'markup',
+        '#markup' => $token_text->render(),
+      ];
+    }
+
+    return $token_help;
   }
 
 }

@@ -4,5 +4,5 @@ services:
     arguments: ['@string_translation', '@database', '@logger.factory', '@messenger', '@entity_type.manager']
   recurring_events_registration.notification_service:
     class: Drupal\recurring_events_registration\NotificationService
-    arguments: ['@string_translation', '@config.factory', '@logger.factory', '@messenger', '@token']
+    arguments: ['@string_translation', '@config.factory', '@logger.factory', '@messenger', '@token', '@module_handler']
     

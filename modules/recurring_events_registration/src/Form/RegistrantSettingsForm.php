@@ -4,8 +4,10 @@ namespace Drupal\recurring_events_registration\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
+use Drupal\recurring_events_registration\NotificationService;
 
 /**
  * Class RegistrantSettingsForm.
@@ -13,6 +15,32 @@ use Drupal\Core\Link;
  * @ingroup recurring_events_registration
  */
 class RegistrantSettingsForm extends ConfigFormBase {
+
+  /**
+   * The registration notification service.
+   *
+   * @var \Drupal\recurring_events_registration\NotificationService
+   */
+  protected $notificationService;
+
+  /**
+   * Constructs a RegistrantSettingsForm object.
+   *
+   * @param \Drupal\recurring_events_registration\NotificationService $notification_service
+   *   The registration notification service.
+   */
+  public function __construct(NotificationService $notification_service) {
+    $this->notificationService = $notification_service;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('recurring_events_registration.notification_service')
+    );
+  }
 
   /**
    * Returns a unique string identifying the form.
@@ -136,26 +164,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
       ],
     ];
 
-    $token_help = '';
-    $token_service = \Drupal::token();
-    $all_tokens = $token_service->getInfo();
-    $tokens = [];
-    $relevant_tokens = [
-      'eventseries',
-      'eventinstance',
-      'registrant',
-    ];
-    foreach ($relevant_tokens as $token_prefix) {
-      if (!empty($all_tokens['tokens'][$token_prefix])) {
-        foreach ($all_tokens['tokens'][$token_prefix] as $token_key => $value) {
-          $tokens[] = '[' . $token_prefix . ':' . $token_key . ']';
-        }
-      }
-    }
-
-    $token_help = $this->t('Available variables are: @tokens.', [
-      '@tokens' => implode(', ', $tokens),
-    ]);
+    $tokens = $this->notificationService->getAvailableTokens();
 
     $notification_types = [];
     \Drupal::moduleHandler()->alter('recurring_events_registration_notification_types', $notification_types);
@@ -165,7 +174,6 @@ class RegistrantSettingsForm extends ConfigFormBase {
         '#type' => 'details',
         '#title' => $notification['name'],
         '#open' => TRUE,
-        '#description' => $token_help,
         '#group' => 'emails',
       ];
       $form['notifications'][$type][$type . '_notification'] = [
@@ -190,6 +198,15 @@ class RegistrantSettingsForm extends ConfigFormBase {
         '#title' => $this->t('Body'),
         '#default_value' => $config->get($type . '_notification_body'),
         '#rows' => 15,
+        '#states' => [
+          'visible' => [
+            'input[name="' . $type . '_notification"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+      $form['notifications'][$type]['tokens'] = [
+        '#type' => 'container',
+        'tokens' => $tokens,
         '#states' => [
           'visible' => [
             'input[name="' . $type . '_notification"]' => ['checked' => TRUE],

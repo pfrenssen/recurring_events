@@ -97,14 +97,14 @@ function recurring_events_registration_mail($key, &$message, $params) {
   $service->setKey($key)->setEntity($params['registrant']);
 
   if ($service->isEnabled()) {
-    if (!empty($message['subject'])) {
-      $service->setSubject($message['subject']);
+    if (!empty($params['subject'])) {
+      $service->setSubject($params['subject']);
     }
-    if (!empty($message['body'])) {
-      $service->setMessage($message['body']);
+    if (!empty($params['body'])) {
+      $service->setMessage($params['body']);
     }
-    if (!empty($message['from'])) {
-      $service->setFrom($message['from']);
+    if (!empty($params['from'])) {
+      $service->setFrom($params['from']);
     }
 
     $message['from'] = $service->getFrom();

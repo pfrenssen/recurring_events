@@ -141,3 +141,17 @@ registrations.user_tab:
     parameters:
       user:
         type: entity:user
+
+# Contact Registrants.
+entity.registrant.instance_contact:
+  path: '/events/{eventinstance}/registrations/contact'
+  defaults:
+    _form: '\Drupal\recurring_events_registration\Form\ContactForm'
+    _title: 'Contact Registrants'
+  requirements:
+    _permission: 'access registrant overview'
+    _custom_access:  '\Drupal\recurring_events_registration\Controller\RegistrantController::canContactRegistrants'
+  options:
+    parameters:
+      eventinstance:
+        type: entity:eventinstance

@@ -13,7 +13,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 function recurring_events_registration_token_info() {
   $eventinstance = [];
   $eventinstance_type = [
-    'name' => t('Event Instance Registration'),
+    'name' => t('Event Instance'),
     'description' => t('Event Instance tokens from the Recurring Events Registration module.'),
     'needs-data' => 'eventinstance',
   ];
