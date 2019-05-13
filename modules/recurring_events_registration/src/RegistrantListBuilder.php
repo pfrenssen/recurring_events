@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Drupal\recurring_events_registration\RegistrationCreationService;
 
 /**
  * Defines a class to build a listing of Registrant entities.
@@ -139,15 +138,22 @@ class RegistrantListBuilder extends EntityListBuilder {
     $query = $this->getStorage()->getQuery()
       ->sort('changed', 'DESC');
 
-    if ($params['_route'] === 'entity.registrant.instance_listing') {
-      $event_instance = $params['eventinstance'];
-      $this->creationService->setEventInstance($event_instance);
-      if ($this->creationService->getRegistrationType() === 'series') {
-        $query->condition('eventseries_id', $event_instance->getEventSeries()->id());
-      }
-      else {
-        $query->condition('eventinstance_id', $event_instance->id());
-      }
+    switch ($params['_route']) {
+      case 'entity.registrant.instance_listing':
+        $event_instance = $params['eventinstance'];
+        $this->creationService->setEventInstance($event_instance);
+        if ($this->creationService->getRegistrationType() === 'series') {
+          $query->condition('eventseries_id', $event_instance->getEventSeries()->id());
+        }
+        else {
+          $query->condition('eventinstance_id', $event_instance->id());
+        }
+        break;
+
+      case 'registrations.user_tab':
+        $user = $params['user'];
+        $query->condition('user_id', $user->id());
+        break;
     }
 
     // Only add the pager if a limit is specified.

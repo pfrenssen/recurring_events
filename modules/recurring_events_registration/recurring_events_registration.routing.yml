@@ -119,7 +119,7 @@ entity.registrant.instance_listing:
   path: '/events/{eventinstance}/registrations'
   defaults:
     _entity_list: 'registrant'
-    _title: 'Registrants'
+    _title: 'Registrations'
   requirements:
     _permission: 'access registrant overview'
     _custom_access:  '\Drupal\recurring_events_registration\Controller\RegistrantController::hasRegistration'
@@ -127,3 +127,17 @@ entity.registrant.instance_listing:
     parameters:
       eventinstance:
         type: entity:eventinstance
+
+# User registrations.
+registrations.user_tab:
+  path: '/user/{user}/registrations'
+  defaults:
+    _entity_list: 'registrant'
+    _title: 'Registrations'
+  requirements:
+    _entity_access: 'user.view'
+    user: \d+
+  options:
+    parameters:
+      user:
+        type: entity:user

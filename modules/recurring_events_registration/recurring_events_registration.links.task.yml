@@ -31,3 +31,9 @@ entity.registrant.instance_listing:
   base_route: entity.eventinstance.canonical
   title: 'Registrations'
   weight: 12
+
+entity.user.registrations:
+  route_name: registrations.user_tab
+  base_route: entity.user.canonical
+  title: 'Registrations'
+  weight: 12
