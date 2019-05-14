@@ -8,6 +8,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\recurring_events_registration\RegistrationCreationService;
 use Drupal\recurring_events_registration\NotificationService;
+use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\Mail\MailManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\Core\Link;
@@ -40,6 +42,20 @@ class ContactForm extends FormBase {
   protected $notificationService;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
+   * The mail manager service.
+   *
+   * @var \Drupal\Core\Mail\MailManager
+   */
+  protected $mail;
+
+  /**
    * The event instance object.
    *
    * @var \Drupal\recurring_events\Entity\EventInstance
@@ -55,11 +71,17 @@ class ContactForm extends FormBase {
    *   The registration creation service.
    * @param \Drupal\recurring_events_registration\NotificationService $notification_service
    *   The registration notification service.
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
+   * @param \Drupal\Core\Mail\MailManager $mail
+   *   The mail manager service.
    */
-  public function __construct(RequestStack $request, RegistrationCreationService $creation_service, NotificationService $notification_service) {
+  public function __construct(RequestStack $request, RegistrationCreationService $creation_service, NotificationService $notification_service, Messenger $messenger, MailManager $mail) {
     $this->request = $request;
     $this->creationService = $creation_service;
     $this->notificationService = $notification_service;
+    $this->messenger = $messenger;
+    $this->mail = $mail;
 
     $request = $this->request->getCurrentRequest();
     $params = $request->attributes->all();
@@ -80,7 +102,9 @@ class ContactForm extends FormBase {
     return new static(
       $container->get('request_stack'),
       $container->get('recurring_events_registration.creation_service'),
-      $container->get('recurring_events_registration.notification_service')
+      $container->get('recurring_events_registration.notification_service'),
+      $container->get('messenger'),
+      $container->get('plugin.manager.mail')
     );
   }
 
@@ -101,9 +125,11 @@ class ContactForm extends FormBase {
 
     $form['header'] = [
       '#type' => 'markup',
-      '#markup' => $this->t('By submitting this form you will be contacting %registered registrants and/or %waitlisted people on the waitlist.', [
+      '#markup' => $this->t('By submitting this form you will be contacting %registered registrants and/or %waitlisted people on the waitlist for the %name @type.', [
         '%registered' => count($registered),
         '%waitlisted' => count($waitlisted),
+        '%name' => $this->eventInstance->title->value,
+        '@type' => $this->creationService->getRegistrationType() === 'series' ? $this->t('series') : $this->t('event'),
       ]),
     ];
 
@@ -149,7 +175,7 @@ class ContactForm extends FormBase {
       'eventinstance' => $this->eventInstance->id(),
     ]));
 
-    $build['back_link'] = [
+    $form['back_link'] = [
       '#type' => 'markup',
       '#prefix' => '<span class="event-register-back-link">',
       '#markup' => $link->toString(),
@@ -174,15 +200,31 @@ class ContactForm extends FormBase {
     $waitlisted = $values['type']['waitlist'] === 'waitlist' ? TRUE : FALSE;
 
     $registrants = $this->creationService->retrieveRegisteredParties($registered, $waitlisted);
-    $mail = \Drupal::service('plugin.manager.mail');
+
+    $reg_count = $wait_count = 0;
+
     if (!empty($registrants)) {
       foreach ($registrants as $registrant) {
         $params['registrant'] = $registrant;
 
         $to = $registrant->mail->value;
-        $mail->mail('recurring_events_registration', 'custom', $to, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
+        $this->mail->mail('recurring_events_registration', 'custom', $to, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
+
+        if ($registrant->getWaitlist() == '1') {
+          $wait_count++;
+        }
+        else {
+          $reg_count++;
+        }
       }
-      // TODO: Add success message.
+
+      $this->messenger->addMessage($this->t('Successfully sent emails to %reg_count registrants and %wait_count waitlisted users.', [
+        '%reg_count' => $reg_count,
+        '%wait_count' => $wait_count,
+      ]));
+    }
+    else {
+      $this->messenger->addMessage($this->t('No emails were sent as there were no registrants or waitlist users to contact.'));
     }
   }
 
