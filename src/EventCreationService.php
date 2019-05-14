@@ -180,39 +180,43 @@ class EventCreationService {
 
     switch ($config['type']) {
       case 'weekly':
-        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T12:00:00';
-        $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
-        $start_date->setTimezone($user_timezone);
+        $time = $user_input['weekly_recurring_date'][0]['time'];
+        $time_parts = $this->convertTimeTo24hourFormat($time);
+        $timestamp = implode(':', $time_parts) . ':00';
+
+        $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T' . $timestamp;
+        $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
         $start_date->setTime(0, 0, 0);
 
-        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
-        $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
-        $end_date->setTimezone($user_timezone);
+        $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T' . $timestamp;
+        $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
         $end_date->setTime(0, 0, 0);
 
         $config['start_date'] = $start_date;
         $config['end_date'] = $end_date;
 
-        $config['time'] = $user_input['weekly_recurring_date'][0]['time'];
+        $config['time'] = $time;
         $config['duration'] = $user_input['weekly_recurring_date'][0]['duration'];
         $config['days'] = array_filter(array_values($user_input['weekly_recurring_date'][0]['days']));
         break;
 
       case 'monthly':
-        $start_timestamp = $user_input['monthly_recurring_date'][0]['value']['date'] . 'T12:00:00';
-        $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
-        $start_date->setTimezone($user_timezone);
+        $time = $user_input['monthly_recurring_date'][0]['time'];
+        $time_parts = $this->convertTimeTo24hourFormat($time);
+        $timestamp = implode(':', $time_parts) . ':00';
+
+        $start_timestamp = $user_input['monthly_recurring_date'][0]['value']['date'] . 'T' . $timestamp;
+        $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
         $start_date->setTime(0, 0, 0);
 
-        $end_timestamp = $user_input['monthly_recurring_date'][0]['end_value']['date'] . 'T12:00:00';
-        $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
-        $end_date->setTimezone($user_timezone);
+        $end_timestamp = $user_input['monthly_recurring_date'][0]['end_value']['date'] . 'T' . $timestamp;
+        $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
         $end_date->setTime(0, 0, 0);
 
         $config['start_date'] = $start_date;
         $config['end_date'] = $end_date;
 
-        $config['time'] = $user_input['monthly_recurring_date'][0]['time'];
+        $config['time'] = $time;
         $config['duration'] = $user_input['monthly_recurring_date'][0]['duration'];
         $config['monthly_type'] = $user_input['monthly_recurring_date'][0]['type'];
 
