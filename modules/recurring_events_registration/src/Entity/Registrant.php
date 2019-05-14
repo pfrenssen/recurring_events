@@ -30,7 +30,7 @@ use Drupal\recurring_events\Entity\EventSeries;
  *       "edit" = "Drupal\recurring_events_registration\Form\RegistrantForm",
  *       "delete" = "Drupal\recurring_events_registration\Form\RegistrantDeleteForm",
  *       "anon-edit" = "Drupal\recurring_events_registration\Form\RegistrantForm",
- *       "anon-delete" = "Drupal\recurring_events_registration\Form\RegistrantDeleteForm",
+ *       "anon-delete" = "Drupal\recurring_events_registration\Form\RegistrantDeleteForm"
  *     },
  *     "access" = "Drupal\recurring_events_registration\RegistrantAccessControlHandler",
  *   },

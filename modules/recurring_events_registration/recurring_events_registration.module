@@ -14,6 +14,7 @@ use Drupal\recurring_events_registration\Entity\Registrant;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_help().
@@ -266,4 +267,23 @@ function recurring_events_registration_send_notification($key, Registrant $regis
     $mail = \Drupal::service('plugin.manager.mail');
     $mail->mail('recurring_events_registration', $key, $to, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
   }
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function recurring_events_registration_entity_operation(EntityInterface $entity) {
+  $operations = [];
+  if ($entity->getEntityTypeId() == 'registrant') {
+    $operations['resend'] = [
+      'title' => t('Resend Mail'),
+      'weight' => 50,
+      'url' => Url::fromRoute('entity.registrant.resend_form', [
+        'eventinstance' => $entity->getEventInstance()->id(),
+        'registrant' => $entity->id(),
+      ]),
+    ];
+  }
+
+  return $operations;
 }

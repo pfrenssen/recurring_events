@@ -332,10 +332,13 @@ class NotificationService {
   /**
    * Get the email subject.
    *
+   * @param bool $parse_tokens
+   *   Whether or not to parse out the tokens.
+   *
    * @return string
    *   The email subject line.
    */
-  public function getSubject() {
+  public function getSubject($parse_tokens = TRUE) {
     $key = $this->getKey();
     if ($key) {
       $subject = $this->subject;
@@ -352,7 +355,11 @@ class NotificationService {
         ]));
         return '';
       }
-      return $this->parseTokenizedString($subject);
+
+      if ($parse_tokens) {
+        return $this->parseTokenizedString($subject);
+      }
+      return $subject;
     }
     return '';
   }
@@ -360,10 +367,13 @@ class NotificationService {
   /**
    * Get the email message.
    *
+   * @param bool $parse_tokens
+   *   Whether or not to parse out the tokens.
+   *
    * @return string
    *   The email message.
    */
-  public function getMessage() {
+  public function getMessage($parse_tokens = TRUE) {
     $key = $this->getKey();
     if ($key) {
       $message = $this->message;
@@ -380,7 +390,11 @@ class NotificationService {
         ]));
         return '';
       }
-      return $this->parseTokenizedString($message);
+
+      if ($parse_tokens) {
+        return $this->parseTokenizedString($message);
+      }
+      return $message;
     }
     return '';
   }

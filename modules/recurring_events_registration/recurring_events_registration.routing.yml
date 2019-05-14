@@ -78,6 +78,21 @@ entity.registrant.delete_form:
       registrant:
         type: entity:registrant
 
+# Resend Registrant email.
+entity.registrant.resend_form:
+  path: '/events/{eventinstance}/registration/{registrant}/resend'
+  defaults:
+    _form: \Drupal\recurring_events_registration\Form\RegistrantResendForm
+    _title: 'Resend Registration Email'
+  requirements:
+    _entity_access: 'registrant.resend'
+  options:
+    parameters:
+      eventinstance:
+        type: entity:eventinstance
+      registrant:
+        type: entity:registrant
+
 # Registrant anonymous edit route.
 entity.registrant.anon_edit_form:
   path: '/events/{eventinstance}/registration/{registrant}/{uuid}/edit'

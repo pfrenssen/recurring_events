@@ -36,6 +36,9 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler {
         }
         return AccessResult::allowedIfHasPermission($account, 'delete own registrant entities');
 
+      case 'resend':
+        return AccessResult::allowedIfHasPermission($account, 'resend registrant emails');
+
       case 'anon-update':
       case 'anon-delete':
         return $this->checkAnonymousAccess($entity, $operation, $account);

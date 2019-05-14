@@ -12,13 +12,16 @@ use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Mail\MailManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\recurring_events\Entity\EventInstance;
+use Drupal\Core\Render\Renderer;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 
 /**
- * Registrant contact form.
+ * Provides a form for resending Registrant registration emails.
+ *
+ * @ingroup recurring_events_registration
  */
-class ContactForm extends FormBase {
+class RegistrantResendForm extends FormBase {
 
   /**
    * The request stack object.
@@ -56,11 +59,25 @@ class ContactForm extends FormBase {
   protected $mail;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\Renderer
+   */
+  protected $renderer;
+
+  /**
    * The event instance object.
    *
    * @var \Drupal\recurring_events\Entity\EventInstance
    */
   protected $eventInstance;
+
+  /**
+   * The registrant object.
+   *
+   * @var \Drupal\recurring_events_registration\Entity\Registrant
+   */
+  protected $registrant;
 
   /**
    * Constructs a ContactForm object.
@@ -75,20 +92,29 @@ class ContactForm extends FormBase {
    *   The messenger service.
    * @param \Drupal\Core\Mail\MailManager $mail
    *   The mail manager service.
+   * @param \Drupal\Core\Render\Renderer $renderer
+   *   The renderer service.
    */
-  public function __construct(RequestStack $request, RegistrationCreationService $creation_service, NotificationService $notification_service, Messenger $messenger, MailManager $mail) {
+  public function __construct(RequestStack $request, RegistrationCreationService $creation_service, NotificationService $notification_service, Messenger $messenger, MailManager $mail, Renderer $renderer) {
     $this->request = $request;
     $this->creationService = $creation_service;
     $this->notificationService = $notification_service;
     $this->messenger = $messenger;
     $this->mail = $mail;
+    $this->renderer = $renderer;
 
     $request = $this->request->getCurrentRequest();
     $params = $request->attributes->all();
-    if (!empty($params['eventinstance'])) {
-      $event_instance = $params['eventinstance'];
-      $this->eventInstance = $event_instance;
-      $this->creationService->setEventInstance($event_instance);
+    if (!empty($params['eventinstance']) && !empty($params['registrant'])) {
+      $this->eventInstance = $params['eventinstance'];
+      $this->creationService->setEventInstance($this->eventInstance);
+
+      $this->registrant = $params['registrant'];
+      $key = 'registration_notification';
+      if ($this->registrant->getWaitlist() == '1') {
+        $key = 'waitlist_notification';
+      }
+      $this->notificationService->setEntity($this->registrant)->setKey($key);
     }
     else {
       throw new NotFoundHttpException();
@@ -104,7 +130,8 @@ class ContactForm extends FormBase {
       $container->get('recurring_events_registration.creation_service'),
       $container->get('recurring_events_registration.notification_service'),
       $container->get('messenger'),
-      $container->get('plugin.manager.mail')
+      $container->get('plugin.manager.mail'),
+      $container->get('renderer')
     );
   }
 
@@ -112,49 +139,46 @@ class ContactForm extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'recurring_events_registration_contact_form';
+    return 'recurring_events_registration_resend_form';
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-
-    $registered = $this->creationService->retrieveRegisteredParties(TRUE, FALSE, FALSE);
-    $waitlisted = $this->creationService->retrieveWaitlistedParties();
-
-    $form['header'] = [
-      '#type' => 'markup',
-      '#markup' => $this->t('By submitting this form you will be contacting %registered registrants and/or %waitlisted people on the waitlist for the %name @type.', [
-        '%registered' => count($registered),
-        '%waitlisted' => count($waitlisted),
-        '%name' => $this->eventInstance->title->value,
-        '@type' => $this->creationService->getRegistrationType() === 'series' ? $this->t('series') : $this->t('event'),
-      ]),
-    ];
-
-    $form['type'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Who would you like to contact?'),
-      '#options' => [
-        'registrants' => $this->t('Registrants'),
-        'waitlist' => $this->t('Waitlisted Users'),
+    $form['resend'] = [
+      '#type' => 'container',
+      '#weight' => -99,
+      'title' => [
+        '#type' => 'markup',
+        '#prefix' => '<h2 class="registration-register-title">',
+        '#markup' => $this->t('Resend Registration Email'),
+        '#suffix' => '</h2>',
       ],
-      '#default_value' => ['registrants'],
-      '#required' => TRUE,
+      'intro' => [
+        '#type' => 'markup',
+        '#prefix' => '<p class=registration-register-intro">',
+        '#markup' => $this->t('You are resending the registration email for %email for %event.', [
+          '%email' => $this->registrant->email->value,
+          '%event' => $this->eventInstance->title->value,
+        ]),
+        '#suffix' => '</p>',
+      ],
     ];
 
     $form['subject'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Email Subject'),
-      '#description' => $this->t('Enter the subject of the email to send to the registrants.'),
+      '#description' => $this->t('The subject of the email to send to the registrant'),
+      '#default_value' => $this->notificationService->getSubject(FALSE),
       '#required' => TRUE,
     ];
 
     $form['message'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Email Message'),
-      '#description' => $this->t('Enter the message of the email to send to the registrants.'),
+      '#description' => $this->t('The message for the email to send to the registrant'),
+      '#default_value' => $this->notificationService->getMessage(FALSE),
       '#required' => TRUE,
     ];
 
@@ -168,7 +192,7 @@ class ContactForm extends FormBase {
 
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Send Email(s)'),
+      '#value' => $this->t('Resend Email'),
     ];
 
     $link = Link::fromTextAndUrl($this->t('Go Back to Registration List'), new Url('entity.registrant.instance_listing', [
@@ -194,38 +218,12 @@ class ContactForm extends FormBase {
     $params = [
       'subject' => $values['subject'],
       'body' => $values['message'],
+      'registrant' => $this->registrant,
     ];
 
-    $registered = $values['type']['registrants'] === 'registrants' ? TRUE : FALSE;
-    $waitlisted = $values['type']['waitlist'] === 'waitlist' ? TRUE : FALSE;
-
-    $registrants = $this->creationService->retrieveRegisteredParties($registered, $waitlisted);
-
-    $reg_count = $wait_count = 0;
-
-    if (!empty($registrants)) {
-      foreach ($registrants as $registrant) {
-        $params['registrant'] = $registrant;
-
-        $to = $registrant->mail->value;
-        $this->mail->mail('recurring_events_registration', 'custom', $to, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
-
-        if ($registrant->getWaitlist() == '1') {
-          $wait_count++;
-        }
-        else {
-          $reg_count++;
-        }
-      }
-
-      $this->messenger->addMessage($this->t('Successfully sent emails to %reg_count registrants and %wait_count waitlisted users.', [
-        '%reg_count' => $reg_count,
-        '%wait_count' => $wait_count,
-      ]));
-    }
-    else {
-      $this->messenger->addMessage($this->t('No emails were sent as there were no registrants or waitlist users to contact.'));
-    }
+    $to = $this->registrant->mail->value;
+    $this->mail->mail('recurring_events_registration', 'custom', $to, \Drupal::languageManager()->getDefaultLanguage()->getId(), $params);
+    $this->messenger->addMessage($this->t('Registrant email successfully resent.'));
   }
 
 }
