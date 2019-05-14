@@ -49,7 +49,7 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
   }
 
   /**
-   * Construct a EventSeriesDeleteForm.
+   * Construct an EventSeriesDeleteForm.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.

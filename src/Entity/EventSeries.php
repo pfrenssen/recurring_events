@@ -72,10 +72,11 @@ use Drupal\user\UserInterface;
  *   id = "eventseries",
  *   label = @Translation("Event series entity"),
  *   handlers = {
- *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
+ *     "storage" = "Drupal\recurring_events\EventSeriesStorage",
  *     "list_builder" = "Drupal\recurring_events\EventSeriesListBuilder",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "translation" = "Drupal\recurring_events\EventSeriesTranslationHandler",
  *     "form" = {
  *       "add" = "Drupal\recurring_events\Form\EventSeriesForm",
  *       "edit" = "Drupal\recurring_events\Form\EventSeriesForm",
@@ -83,6 +84,9 @@ use Drupal\user\UserInterface;
  *       "clone" = "Drupal\recurring_events\Form\EventSeriesCloneForm",
  *     },
  *     "access" = "Drupal\recurring_events\EventSeriesAccessControlHandler",
+ *     "route_provider" = {
+ *       "html" = "Drupal\recurring_events\EventSeriesHtmlRouteProvider",
+ *     },
  *   },
  *   base_table = "eventseries",
  *   data_table = "eventseries_field_data",
@@ -110,9 +114,12 @@ use Drupal\user\UserInterface;
  *     "edit-form" = "/events/series/{eventseries}/edit",
  *     "delete-form" = "/events/series/{eventseries}/delete",
  *     "collection" = "/admin/content/events/series",
+ *     "clone-form" = "/events/series/{eventseries}/clone",
  *     "version-history" = "/events/series/{eventseries}/revisions",
  *     "revision" = "/events/series/{eventseries}/revisions/{eventseries_revision}/view",
- *     "clone-form" = "/events/series/{eventseries}/clone",
+ *     "revision_revert" = "/events/series/{eventseries}/revisions/{eventseries_revision}/revert",
+ *     "revision_delete" = "/events/series/{eventseries}/revisions/{eventseries_revision}/delete",
+ *     "translation_revert" = "/events/series/{eventseries}/revisions/{eventseries_revision}/revert/{langcode}",
  *   },
  *   field_ui_base_route = "eventseries.settings",
  * )
@@ -131,7 +138,7 @@ use Drupal\user\UserInterface;
  * we want. In our case we want to provide access to the standard fields about
  * creation and changed time stamps.
  *
- * Our interface (see EventSeriesInterface) also exposes the
+ * Our interface (see EventInterface) also exposes the
  * EntityOwnerInterface. This allows us to provide methods for setting
  * and providing ownership information.
  *
@@ -159,6 +166,22 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
   /**
    * {@inheritdoc}
    */
+  protected function urlRouteParameters($rel) {
+    $uri_route_parameters = parent::urlRouteParameters($rel);
+
+    if ($rel === 'revision_revert' && $this instanceof RevisionableInterface) {
+      $uri_route_parameters[$this->getEntityTypeId() . '_revision'] = $this->getRevisionId();
+    }
+    elseif ($rel === 'revision_delete' && $this instanceof RevisionableInterface) {
+      $uri_route_parameters[$this->getEntityTypeId() . '_revision'] = $this->getRevisionId();
+    }
+
+    return $uri_route_parameters;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
@@ -181,36 +204,6 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
   /**
    * {@inheritdoc}
    */
-  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
-    parent::preSaveRevision($storage, $record);
-
-    if (!$this->isNewRevision() && isset($this->original) && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing event without adding a new
-      // revision, we need to make sure $entity->revision_log is reset whenever
-      // it is empty. Therefore, this code allows us to avoid clobbering an
-      // existing log entry with an empty one.
-      $record->revision_log = $this->original->revision_log->value;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRevisionAuthor() {
-    return $this->getRevisionUser();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRevisionAuthorId($uid) {
-    $this->setRevisionUserId($uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -228,19 +221,6 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
   public function setChangedTime($timestamp) {
     $this->set('changed', $timestamp);
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getChangedTimeAcrossTranslations() {
-    $changed = $this->getUntranslated()->getChangedTime();
-    foreach ($this->getTranslationLanguages(FALSE) as $language) {
-      $translation_changed = $this->getTranslation($language->getId())
-        ->getChangedTime();
-      $changed = max($translation_changed, $changed);
-    }
-    return $changed;
   }
 
   /**
@@ -270,6 +250,21 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function setOwner(UserInterface $account) {
     $this->setOwnerId($account->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionAuthor() {
+    return $this->getRevisionUser();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionAuthorId($uid) {
+    $this->setRevisionUserId($uid);
     return $this;
   }
 
@@ -468,6 +463,13 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
         'weight' => 120,
       ])
       ->setDisplayConfigurable('form', TRUE);
+
+    $fields['revision_translation_affected'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Revision translation affected'))
+      ->setDescription(t('Indicates if the last edit of a translation belongs to current revision.'))
+      ->setReadOnly(TRUE)
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE);
 
     return $fields;
   }

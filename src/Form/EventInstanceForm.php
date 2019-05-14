@@ -33,7 +33,7 @@ class EventInstanceForm extends ContentEntityForm {
   }
 
   /**
-   * Construct a EventSeriesForm.
+   * Construct an EventInstanceForm.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.
@@ -89,10 +89,21 @@ class EventInstanceForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $form_state->setRedirect('entity.eventinstance.collection');
-    parent::save($form, $form_state);
-
     $entity = $this->getEntity();
+
+    // Save as a new revision if requested to do so.
+    if (!$form_state->isValueEmpty('new_revision') && $form_state->getValue('new_revision') != FALSE) {
+      $entity->setNewRevision();
+
+      // If a new revision is created, save the current user as revision author.
+      $entity->setRevisionCreationTime(REQUEST_TIME);
+      $entity->setRevisionUserId(\Drupal::currentUser()->id());
+    }
+    else {
+      $entity->setNewRevision(FALSE);
+    }
+
+    parent::save($form, $form_state);
 
     if ($entity->isDefaultTranslation()) {
       $message = t('Event instance of %label has been saved.', [
@@ -106,6 +117,8 @@ class EventInstanceForm extends ContentEntityForm {
       ]);
     }
     $this->messenger->addMessage($message);
+
+    $form_state->setRedirect('entity.eventinstance.canonical', ['eventinstance' => $entity->id()]);
   }
 
 }

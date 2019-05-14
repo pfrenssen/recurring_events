@@ -23,6 +23,11 @@ delete own eventseries entity:
 clone eventseries entity:
   title: 'Clone eventseries entity'
   description: 'Clone existing event series entities'
+view all eventseries revisions:
+  title: 'View all eventseries revisions'
+revert all eventseries revisions:
+  title: 'Revert all eventseries revisions'
+  description: 'Role requires permission <em>view eventseries revisions</em> and <em>edit rights</em> for eventseries entities in question or <em>administer eventseries entities</em>.'
 administer eventseries entity:
   title: 'Administer eventseries entity'
   description: 'Make changes to the event series entity type.'
@@ -50,6 +55,11 @@ delete own eventinstance entity:
 clone eventinstance entity:
   title: 'Clone eventinstance entity'
   description: 'Clone existing event instance entities'
+view all eventinstance revisions:
+  title: 'View all eventinstance revisions'
+revert all eventinstance revisions:
+  title: 'Revert all eventinstance revisions'
+  description: 'Role requires permission <em>view eventinstance revisions</em> and <em>edit rights</em> for eventinstance entities in question or <em>administer eventinstance entities</em>.'
 administer eventinstance entity:
   title: 'Administer eventinstance entity'
   description: 'Make changes to the event instance entity type.'

@@ -87,7 +87,7 @@ class RegistrantForm extends ContentEntityForm {
   }
 
   /**
-   * Construct a EventSeriesForm.
+   * Construct an RegistrantForm.
    *
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager service.

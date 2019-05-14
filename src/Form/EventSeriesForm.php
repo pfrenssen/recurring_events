@@ -67,7 +67,7 @@ class EventSeriesForm extends ContentEntityForm {
   }
 
   /**
-   * Construct a EventSeriesForm.
+   * Construct an EventSeriesForm.
    *
    * @param \Drupal\recurring_events\EventCreationService $creation_service
    *   The event creation service.
@@ -211,9 +211,20 @@ class EventSeriesForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $form_state->setRedirect('entity.eventseries.collection');
     $entity = $this->getEntity();
     $original = NULL;
+
+    // Save as a new revision if requested to do so.
+    if (!$form_state->isValueEmpty('new_revision') && $form_state->getValue('new_revision') != FALSE) {
+      $entity->setNewRevision();
+
+      // If a new revision is created, save the current user as revision author.
+      $entity->setRevisionCreationTime(REQUEST_TIME);
+      $entity->setRevisionUserId(\Drupal::currentUser()->id());
+    }
+    else {
+      $entity->setNewRevision(FALSE);
+    }
 
     if (!$entity->isNew()) {
       $original = $this->storage->loadUnchanged($entity->id());
@@ -222,6 +233,8 @@ class EventSeriesForm extends ContentEntityForm {
     $this->messenger->addStatus($this->t('Successfully saved the %name event series', [
       '%name' => $entity->title->value,
     ]));
+
+    $form_state->setRedirect('entity.eventseries.canonical', ['eventseries' => $entity->id()]);
 
     $this->creationService->saveEvent($entity, $form_state, $original);
     parent::save($form, $form_state);

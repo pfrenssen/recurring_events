@@ -17,14 +17,21 @@ eventseries.delete_form:
   route_name:  entity.eventseries.delete_form
   base_route:  entity.eventseries.canonical
   title: Delete
-  weight: 
+  weight: 10
+
+# Event Series revisions link.
+entity.eventseries.version_history:
+  route_name: entity.eventseries.version_history
+  base_route: entity.eventseries.canonical
+  title: 'Revisions'
+  weight: 11
   
 # Event Series clone link.
 eventseries.clone_form:
   route_name:  entity.eventseries.clone_form
   base_route:  entity.eventseries.canonical
   title: Clone
-  weight: 11
+  weight: 12
 
 ### Event Instance local links.
 
@@ -47,12 +54,19 @@ eventinstance.delete_form:
   title: Delete
   weight: 10
 
+# Event Instance revisions link.
+entity.eventinstance.version_history:
+  route_name: entity.eventinstance.version_history
+  base_route: entity.eventinstance.canonical
+  title: 'Revisions'
+  weight: 11
+
 # Event Instance clone link.
 eventinstance.clone_form:
   route_name:  entity.eventinstance.clone_form
   base_route:  entity.eventinstance.canonical
   title: Clone
-  weight: 11
+  weight: 12
 
 # Event Series settings admin page.
 entity.eventseries.settings:
