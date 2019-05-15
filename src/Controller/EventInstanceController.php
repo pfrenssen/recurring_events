@@ -11,6 +11,7 @@ use Drupal\system\SystemManager;
 use Drupal\recurring_events\EventInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 /**
  * The EventInstanceController class.
@@ -75,8 +76,8 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
    *   An array suitable for drupal_render().
    */
   public function revisionShow($eventinstance_revision) {
-    $eventinstance = $this->entityManager()->getStorage('eventinstance')->loadRevision($eventinstance_revision);
-    $view_builder = $this->entityManager()->getViewBuilder('eventinstance');
+    $eventinstance = $this->entityTypeManager()->getStorage('eventinstance')->loadRevision($eventinstance_revision);
+    $view_builder = $this->entityTypeManager()->getViewBuilder('eventinstance');
 
     return $view_builder->view($eventinstance);
   }
@@ -91,8 +92,11 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
    *   The page title.
    */
   public function revisionPageTitle($eventinstance_revision) {
-    $eventinstance = $this->entityManager()->getStorage('eventinstance')->loadRevision($eventinstance_revision);
-    return $this->t('Revision of %title from %date', ['%title' => $eventinstance->label(), '%date' => format_date($eventinstance->getRevisionCreationTime())]);
+    $eventinstance = $this->entityTypeManager()->getStorage('eventinstance')->loadRevision($eventinstance_revision);
+    return $this->t('Revision of %title from %date', [
+      '%title' => $eventinstance->label(),
+      '%date' => $this->dateFormatter->format($eventinstance->getRevisionCreationTime()),
+    ]);
   }
 
   /**
@@ -110,7 +114,7 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
     $langname = $eventinstance->language()->getName();
     $languages = $eventinstance->getTranslationLanguages();
     $has_translations = (count($languages) > 1);
-    $eventinstance_storage = $this->entityManager()->getStorage('eventinstance');
+    $eventinstance_storage = $this->entityTypeManager()->getStorage('eventinstance');
 
     $build['#title'] = $has_translations ? $this->t('@langname revisions for %title', ['@langname' => $langname, '%title' => $eventinstance->label()]) : $this->t('Revisions for %title', ['%title' => $eventinstance->label()]);
     $header = [$this->t('Revision'), $this->t('Operations')];
@@ -136,12 +140,12 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
         ];
 
         // Use revision link to link to revisions that are not active.
-        $date = \Drupal::service('date.formatter')->format($revision->getRevisionCreationTime(), 'short');
+        $date = $this->dateFormatter->format($revision->getRevisionCreationTime(), 'short');
         if ($vid != $eventinstance->getRevisionId()) {
-          $link = $this->l($date, new Url('entity.eventinstance.revision', ['eventinstance' => $eventinstance->id(), 'eventinstance_revision' => $vid]));
+          $link = Link::fromTextAndUrl($date, new Url('entity.eventinstance.revision', ['eventinstance' => $eventinstance->id(), 'eventinstance_revision' => $vid]));
         }
         else {
-          $link = $eventinstance->link($date);
+          $link = $eventinstance->toLink($date);
         }
 
         $row = [];
@@ -151,7 +155,7 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
             '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
             '#context' => [
               'date' => $link,
-              'username' => \Drupal::service('renderer')->renderPlain($username),
+              'username' => $this->renderer->renderPlain($username),
               'message' => ['#markup' => $revision->getRevisionLogMessage(), '#allowed_tags' => Xss::getHtmlTagList()],
             ],
           ],
