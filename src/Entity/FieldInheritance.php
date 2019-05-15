@@ -18,9 +18,6 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *       "edit" = "Drupal\recurring_events\Form\FieldInheritanceForm",
  *       "delete" = "Drupal\recurring_events\Form\FieldInheritanceDeleteForm"
  *     },
- *     "route_provider" = {
- *       "html" = "Drupal\recurring_events\FieldInheritanceHtmlRouteProvider",
- *     },
  *   },
  *   config_prefix = "field_inheritance",
  *   admin_permission = "administer site configuration",

@@ -65,6 +65,9 @@ function recurring_events_entity_base_field_info_alter(&$fields, EntityTypeInter
           ->setClass($class)
           ->setSettings($settings)
           ->setTargetEntityTypeId($entity_type->id())
+          ->setTranslatable(FALSE)
+          ->setRevisionable(FALSE)
+          ->setReadOnly(TRUE)
           ->setDisplayConfigurable('view', TRUE);
       }
     }
