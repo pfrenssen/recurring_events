@@ -9,6 +9,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\recurring_events\EventInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Messenger\Messenger;
 
 /**
  * Provides a form for reverting an eventseries revision.
@@ -16,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @ingroup recurring_events
  */
 class EventSeriesRevisionRevertForm extends ConfirmFormBase {
-
 
   /**
    * The eventseries revision.
@@ -40,16 +40,26 @@ class EventSeriesRevisionRevertForm extends ConfirmFormBase {
   protected $dateFormatter;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
    * Constructs a new EventSeriesRevisionRevertForm.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
    *   The eventseries storage.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
    */
-  public function __construct(EntityStorageInterface $entity_storage, DateFormatterInterface $date_formatter) {
+  public function __construct(EntityStorageInterface $entity_storage, DateFormatterInterface $date_formatter, Messenger $messenger) {
     $this->eventSeriesStorage = $entity_storage;
     $this->dateFormatter = $date_formatter;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -58,7 +68,8 @@ class EventSeriesRevisionRevertForm extends ConfirmFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager')->getStorage('eventseries'),
-      $container->get('date.formatter')
+      $container->get('date.formatter'),
+      $container->get('messenger')
     );
   }
 
@@ -120,7 +131,10 @@ class EventSeriesRevisionRevertForm extends ConfirmFormBase {
     $this->revision->save();
 
     $this->logger('content')->notice('eventseries: reverted %title revision %revision.', ['%title' => $this->revision->label(), '%revision' => $this->revision->getRevisionId()]);
-    drupal_set_message(t('eventseries %title has been reverted to the revision from %revision-date.', ['%title' => $this->revision->label(), '%revision-date' => $this->dateFormatter->format($original_revision_timestamp)]));
+    $this->messenger->addMessage(t('eventseries %title has been reverted to the revision from %revision-date.', [
+      '%title' => $this->revision->label(),
+      '%revision-date' => $this->dateFormatter->format($original_revision_timestamp),
+    ]));
     $form_state->setRedirect(
       'entity.eventseries.version_history',
       ['eventseries' => $this->revision->id()]

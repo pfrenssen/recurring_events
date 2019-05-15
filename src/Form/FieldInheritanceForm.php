@@ -4,11 +4,39 @@ namespace Drupal\recurring_events\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\Messenger;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class FieldInheritanceForm.
  */
 class FieldInheritanceForm extends EntityForm {
+
+  /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
+   * Construct an EventSeriesDeleteForm.
+   *
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
+   */
+  public function __construct(Messenger $messenger) {
+    $this->messenger = $messenger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('messenger')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -155,13 +183,13 @@ class FieldInheritanceForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Field inheritance.', [
+        $this->messenger->addMessage($this->t('Created the %label Field inheritance.', [
           '%label' => $field_inheritance->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Field inheritance.', [
+        $this->messenger->addMessage($this->t('Saved the %label Field inheritance.', [
           '%label' => $field_inheritance->label(),
         ]));
     }

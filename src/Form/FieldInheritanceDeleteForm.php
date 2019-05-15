@@ -5,11 +5,39 @@ namespace Drupal\recurring_events\Form;
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Messenger\Messenger;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds the form to delete Field inheritance entities.
  */
 class FieldInheritanceDeleteForm extends EntityConfirmFormBase {
+
+  /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
+   * Construct an EventSeriesDeleteForm.
+   *
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
+   */
+  public function __construct(Messenger $messenger) {
+    $this->messenger = $messenger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('messenger')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -38,13 +66,11 @@ class FieldInheritanceDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
 
-    drupal_set_message(
-      $this->t('content @type: deleted @label.',
-        [
-          '@type' => $this->entity->bundle(),
-          '@label' => $this->entity->label(),
-        ]
-        )
+    $this->messenger->addMessage(
+      $this->t('content @type: deleted @label.', [
+        '@type' => $this->entity->bundle(),
+        '@label' => $this->entity->label(),
+      ])
     );
 
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();

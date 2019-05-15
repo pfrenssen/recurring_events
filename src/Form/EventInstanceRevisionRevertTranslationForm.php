@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EventInstanceRevisionRevertTranslationForm extends EventInstanceRevisionRevertForm {
 
-
   /**
    * The language to be reverted.
    *
