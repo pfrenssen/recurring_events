@@ -11,6 +11,7 @@ use Drupal\system\SystemManager;
 use Drupal\recurring_events\EventInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 /**
  * The EventSeriesController class.
@@ -89,8 +90,8 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
    *   An array suitable for drupal_render().
    */
   public function revisionShow($eventseries_revision) {
-    $eventseries = $this->entityManager()->getStorage('eventseries')->loadRevision($eventseries_revision);
-    $view_builder = $this->entityManager()->getViewBuilder('eventseries');
+    $eventseries = $this->entityTypeManager()->getStorage('eventseries')->loadRevision($eventseries_revision);
+    $view_builder = $this->entityTypeManager()->getViewBuilder('eventseries');
 
     return $view_builder->view($eventseries);
   }
@@ -105,8 +106,11 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
    *   The page title.
    */
   public function revisionPageTitle($eventseries_revision) {
-    $eventseries = $this->entityManager()->getStorage('eventseries')->loadRevision($eventseries_revision);
-    return $this->t('Revision of %title from %date', ['%title' => $eventseries->label(), '%date' => format_date($eventseries->getRevisionCreationTime())]);
+    $eventseries = $this->entityTypeManager()->getStorage('eventseries')->loadRevision($eventseries_revision);
+    return $this->t('Revision of %title from %date', [
+      '%title' => $eventseries->label(),
+      '%date' => $this->dateFormatter->format($eventseries->getRevisionCreationTime()),
+    ]);
   }
 
   /**
@@ -124,7 +128,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
     $langname = $eventseries->language()->getName();
     $languages = $eventseries->getTranslationLanguages();
     $has_translations = (count($languages) > 1);
-    $eventseries_storage = $this->entityManager()->getStorage('eventseries');
+    $eventseries_storage = $this->entityTypeManager()->getStorage('eventseries');
 
     $build['#title'] = $has_translations ? $this->t('@langname revisions for %title', ['@langname' => $langname, '%title' => $eventseries->label()]) : $this->t('Revisions for %title', ['%title' => $eventseries->label()]);
     $header = [$this->t('Revision'), $this->t('Operations')];
@@ -152,10 +156,10 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
         // Use revision link to link to revisions that are not active.
         $date = \Drupal::service('date.formatter')->format($revision->getRevisionCreationTime(), 'short');
         if ($vid != $eventseries->getRevisionId()) {
-          $link = $this->l($date, new Url('entity.eventseries.revision', ['eventseries' => $eventseries->id(), 'eventseries_revision' => $vid]));
+          $link = Link::fromTextAndUrl($date, new Url('entity.eventseries.revision', ['eventseries' => $eventseries->id(), 'eventseries_revision' => $vid]));
         }
         else {
-          $link = $eventseries->link($date);
+          $link = $eventseries->toLink($date);
         }
 
         $row = [];
@@ -165,7 +169,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
             '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
             '#context' => [
               'date' => $link,
-              'username' => \Drupal::service('renderer')->renderPlain($username),
+              'username' => $this->renderer->renderPlain($username),
               'message' => ['#markup' => $revision->getRevisionLogMessage(), '#allowed_tags' => Xss::getHtmlTagList()],
             ],
           ],
