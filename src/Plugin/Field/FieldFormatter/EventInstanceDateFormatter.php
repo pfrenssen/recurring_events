@@ -98,11 +98,15 @@ class EventInstanceDateFormatter extends EntityReferenceFormatterBase {
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $entity) {
       $date_string = '';
+      $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
       if (!empty($entity->date->start_date) && !empty($entity->date->end_date)) {
         /** @var \Drupal\Core\Datetime\DrupalDateTime $start_date */
         $start_date = $entity->date->start_date;
         /** @var \Drupal\Core\Datetime\DrupalDateTime $end_date */
         $end_date = $entity->date->end_date;
+
+        $start_date->setTimezone($user_timezone);
+        $end_date->setTimezone($user_timezone);
 
         $date = [];
         $date[] = $start_date->format($this->getSetting('date_format'));
