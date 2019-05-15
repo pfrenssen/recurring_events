@@ -35,6 +35,8 @@ use Drupal\recurring_events\Entity\EventSeries;
  *     "access" = "Drupal\recurring_events_registration\RegistrantAccessControlHandler",
  *   },
  *   base_table = "registrant",
+ *   translatable = FALSE,
+ *   fieldable = TRUE,
  *   admin_permission = "administer registrant entities",
  *   entity_keys = {
  *     "id" = "id",

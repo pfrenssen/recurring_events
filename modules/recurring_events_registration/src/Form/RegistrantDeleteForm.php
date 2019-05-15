@@ -5,6 +5,8 @@ namespace Drupal\recurring_events_registration\Form;
 use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Messenger\Messenger;
 
 /**
  * Provides a form for deleting Registrant entities.
@@ -12,6 +14,32 @@ use Drupal\Core\Url;
  * @ingroup recurring_events_registration
  */
 class RegistrantDeleteForm extends ContentEntityDeleteForm {
+
+  /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\Messenger
+   */
+  protected $messenger;
+
+  /**
+   * Constructs a RegistrantDeleteForm object.
+   *
+   * @param \Drupal\Core\Messenger\Messenger $messenger
+   *   The messenger service.
+   */
+  public function __construct(Messenger $messenger) {
+    $this->messenger = $messenger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('messenger')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -90,7 +118,7 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
       $service->promoteFromWaitlist();
     }
 
-    drupal_set_message($this->getDeletionMessage());
+    $this->messenger->addMessage($this->getDeletionMessage());
     $this->logDeletionMessage();
   }
 

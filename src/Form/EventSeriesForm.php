@@ -230,14 +230,23 @@ class EventSeriesForm extends ContentEntityForm {
       $original = $this->storage->loadUnchanged($entity->id());
     }
 
-    $this->messenger->addStatus($this->t('Successfully saved the %name event series', [
-      '%name' => $entity->title->value,
-    ]));
+    if ($entity->isDefaultTranslation()) {
+      $this->creationService->saveEvent($entity, $form_state, $original);
+      $this->messenger->addStatus($this->t('Successfully saved the %name event series', [
+        '%name' => $entity->title->value,
+      ]));
+    }
+    else {
 
-    $form_state->setRedirect('entity.eventseries.canonical', ['eventseries' => $entity->id()]);
+      $this->messenger->addStatus($this->t('@language translation of the @type %label has been saved.', [
+        '@language' => $entity->language()->getName(),
+        '@type' => 'Event ',
+        '%label' => $entity->getUntranslated()->title->value,
+      ]));
+    }
 
-    $this->creationService->saveEvent($entity, $form_state, $original);
     parent::save($form, $form_state);
+    $form_state->setRedirect('entity.eventseries.canonical', ['eventseries' => $entity->id()]);
   }
 
 }
