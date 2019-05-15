@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\Render\Renderer;
 
 /**
  * Provides a form for deleting Registrant entities.
@@ -26,6 +27,13 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
   protected $messenger;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\Renderer
+   */
+  protected $renderer;
+
+  /**
    * Constructs a RegistrantDeleteForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
@@ -36,10 +44,13 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
    *   The time service.
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
+   * @param \Drupal\Core\Render\Renderer $renderer
+   *   The renderer service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, Messenger $messenger) {
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->messenger = $messenger;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -50,7 +61,8 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('messenger')
+      $container->get('messenger'),
+      $container->get('renderer')
     );
   }
 
@@ -88,7 +100,7 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
       ],
     ];
 
-    return \Drupal::service('renderer')->render($build);
+    return $this->renderer->render($build);
   }
 
   /**
