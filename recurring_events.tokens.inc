@@ -87,7 +87,8 @@ function recurring_events_tokens($type, $tokens, array $data, array $options, Bu
 
         case 'date':
           $format = \Drupal::config('recurring_events.eventinstance.config')->get('date_format');
-          $replacements[$original] = $event_instance->date->start_date->format($format);
+          $timezone = new \DateTimeZone(drupal_get_user_timezone());
+          $replacements[$original] = $event_instance->date->start_date->setTimezone($timezone)->format($format);
           break;
 
         case 'url':
