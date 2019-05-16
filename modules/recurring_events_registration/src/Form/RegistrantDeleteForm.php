@@ -11,6 +11,7 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Render\Renderer;
+use Drupal\recurring_events_registration\RegistrationCreationService;
 
 /**
  * Provides a form for deleting Registrant entities.
@@ -34,6 +35,13 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
   protected $renderer;
 
   /**
+   * The creation service.
+   *
+   * @var \Drupal\recurring_events_registration\RegistrationCreationService
+   */
+  protected $creationService;
+
+  /**
    * Constructs a RegistrantDeleteForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
@@ -46,11 +54,14 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
    *   The messenger service.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The renderer service.
+   * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
+   *   The creation service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer) {
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer, RegistrationCreationService $creation_service) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->messenger = $messenger;
     $this->renderer = $renderer;
+    $this->creationService = $creation_service;
   }
 
   /**
@@ -62,7 +73,8 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
       $container->get('messenger'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('recurring_events_registration.creation_service')
     );
   }
 
@@ -137,10 +149,9 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
 
     $form_state->setRedirectUrl($eventinstance->toUrl('canonical'));
 
-    $service = \Drupal::service('recurring_events_registration.creation_service');
-    $service->setEventInstance($eventinstance);
-    if ($service->hasWaitlist() && $entity->waitlist->value == '0') {
-      $service->promoteFromWaitlist();
+    $this->creationService->setEventInstance($eventinstance);
+    if ($this->creationService->hasWaitlist() && $entity->waitlist->value == '0') {
+      $this->creationService->promoteFromWaitlist();
     }
 
     $this->messenger->addMessage($this->getDeletionMessage());

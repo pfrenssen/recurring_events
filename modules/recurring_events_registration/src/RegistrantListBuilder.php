@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\Core\Entity\EntityFieldManager;
 
 /**
  * Defines a class to build a listing of Registrant entities.
@@ -39,6 +40,13 @@ class RegistrantListBuilder extends EntityListBuilder {
   protected $creationService;
 
   /**
+   * The entity field manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManager
+   */
+  protected $entityFieldManager;
+
+  /**
    * Constructs a new EventInstanceListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -51,8 +59,10 @@ class RegistrantListBuilder extends EntityListBuilder {
    *   The request object.
    * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
    *   The registration creation service.
+   * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
+   *   The entity field manager service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ConfigFactory $config, RequestStack $request, RegistrationCreationService $creation_service) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ConfigFactory $config, RequestStack $request, RegistrationCreationService $creation_service, EntityFieldManager $entity_field_manager) {
     parent::__construct($entity_type, $storage);
     $this->config = $config;
 
@@ -60,6 +70,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     $this->limit = $config->get('limit');
     $this->request = $request;
     $this->creationService = $creation_service;
+    $this->entityFieldManager = $entity_field_manager;
   }
 
   /**
@@ -71,7 +82,8 @@ class RegistrantListBuilder extends EntityListBuilder {
       $container->get('entity.manager')->getStorage($entity_type->id()),
       $container->get('config.factory'),
       $container->get('request_stack'),
-      $container->get('recurring_events_registration.creation_service')
+      $container->get('recurring_events_registration.creation_service'),
+      $container->get('entity_field.manager')
     );
   }
 
@@ -119,7 +131,7 @@ class RegistrantListBuilder extends EntityListBuilder {
    */
   protected function getCustomFields() {
     $custom_fields = [];
-    $fields = \Drupal::service('entity_field.manager')->getFieldDefinitions('registrant', 'registrant');
+    $fields = $this->entityFieldManager->getFieldDefinitions('registrant', 'registrant');
     foreach ($fields as $machine_name => $field) {
       if (strpos($machine_name, 'field_') === 0) {
         $custom_fields[$machine_name] = $field->label();

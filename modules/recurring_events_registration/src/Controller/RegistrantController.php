@@ -65,6 +65,8 @@ class RegistrantController extends ControllerBase implements ContainerInjectionI
    */
   public static function hasRegistration(EventInstance $eventinstance) {
     if (!empty($eventinstance)) {
+      // Static function, so we need to request the service statically, not
+      // through dependency injection.
       $service = \Drupal::service('recurring_events_registration.creation_service');
       $service->setEventInstance($eventinstance);
       if ($service->hasRegistration()) {

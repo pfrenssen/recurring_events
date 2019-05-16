@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\Datetime\DateFormatter;
 
 /**
  * Provides a form for deleting an eventinstance entity.
@@ -31,14 +32,11 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
   protected $messenger;
 
   /**
-   * {@inheritdoc}
+   * The date formatter service.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatter
    */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity.manager'),
-      $container->get('messenger')
-    );
-  }
+  protected $dateFormatter;
 
   /**
    * Construct a EventInstanceDeleteForm.
@@ -47,10 +45,24 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
    *   The entity manager service.
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
+   *   The date formatter service.
    */
-  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger) {
-    $this->messenger = $messenger;
+  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger, DateFormatter $date_formatter) {
     parent::__construct($entity_manager);
+    $this->messenger = $messenger;
+    $this->dateFormatter = $date_formatter;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity.manager'),
+      $container->get('messenger'),
+      $container->get('date.formatter')
+    );
   }
 
   /**
@@ -81,7 +93,7 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
     if ($entity->isDefaultTranslation()) {
       $start_date = $entity->date->start_date;
       return $this->t('Deleting this instance will remove only the instance on %date and not other events in this series. This action cannot be undone.', [
-        '%date' => \Drupal::service('date.formatter')->format($start_date->getTimestamp(), 'custom', 'Y-m-d h:i A'),
+        '%date' => $this->dateFormatter->format($start_date->getTimestamp(), 'custom', 'Y-m-d h:i A'),
       ]);
     }
   }
@@ -156,13 +168,13 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
         [
           '@type' => $this->entity->bundle(),
           '%title' => $this->entity->getEventSeries()->title->value,
-          '%date' => \Drupal::service('date.formatter')->format($start_date->getTimestamp(), 'custom', 'Y-m-d h:i A'),
+          '%date' => $this->dateFormatter->format($start_date->getTimestamp(), 'custom', 'Y-m-d h:i A'),
         ]
       );
 
       $this->messenger->addMessage($this->t('The %title event instance starting on %date has been deleted.', [
         '%title' => $this->entity->getEventSeries()->title->value,
-        '%date' => \Drupal::service('date.formatter')->format($start_date->getTimestamp(), 'custom', 'Y-m-d h:i A'),
+        '%date' => $this->dateFormatter->format($start_date->getTimestamp(), 'custom', 'Y-m-d h:i A'),
       ]));
 
       $form_state->setRedirect('entity.eventinstance.collection');

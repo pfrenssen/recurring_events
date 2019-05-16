@@ -15,7 +15,7 @@ class FieldInheritanceFactory extends FieldItemList {
   use ComputedItemListTrait;
 
   /**
-   * Constructs a TypedData object given its definition and context.
+   * Constructs a FieldInheritanceFactory object.
    *
    * @param \Drupal\Core\Field\BaseFieldDefinition $definition
    *   The data definition.

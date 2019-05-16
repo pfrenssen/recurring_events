@@ -7,6 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Messenger\Messenger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityFieldManager;
 
 /**
  * Builds the form to delete Field inheritance entities.
@@ -21,13 +22,23 @@ class FieldInheritanceDeleteForm extends EntityConfirmFormBase {
   protected $messenger;
 
   /**
+   * The entity field manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManager
+   */
+  protected $entityFieldManager;
+
+  /**
    * Construct an EventSeriesDeleteForm.
    *
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
+   * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
+   *   The entity field manager service.
    */
-  public function __construct(Messenger $messenger) {
+  public function __construct(Messenger $messenger, EntityFieldManager $entity_field_manager) {
     $this->messenger = $messenger;
+    $this->entityFieldManager = $entity_field_manager;
   }
 
   /**
@@ -35,7 +46,8 @@ class FieldInheritanceDeleteForm extends EntityConfirmFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('messenger')
+      $container->get('messenger'),
+      $container->get('entity_field.manager')
     );
   }
 
@@ -73,7 +85,7 @@ class FieldInheritanceDeleteForm extends EntityConfirmFormBase {
       ])
     );
 
-    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+    $this->entityFieldManager->clearCachedFieldDefinitions();
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 

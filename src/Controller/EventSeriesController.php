@@ -154,7 +154,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
         ];
 
         // Use revision link to link to revisions that are not active.
-        $date = \Drupal::service('date.formatter')->format($revision->getRevisionCreationTime(), 'short');
+        $date = $this->dateFormatter->format($revision->getRevisionCreationTime(), 'short');
         if ($vid != $eventseries->getRevisionId()) {
           $link = Link::fromTextAndUrl($date, new Url('entity.eventseries.revision', ['eventseries' => $eventseries->id(), 'eventseries_revision' => $vid]));
         }

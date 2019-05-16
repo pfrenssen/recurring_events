@@ -7,13 +7,46 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Component\Uuid\Uuid;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityHandlerInterface;
 
 /**
  * Access controller for the Registrant entity.
  *
  * @see \Drupal\recurring_events_registration\Entity\Registrant.
  */
-class RegistrantAccessControlHandler extends EntityAccessControlHandler {
+class RegistrantAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
+
+  /**
+   * The creation service.
+   *
+   * @var \Drupal\recurring_events_registration\RegistrationCreationService
+   */
+  protected $creationService;
+
+  /**
+   * RegistrantAccessControlHandler constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type.
+   * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
+   *   The creation service.
+   */
+  public function __construct(EntityTypeInterface $entity_type, RegistrationCreationService $creation_service) {
+    parent::__construct($entity_type);
+    $this->creationService = $creation_service;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('recurring_events_registration.creation_service')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -54,9 +87,8 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler {
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
     $params = \Drupal::request()->attributes->all();
     if (!empty($params['eventinstance'])) {
-      $service = \Drupal::service('recurring_events_registration.creation_service');
-      $service->setEventInstance($params['eventinstance']);
-      if ($service->hasRegistration()) {
+      $this->creationService->setEventInstance($params['eventinstance']);
+      if ($this->creationService->hasRegistration()) {
         return AccessResult::allowedIfHasPermission($account, 'add registrant entities');
       }
     }

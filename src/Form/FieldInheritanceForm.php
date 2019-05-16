@@ -6,6 +6,8 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\Messenger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityFieldManager;
+use Drupal\recurring_events\FieldInheritancePluginManager;
 
 /**
  * Class FieldInheritanceForm.
@@ -20,13 +22,33 @@ class FieldInheritanceForm extends EntityForm {
   protected $messenger;
 
   /**
-   * Construct an EventSeriesDeleteForm.
+   * The entity field manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManager
+   */
+  protected $entityFieldManager;
+
+  /**
+   * The field inheritance plugin manager.
+   *
+   * @var \Drupal\recurring_events\FieldInheritancePluginManager
+   */
+  protected $fieldInheritance;
+
+  /**
+   * Construct an FieldInheritanceForm.
    *
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
+   * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
+   *   The entity field manager service.
+   * @param \Drupal\recurring_events\FieldInheritancePluginManager $field_inheritance
+   *   The field inheritance plugin manager.
    */
-  public function __construct(Messenger $messenger) {
+  public function __construct(Messenger $messenger, EntityFieldManager $entity_field_manager, FieldInheritancePluginManager $field_inheritance) {
     $this->messenger = $messenger;
+    $this->entityFieldManager = $entity_field_manager;
+    $this->fieldInheritance = $field_inheritance;
   }
 
   /**
@@ -34,7 +56,9 @@ class FieldInheritanceForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('messenger')
+      $container->get('messenger'),
+      $container->get('entity_field.manager'),
+      $container->get('plugin.manager.field_inheritance')
     );
   }
 
@@ -90,7 +114,7 @@ class FieldInheritanceForm extends EntityForm {
       '#suffix' => '</p>',
     ];
 
-    $series_fields = array_keys(\Drupal::service('entity_field.manager')->getFieldDefinitions('eventseries', 'eventseries'));
+    $series_fields = array_keys($this->entityFieldManager->getFieldDefinitions('eventseries', 'eventseries'));
     $series_fields = array_combine($series_fields, $series_fields);
 
     $form['sourceField'] = [
@@ -102,7 +126,7 @@ class FieldInheritanceForm extends EntityForm {
       '#default_value' => $field_inheritance->sourceField(),
     ];
 
-    $instance_fields = array_keys(\Drupal::service('entity_field.manager')->getFieldDefinitions('eventinstance', 'eventinstance'));
+    $instance_fields = array_keys($this->entityFieldManager->getFieldDefinitions('eventinstance', 'eventinstance'));
     $instance_fields = array_combine($instance_fields, $instance_fields);
 
     $form['entityField'] = [
@@ -121,7 +145,7 @@ class FieldInheritanceForm extends EntityForm {
       '#default_value' => $field_inheritance->entityField(),
     ];
 
-    $plugins = array_keys(\Drupal::service('plugin.manager.field_inheritance')->getDefinitions());
+    $plugins = array_keys($this->fieldInheritance->getDefinitions());
     $plugins = array_combine($plugins, $plugins);
 
     $form['plugin'] = [
@@ -144,8 +168,8 @@ class FieldInheritanceForm extends EntityForm {
     $values = $form_state->getValues();
 
     if (!empty($values['sourceField']) && !empty($values['entityField'])) {
-      $series_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('eventseries', 'eventseries');
-      $instance_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('eventinstance', 'eventinstance');
+      $series_definitions = $this->entityFieldManager->getFieldDefinitions('eventseries', 'eventseries');
+      $instance_definitions = $this->entityFieldManager->getFieldDefinitions('eventinstance', 'eventinstance');
 
       if ($series_definitions[$values['sourceField']]->getType() !== $instance_definitions[$values['entityField']]->getType()) {
         $message = $this->t('Source and entity field definition types must be the same to inherit data. Source - @source_name type: @source_type. Entity - @entity_name type: @entity_type', [
@@ -158,7 +182,7 @@ class FieldInheritanceForm extends EntityForm {
         $form_state->setErrorByName('entityField', $message);
       }
 
-      $plugin_definition = \Drupal::service('plugin.manager.field_inheritance')->getDefinition($values['plugin']);
+      $plugin_definition = $this->fieldInheritance->getDefinition($values['plugin']);
       $field_types = $plugin_definition['types'];
 
       if (!in_array($series_definitions[$values['sourceField']]->getType(), $field_types)) {
@@ -193,7 +217,7 @@ class FieldInheritanceForm extends EntityForm {
           '%label' => $field_inheritance->label(),
         ]));
     }
-    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+    $this->entityFieldManager->clearCachedFieldDefinitions();
     $form_state->setRedirectUrl($field_inheritance->toUrl('collection'));
   }
 
