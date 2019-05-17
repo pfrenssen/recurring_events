@@ -101,7 +101,8 @@ use Drupal\user\UserInterface;
  *     "revision" = "vid",
  *     "published" = "status",
  *     "langcode" = "langcode",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "label" = "title"
  *   },
  *   revision_metadata_keys = {
  *     "revision_user" = "revision_uid",

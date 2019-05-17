@@ -81,6 +81,7 @@ entity.eventinstance.canonical:
   path: '/events/{eventinstance}'
   defaults:
     _entity_view: 'eventinstance'
+    _title_callback: '\Drupal\recurring_events\Controller\EventInstanceController::getTitle'
   requirements:
     _entity_access: 'eventinstance.view'
   options:

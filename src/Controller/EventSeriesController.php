@@ -84,7 +84,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
    * Displays an eventseries revision.
    *
    * @param int $eventseries_revision
-   *   The Default entity  revision ID.
+   *   The eventseries revision ID.
    *
    * @return array
    *   An array suitable for drupal_render().
@@ -100,7 +100,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
    * Page title callback for an eventseries revision.
    *
    * @param int $eventseries_revision
-   *   The Default entity  revision ID.
+   *   The eventseries revision ID.
    *
    * @return string
    *   The page title.
@@ -117,7 +117,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
    * Generates an overview table of older revisions of an eventseries.
    *
    * @param \Drupal\recurring_events\EventInterface $eventseries
-   *   A Default entity  object.
+   *   A eventseries object.
    *
    * @return array
    *   An array as expected by drupal_render().

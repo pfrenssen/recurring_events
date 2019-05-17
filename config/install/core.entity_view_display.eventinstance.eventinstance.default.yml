@@ -28,29 +28,6 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-  inherited_title:
-    type: string
-    weight: 0
-    region: content
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-  owen_field:
-    type: text_default
-    weight: 3
-    region: content
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-  title:
-    type: string
-    weight: 0
-    region: content
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
 hidden:
   body: true
-  inherited_description: true
+  title: true

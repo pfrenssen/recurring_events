@@ -12,6 +12,7 @@ use Drupal\recurring_events\EventInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
+use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * The EventInstanceController class.
@@ -40,6 +41,20 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
   protected $systemManager;
 
   /**
+   * The language manager service.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * The current language code.
+   *
+   * @var string
+   */
+  protected $langCode;
+
+  /**
    * Constructs a EventInstanceController object.
    *
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
@@ -48,11 +63,15 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
    *   The renderer service.
    * @param \Drupal\system\SystemManager $systemManager
    *   System manager service.
+   * @param Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager service.
    */
-  public function __construct(DateFormatterInterface $date_formatter, RendererInterface $renderer, SystemManager $systemManager) {
+  public function __construct(DateFormatterInterface $date_formatter, RendererInterface $renderer, SystemManager $systemManager, LanguageManagerInterface $language_manager) {
     $this->dateFormatter = $date_formatter;
     $this->renderer = $renderer;
     $this->systemManager = $systemManager;
+    $this->languageManager = $language_manager;
+    $this->langCode = $this->languageManager->getCurrentLanguage()->getId();
   }
 
   /**
@@ -62,15 +81,33 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
     return new static(
       $container->get('date.formatter'),
       $container->get('renderer'),
-      $container->get('system.manager')
+      $container->get('system.manager'),
+      $container->get('language_manager')
     );
+  }
+
+  /**
+   * Get the page title for an eventinstance.
+   *
+   * @param \Drupal\recurring_events\EventInterface $eventinstance
+   *   A eventinstance object.
+   *
+   * @return string
+   *   The title of the page.
+   */
+  public function getTitle(EventInterface $eventinstance) {
+    $title = $eventinstance->title->value;
+    if ($eventinstance->hasTranslation($this->langCode)) {
+      $title = $eventinstance->getTranslation($this->langCode)->title->value;
+    }
+    return $title;
   }
 
   /**
    * Displays an eventinstance revision.
    *
    * @param int $eventinstance_revision
-   *   The Default entity  revision ID.
+   *   The eventinstance revision ID.
    *
    * @return array
    *   An array suitable for drupal_render().
@@ -86,7 +123,7 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
    * Page title callback for an eventinstance revision.
    *
    * @param int $eventinstance_revision
-   *   The Default entity  revision ID.
+   *   The eventinstance revision ID.
    *
    * @return string
    *   The page title.
@@ -103,7 +140,7 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
    * Generates an overview table of older revisions of an eventinstance.
    *
    * @param \Drupal\recurring_events\EventInterface $eventinstance
-   *   A Default entity  object.
+   *   A eventinstance object.
    *
    * @return array
    *   An array as expected by drupal_render().
