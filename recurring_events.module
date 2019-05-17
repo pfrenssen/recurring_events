@@ -54,11 +54,15 @@ function recurring_events_entity_base_field_info_alter(&$fields, EntityTypeInter
         }
 
         $class = '\Drupal\recurring_events\FieldInheritanceFactory';
-        if ($type === 'entity_reference') {
+        if ($field->plugin() === 'entity_reference_inheritance') {
           $class = '\Drupal\recurring_events\EntityReferenceFieldInheritanceFactory';
         }
+
+        // Allow developers to override the class to use for a field.
+        \Drupal::moduleHandler()->alter('recurring_events_inheritance_class', $class, $field);
+
         $fields[$field->id()] = BaseFieldDefinition::create($type)
-          ->setLabel($field->label())
+          ->setLabel(t('Inherited @label', ['@label' => $field->label()]))
           ->setName($field->id())
           ->setDescription(t('The inherited field: @field', ['@field' => $field->label()]))
           ->setComputed(TRUE)

@@ -11,7 +11,9 @@ use Drupal\recurring_events\FieldInheritancePluginInterface;
  *   id = "entity_reference_inheritance",
  *   name = @Translation("Entity Reference Field Inheritance"),
  *   types = {
- *     "entity_reference"
+ *     "entity_reference",
+ *     "image",
+ *     "webform"
  *   }
  * )
  */

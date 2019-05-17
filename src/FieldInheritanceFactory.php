@@ -58,6 +58,9 @@ class FieldInheritanceFactory extends FieldItemList {
         $this->list[$key] = $this->createItem($key, $value);
       }
     }
+    else {
+      $this->applyDefaultValue();
+    }
   }
 
   /**

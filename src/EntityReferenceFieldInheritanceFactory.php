@@ -62,6 +62,9 @@ class EntityReferenceFieldInheritanceFactory extends EntityReferenceFieldItemLis
         $this->list[$key] = $this->createItem($key, $value);
       }
     }
+    else {
+      $this->applyDefaultValue();
+    }
   }
 
   /**

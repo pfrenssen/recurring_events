@@ -201,6 +201,8 @@ abstract class FieldInheritancePluginBase extends PluginBase implements FieldInh
     $series = $this->getEventSeries();
     $instance = $this->getEventInstance();
 
+    $values = [];
+
     if (!empty($instance->{$this->getEntityField()}->getValue())) {
       $values = $instance->{$this->getEntityField()}->getValue();
     }

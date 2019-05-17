@@ -94,6 +94,20 @@ function hook_recurring_events_diff_array_alter(array &$diff = []) {
 }
 
 /**
+ * Alter the inheritance class used to build the inherited basefield.
+ *
+ * @var string $class
+ *   The class to alter.
+ * @var Drupal\Core\Field\FieldDefinitionInterface $field
+ *   The field context.
+ */
+function hook_recurring_events_inheritance_class_alter(&$class, $field) {
+  if ($field->plugin() === 'entity_reference_inheritance') {
+    $class = '\Drupal\my_module\EntityReferenceFieldInheritanceFactory';
+  }
+}
+
+/**
  * Execute custom code before event instances are deleted.
  *
  * When an eventseries is updated and has date recurring configuration changes
