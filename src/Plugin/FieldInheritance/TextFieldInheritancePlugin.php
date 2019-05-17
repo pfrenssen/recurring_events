@@ -13,7 +13,10 @@ use Drupal\recurring_events\FieldInheritancePluginInterface;
  *   types = {
  *     "text",
  *     "text_long",
- *     "text_with_summary"
+ *     "text_with_summary",
+ *     "string",
+ *     "string_long",
+ *     "list_string"
  *   }
  * )
  */

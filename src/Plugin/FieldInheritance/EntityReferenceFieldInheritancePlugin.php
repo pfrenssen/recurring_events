@@ -13,6 +13,7 @@ use Drupal\recurring_events\FieldInheritancePluginInterface;
  *   types = {
  *     "entity_reference",
  *     "image",
+ *     "file",
  *     "webform"
  *   }
  * )
