@@ -220,7 +220,7 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
             $links['revert'] = [
               'title' => $this->t('Revert'),
               'url' => $has_translations ?
-              Url::fromRoute('entity.eventinstance.translation_revert', [
+              Url::fromRoute('entity.eventinstance.revision_revert_translation_confirm', [
                 'eventinstance' => $eventinstance->id(),
                 'eventinstance_revision' => $vid,
                 'langcode' => $langcode,

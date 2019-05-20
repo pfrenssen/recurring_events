@@ -197,7 +197,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
             $links['revert'] = [
               'title' => $this->t('Revert'),
               'url' => $has_translations ?
-              Url::fromRoute('entity.eventseries.translation_revert', [
+              Url::fromRoute('entity.eventseries.revision_revert_translation_confirm', [
                 'eventseries' => $eventseries->id(),
                 'eventseries_revision' => $vid,
                 'langcode' => $langcode,
