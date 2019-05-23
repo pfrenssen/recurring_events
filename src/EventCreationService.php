@@ -431,14 +431,9 @@ class EventCreationService {
    *   The original, unsaved event series entity.
    */
   public function saveEvent(EventSeries $event, EventSeries $original = NULL) {
-    $update_event_id = FALSE;
-
-    // If this is a brand new series, then we don't have an ID for it yet to
-    // save against the instances. So we need to defer that part 'til later. We
-    // also want to always create instances if this is a brand new series.
+    // We want to always create instances if this is a brand new series.
     if ($event->isNew()) {
       $create_instances = TRUE;
-      $update_event_id = TRUE;
     }
     else {
       // If there are date differences, we need to clear out the instances.
