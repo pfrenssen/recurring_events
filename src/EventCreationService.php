@@ -280,16 +280,29 @@ class EventCreationService {
    * @param Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
    * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state of an updated event series entity.
+   *   (Optional) The form state of an updated event series entity.
+   * @param Drupal\recurring_events\Entity\EventSeries $edited
+   *   (Optional) The edited event series entity.
    *
    * @return array
    *   An array of differences.
    */
-  public function buildDiffArray(EventSeries $event, FormStateInterface $form_state) {
+  public function buildDiffArray(EventSeries $event, FormStateInterface $form_state = NULL, EventSeries $edited = NULL) {
     $diff = [];
 
     $entity_config = $this->convertEntityConfigToArray($event);
-    $form_config = $this->convertFormConfigToArray($form_state);
+    $form_config = [];
+
+    if (!is_null($form_state)) {
+      $form_config = $this->convertFormConfigToArray($form_state);
+    }
+    if (!is_null($edited)) {
+      $form_config = $this->convertEntityConfigToArray($edited);
+    }
+
+    if (empty($form_config)) {
+      return $diff;
+    }
 
     if ($entity_config['type'] !== $form_config['type']) {
       $diff['type'] = [
@@ -414,25 +427,25 @@ class EventCreationService {
    *
    * @param Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
-   * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state of an updated event series entity.
    * @param Drupal\recurring_events\Entity\EventSeries $original
    *   The original, unsaved event series entity.
    */
-  public function saveEvent(EventSeries $event, FormStateInterface $form_state, EventSeries $original = NULL) {
-    // We only need a revision if this is an existing entity.
+  public function saveEvent(EventSeries $event, EventSeries $original = NULL) {
+    $update_event_id = FALSE;
+
+    // If this is a brand new series, then we don't have an ID for it yet to
+    // save against the instances. So we need to defer that part 'til later. We
+    // also want to always create instances if this is a brand new series.
     if ($event->isNew()) {
       $create_instances = TRUE;
-      // We have to save the event series first so we can use the ID to store
-      // against the event instances we create.
-      $event->save();
+      $update_event_id = TRUE;
     }
     else {
       // If there are date differences, we need to clear out the instances.
-      $create_instances = $this->checkForFormRecurConfigChanges($original, $form_state);
+      $create_instances = $this->checkForOriginalRecurConfigChanges($event, $original);
       if ($create_instances) {
         // Allow other modules to react prior to the deletion of all instances.
-        \Drupal::moduleHandler()->invokeAll('recurring_events_save_pre_instances_deletion', [$event, $form_state]);
+        \Drupal::moduleHandler()->invokeAll('recurring_events_save_pre_instances_deletion', [$event, $original]);
 
         // Find all the instances and delete them.
         $instances = $event->event_instances->referencedEntities();
@@ -454,13 +467,13 @@ class EventCreationService {
         }
 
         // Allow other modules to react after the deletion of all instances.
-        \Drupal::moduleHandler()->invokeAll('recurring_events_save_post_instances_deletion', [$event, $form_state]);
+        \Drupal::moduleHandler()->invokeAll('recurring_events_save_post_instances_deletion', [$event, $original]);
       }
     }
 
     // Only create instances if date changes have been made or the event is new.
     if ($create_instances) {
-      $this->createInstances($event, $form_state);
+      $this->createInstances($event);
     }
   }
 
@@ -469,11 +482,9 @@ class EventCreationService {
    *
    * @param Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
-   * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state of an updated event series entity.
    */
-  public function createInstances(EventSeries $event, FormStateInterface $form_state) {
-    $form_data = $this->convertFormConfigToArray($form_state);
+  public function createInstances(EventSeries $event) {
+    $form_data = $this->convertEntityConfigToArray($event);
     $event_instances = [];
 
     $timezone = new \DateTimeZone(drupal_get_user_timezone());
@@ -634,7 +645,7 @@ class EventCreationService {
 
     // If the start date is after the end date then we have an invalid range so
     // just return nothing.
-    if ($start > $end) {
+    if ($start->getTimestamp() > $end->getTimestamp()) {
       return $dates;
     }
 
@@ -646,7 +657,7 @@ class EventCreationService {
 
     // Loop through a week at a time, storing the date in the array to return
     // until the end date is surpassed.
-    while ($start <= $end) {
+    while ($start->getTimestamp() <= $end->getTimestamp()) {
       // If we do not clone here we end up modifying the value of start in
       // the array and get some funky dates returned.
       $dates[] = clone $start;
@@ -682,7 +693,7 @@ class EventCreationService {
 
     // If the start date is after the end date then we have an invalid range so
     // just return nothing.
-    if ($start > $end) {
+    if ($start->getTimestamp() > $end->getTimestamp()) {
       return $dates;
     }
 
@@ -718,7 +729,7 @@ class EventCreationService {
 
     // Loop through each month checking to see if the day of the month is a
     // valid day, until the end date has been surpassed.
-    while ($start <= $end) {
+    while ($start->getTimestamp() <= $end->getTimestamp()) {
       // If we do not clone here we end up modifying the value of start in
       // the array and get some funky dates returned.
       $dates[] = clone $start;
@@ -787,7 +798,7 @@ class EventCreationService {
 
     // If the start date is after the end date then we have an invalid range so
     // just return nothing.
-    if ($start > $end_date) {
+    if ($start->getTimestamp() > $end_date->getTimestamp()) {
       return $dates;
     }
 
@@ -802,7 +813,7 @@ class EventCreationService {
 
     // Loop through a week at a time, storing the date in the array to return
     // until the end date is surpassed.
-    while ($start <= $end_date) {
+    while ($start->getTimestamp() <= $end_date->getTimestamp()) {
       // If we do not clone here we end up modifying the value of start in
       // the array and get some funky dates returned.
       $dates[] = clone $start;

@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\recurring_events_registration\Entity\Registrant;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\recurring_events\Entity\EventInstance;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
@@ -154,7 +153,7 @@ function recurring_events_registration_recurring_events_registration_notificatio
 /**
  * Implements hook_recurring_events_save_pre_instances_deletion().
  */
-function recurring_events_registration_recurring_events_save_pre_instances_deletion(EventSeries $event_series, FormStateInterface $form_state) {
+function recurring_events_registration_recurring_events_save_pre_instances_deletion(EventSeries $event_series) {
   $registration_creation_service = \Drupal::service('recurring_events_registration.creation_service');
   $registration_creation_service->setEventSeries($event_series);
 

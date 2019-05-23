@@ -168,7 +168,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
             '#type' => 'inline_template',
             '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
             '#context' => [
-              'date' => $link,
+              'date' => $link->toString(),
               'username' => $this->renderer->renderPlain($username),
               'message' => ['#markup' => $revision->getRevisionLogMessage(), '#allowed_tags' => Xss::getHtmlTagList()],
             ],
