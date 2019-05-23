@@ -231,13 +231,11 @@ class EventSeriesForm extends ContentEntityForm {
     }
 
     if ($entity->isDefaultTranslation()) {
-      $this->creationService->saveEvent($entity, $form_state, $original);
       $this->messenger->addStatus($this->t('Successfully saved the %name event series', [
         '%name' => $entity->title->value,
       ]));
     }
     else {
-
       $this->messenger->addStatus($this->t('@language translation of the @type %label has been saved.', [
         '@language' => $entity->language()->getName(),
         '@type' => 'Event ',

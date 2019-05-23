@@ -117,10 +117,10 @@ function hook_recurring_events_inheritance_class_alter(&$class, $field) {
  *
  * @param Drupal\recurring_events\Entity\EventSeries $event_series
  *   The eventseries being altered.
- * @param Drupal\Core\Form\FormStateInterface $form_state
- *   The form state of an updated event series entity.
+ * @param Drupal\recurring_events\Entity\EventSeries $original
+ *   The original, unaltered eventseries.
  */
-function hook_recurring_events_save_pre_instances_deletion(EventSeries $event_series, FormStateInterface $form_state) {
+function hook_recurring_events_save_pre_instances_deletion(EventSeries $event_series, EventSeries $original) {
 }
 
 /**
@@ -133,10 +133,10 @@ function hook_recurring_events_save_pre_instances_deletion(EventSeries $event_se
  *
  * @param Drupal\recurring_events\Entity\EventSeries $event_series
  *   The eventseries being altered.
- * @param Drupal\Core\Form\FormStateInterface $form_state
- *   The form state of an updated event series entity.
+ * @param Drupal\recurring_events\Entity\EventSeries $original
+ *   The original, unaltered eventseries.
  */
-function hook_recurring_events_save_post_instances_deletion(EventSeries $event_series, FormStateInterface $form_state) {
+function hook_recurring_events_save_post_instances_deletion(EventSeries $event_series, EventSeries $original) {
 }
 
 /**

@@ -256,6 +256,21 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
   /**
    * {@inheritdoc}
    */
+  public function getRevisionCreationTime() {
+    return $this->revision_timestamp->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setRevisionCreationTime($timestamp) {
+    $this->revision_timestamp->value = $timestamp;
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRevisionAuthor() {
     return $this->getRevisionUser();
   }
