@@ -73,3 +73,8 @@ administer eventseries:
 access eventseries overview:
   title: 'Access the eventseries overview page'
   description: 'View the admin table view of eventseries'
+
+# Event Instance Administration.
+access eventinstance overview:
+  title: 'Access the eventinstance overview page'
+  description: 'View the table view of eventinstance'
