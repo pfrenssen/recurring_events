@@ -85,3 +85,15 @@ entity.field_inheritance.collection:
   route_name: entity.field_inheritance.collection
   title: Field Inheritance
   base_route: eventinstance.settings
+
+# Excluded dates settings admin page.
+entity.excluded_dates.collection:
+  route_name: entity.excluded_dates.collection
+  title: Excluded dates
+  base_route: eventseries.settings
+
+# Included dates settings admin page.
+entity.included_dates.collection:
+  route_name: entity.included_dates.collection
+  title: Included dates
+  base_route: eventseries.settings
