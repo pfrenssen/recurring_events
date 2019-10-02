@@ -410,24 +410,4 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
     return $this->get('eventseries_id')->entity;
   }
 
-  /**
-   * Get event instance inherited title.
-   *
-   * @return string
-   *   The event instance inherited title.
-   */
-  public function getInheritedTitle() {
-    return $this->get('title')->value;
-  }
-
-  /**
-   * Get event instance inherited description.
-   *
-   * @return string
-   *   The event instance inherited description.
-   */
-  public function getInheritedDescription() {
-    return $this->get('description')->value;
-  }
-
 }
