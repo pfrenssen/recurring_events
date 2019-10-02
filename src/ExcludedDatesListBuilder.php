@@ -14,7 +14,7 @@ class ExcludedDatesListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = $this->t('Included dates');
+    $header['label'] = $this->t('Excluded dates');
     $header['id'] = $this->t('Machine name');
     $header['start'] = $this->t('Start');
     $header['end'] = $this->t('End');
