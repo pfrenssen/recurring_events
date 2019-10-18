@@ -36,3 +36,8 @@ administer registrant entities:
   title: 'Administer registrant entities'
   description: 'Allow to access the administration form to configure registrant entities'
   restrict access: true
+
+# Registrant Administration.
+access registrant overview:
+title: 'Access the registrant overview page'
+description: 'View the table view of registrants'
