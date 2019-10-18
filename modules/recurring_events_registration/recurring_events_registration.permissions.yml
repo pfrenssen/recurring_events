@@ -39,5 +39,5 @@ administer registrant entities:
 
 # Registrant Administration.
 access registrant overview:
-title: 'Access the registrant overview page'
-description: 'View the table view of registrants'
+  title: 'Access the registrant overview page'
+  description: 'View the table view of registrants'
