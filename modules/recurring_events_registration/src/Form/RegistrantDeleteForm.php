@@ -167,7 +167,7 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
 
     return $this->t('Your registration for %email for %event has been cancelled.', [
       '%email' => $entity->email->value,
-      '%event' => $entity->getEventSeries()->name->value,
+      '%event' => $entity->getEventSeries()->title->value,
     ]);
   }
 
