@@ -305,31 +305,6 @@ function recurring_events_form_content_moderation_entity_moderation_form_alter(&
 }
 
 /**
- * Implements hook_form_alter().
- */
-function recurring_events_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if ($form_id == 'eventseries_add_form' || $form_id == 'eventseries_edit_form') {
-    $form['excluded_dates_wrapper'] = [
-      '#type' => 'details',
-      '#open' => FALSE,
-      '#title' => t('Excluded Dates'),
-      '#weight' => $form['excluded_dates']['#weight'],
-      'excluded_dates' => $form['excluded_dates'],
-    ];
-    unset($form['excluded_dates']);
-
-    $form['included_dates_wrapper'] = [
-      '#type' => 'details',
-      '#open' => FALSE,
-      '#title' => t('Included Dates'),
-      '#weight' => $form['included_dates']['#weight'],
-      'included_dates' => $form['included_dates'],
-    ];
-    unset($form['included_dates']);
-  }
-}
-
-/**
  * Implements hook_recurring_events_event_instances_pre_create_alter().
  */
 function recurring_events_recurring_events_event_instances_pre_create_alter(array &$event_instances, EventSeries $event) {
