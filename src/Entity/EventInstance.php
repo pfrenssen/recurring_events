@@ -287,6 +287,14 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
 
   /**
    * {@inheritdoc}
+   */
+  public function getTitle() {
+    // @todo Resolve this with field inheritance.
+    return $this->getEventSeries()->get('title')->value;
+  }
+
+  /**
+   * {@inheritdoc}
    *
    * Define the field properties here.
    *
