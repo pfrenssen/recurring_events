@@ -35,6 +35,11 @@ function recurring_events_registration_token_info() {
     'needs-data' => 'registrant',
   ];
 
+  $registrant['email'] = [
+    'name' => t('Registrant Email'),
+    'description' => t('The email of the registrant.'),
+  ];
+
   $registrant['edit_url'] = [
     'name' => t('Edit Registrant URL'),
     'description' => t('The URL to edit a registrant.'),
@@ -85,6 +90,10 @@ function recurring_events_registration_tokens($type, $tokens, array $data, array
     $registrant = $data['registrant'];
     foreach ($tokens as $name => $original) {
       switch ($name) {
+        case 'email':
+          $replacements[$original] = $registrant->email->value;
+          break;
+
         case 'edit_url':
           $url = $registrant->toUrl('edit-form')->setAbsolute(TRUE)->toString();
           if ($registrant->user_id->target_id === '0') {

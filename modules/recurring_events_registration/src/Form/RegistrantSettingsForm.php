@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\recurring_events_registration\NotificationService;
+use Drupal\recurring_events_registration\RegistrationCreationService;
 
 /**
  * Class RegistrantSettingsForm.
@@ -24,13 +25,23 @@ class RegistrantSettingsForm extends ConfigFormBase {
   protected $notificationService;
 
   /**
+   * The registration creation service.
+   *
+   * @var \Drupal\recurring_events_registration\RegistrationCreationService
+   */
+  protected $creationService;
+
+  /**
    * Constructs a RegistrantSettingsForm object.
    *
    * @param \Drupal\recurring_events_registration\NotificationService $notification_service
    *   The registration notification service.
+   * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
+   *   The registration creation service.
    */
-  public function __construct(NotificationService $notification_service) {
+  public function __construct(NotificationService $notification_service, RegistrationCreationService $creation_service) {
     $this->notificationService = $notification_service;
+    $this->creationService = $creation_service;
   }
 
   /**
@@ -38,7 +49,8 @@ class RegistrantSettingsForm extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('recurring_events_registration.notification_service')
+      $container->get('recurring_events_registration.notification_service'),
+      $container->get('recurring_events_registration.creation_service')
     );
   }
 
@@ -72,6 +84,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
       ->set('show_capacity', $form_state->getValue('show_capacity'))
       ->set('limit', $form_state->getValue('limit'))
       ->set('date_format', $form_state->getValue('date_format'))
+      ->set('title', $form_state->getValue('title'))
       ->set('email_notifications', $form_state->getValue('email_notifications'));
 
     $notification_types = [];
@@ -140,6 +153,20 @@ class RegistrantSettingsForm extends ConfigFormBase {
       ]),
       '#default_value' => $config->get('date_format'),
     ];
+
+    $registrant_tokens = $this->creationService->getAvailableTokens(['registrant']);
+
+    $form['display']['title'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Registrant Title'),
+      '#required' => TRUE,
+      '#description' => $this->t('Enter the format for the title field', [
+        '@link' => $php_date_link->toString(),
+      ]),
+      '#default_value' => $config->get('title'),
+    ];
+
+    $form['display']['tokens'] = $registrant_tokens;
 
     $form['notifications'] = [
       '#type' => 'details',

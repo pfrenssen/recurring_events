@@ -58,6 +58,13 @@ class NotificationService {
   protected $moduleHandler;
 
   /**
+   * The registration creation service.
+   *
+   * @var \Drupal\recurring_events_registration\RegistrationCreationService
+   */
+  protected $creationService;
+
+  /**
    * The registrant entity.
    *
    * @var \Drupal\recurring_events_registration\Entity\RegistrantInterface
@@ -121,14 +128,17 @@ class NotificationService {
    *   The token service.
    * @param \Drupal\Core\Extension\ModuleHandler $module_handler
    *   The module handler service.
+   * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
+   *   The registration creation service.
    */
-  public function __construct(TranslationInterface $translation, ConfigFactory $config_factory, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token, ModuleHandler $module_handler) {
+  public function __construct(TranslationInterface $translation, ConfigFactory $config_factory, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token, ModuleHandler $module_handler, RegistrationCreationService $creation_service) {
     $this->translation = $translation;
     $this->configFactory = $config_factory;
     $this->loggerFactory = $logger->get('recurring_events_registration');
     $this->messenger = $messenger;
     $this->token = $token;
     $this->moduleHandler = $module_handler;
+    $this->creationService = $creation_service;
     $this->configName = 'recurring_events_registration.registrant.config';
   }
 
@@ -143,7 +153,7 @@ class NotificationService {
       $container->get('messenger'),
       $container->get('token'),
       $container->get('module_handler'),
-      $container->get('string_translation')
+      $container->get('recurring_events_registration.creation_service')
     );
   }
 
@@ -430,34 +440,7 @@ class NotificationService {
       'registrant',
     ];
 
-    if ($this->moduleHandler->moduleExists('token')) {
-      $token_help = [
-        '#theme' => 'token_tree_link',
-        '#token_types' => $relevant_tokens,
-      ];
-    }
-    else {
-      $all_tokens = $this->token->getInfo();
-      $tokens = [];
-      foreach ($relevant_tokens as $token_prefix) {
-        if (!empty($all_tokens['tokens'][$token_prefix])) {
-          foreach ($all_tokens['tokens'][$token_prefix] as $token_key => $value) {
-            $tokens[] = '[' . $token_prefix . ':' . $token_key . ']';
-          }
-        }
-      }
-
-      $token_text = $this->translation->translate('Available tokens are: @tokens', [
-        '@tokens' => implode(', ', $tokens),
-      ]);
-
-      $token_help = [
-        '#type' => 'markup',
-        '#markup' => $token_text->render(),
-      ];
-    }
-
-    return $token_help;
+    return $this->creationService->getAvailableTokens($relevant_tokens);
   }
 
 }

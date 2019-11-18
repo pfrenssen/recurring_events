@@ -11,6 +11,8 @@ use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Utility\Token;
 
 /**
  * RegistrationCreationService class.
@@ -67,6 +69,20 @@ class RegistrationCreationService {
   protected $eventSeries;
 
   /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandler
+   */
+  protected $moduleHandler;
+
+  /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
    * Class constructor.
    *
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
@@ -79,13 +95,19 @@ class RegistrationCreationService {
    *   The messenger service.
    * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
    *   The entity type manager service.
+   * @param \Drupal\Core\Extension\ModuleHandler $module_handler
+   *   The module handler service.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
    */
-  public function __construct(TranslationInterface $translation, Connection $database, LoggerChannelFactoryInterface $logger, Messenger $messenger, EntityTypeManager $entity_type_manager) {
+  public function __construct(TranslationInterface $translation, Connection $database, LoggerChannelFactoryInterface $logger, Messenger $messenger, EntityTypeManager $entity_type_manager, ModuleHandler $module_handler, Token $token) {
     $this->translation = $translation;
     $this->database = $database;
     $this->loggerFactory = $logger->get('recurring_events_registration');
     $this->messenger = $messenger;
     $this->storage = $entity_type_manager->getStorage('registrant');
+    $this->moduleHandler = $module_handler;
+    $this->token = $token;
   }
 
   /**
@@ -97,7 +119,9 @@ class RegistrationCreationService {
       $container->get('database'),
       $container->get('logger.factory'),
       $container->get('messenger'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('module_handler'),
+      $container->get('token')
     );
   }
 
@@ -492,6 +516,40 @@ class RegistrationCreationService {
         recurring_events_registration_send_notification($key, $first_waitlist);
       }
     }
+  }
+
+  /**
+   * Retrieve the tokens available for a registrant.
+   */
+  public function getAvailableTokens($relevant_tokens = ['registrant']) {
+    if ($this->moduleHandler->moduleExists('token')) {
+      $token_help = [
+        '#theme' => 'token_tree_link',
+        '#token_types' => $relevant_tokens,
+      ];
+    }
+    else {
+      $all_tokens = $this->token->getInfo();
+      $tokens = [];
+      foreach ($relevant_tokens as $token_prefix) {
+        if (!empty($all_tokens['tokens'][$token_prefix])) {
+          foreach ($all_tokens['tokens'][$token_prefix] as $token_key => $value) {
+            $tokens[] = '[' . $token_prefix . ':' . $token_key . ']';
+          }
+        }
+      }
+
+      $token_text = $this->translation->translate('Available tokens are: @tokens', [
+        '@tokens' => implode(', ', $tokens),
+      ]);
+
+      $token_help = [
+        '#type' => 'markup',
+        '#markup' => $token_text->render(),
+      ];
+    }
+
+    return $token_help;
   }
 
 }

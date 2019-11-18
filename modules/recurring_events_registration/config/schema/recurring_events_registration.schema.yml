@@ -11,6 +11,9 @@ recurring_events_registration.registrant.config:
     date_format:
       type: string
       label: 'The formatting of dates when displaying registrants'
+    title:
+      type: string
+      label: 'The title of the registrants'
     email_notifications:
       type: boolean
       label: 'Whether to enable email notifications'

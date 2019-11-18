@@ -1,6 +1,7 @@
 show_capacity: true
 limit: 10
 date_format: 'F jS, Y h:iA'
+title: '[registrant:email]'
 email_notifications: true
 registration_notification_enabled: true
 registration_notification_enabled: true

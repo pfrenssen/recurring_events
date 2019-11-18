@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\recurring_events\Entity\EventSeries;
+use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFieldItemList;
 
 /**
  * Defines the Registrant entity.
@@ -42,6 +43,7 @@ use Drupal\recurring_events\Entity\EventSeries;
  *     "id" = "id",
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
+ *     "label" = "title",
  *   },
  *   links = {
  *     "canonical" = "/events/{eventinstance}/registrant/{registrant}",
@@ -203,6 +205,12 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'));
+
+    $fields['title'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Title'))
+      ->setReadOnly(TRUE)
+      ->setComputed(TRUE)
+      ->setClass(ComputedRegistrantTitleFieldItemList::class);
 
     return $fields;
   }
