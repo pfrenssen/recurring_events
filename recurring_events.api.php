@@ -28,6 +28,17 @@ function hook_recurring_events_durations_alter(array &$durations = []) {
 }
 
 /**
+ * Alter the unit options available when creating an event series entity.
+ *
+ * @param array $units
+ *   An array of units.
+ */
+function hook_recurring_events_units_alter(array &$units = []) {
+  // Events can recur ever millisecond (please do not do this).
+  $units['millisecond'] = t('Millisecond(s)');
+}
+
+/**
  * Alter the days options available when creating an event series entity.
  *
  * @param array $days
@@ -127,6 +138,17 @@ function hook_recurring_events_event_instances_pre_create_alter(&$event_instance
       unset($event_instances[$key]);
     }
   }
+}
+
+/**
+ * Alter the array of recur type fields available when creating a series.
+ *
+ * @var array $fields
+ *   The array of recur type fields available.
+ */
+function hook_recurring_events_recur_field_types(&$fields) {
+  // Do not allow weekly events.
+  unset($fields['weekly_recurring_date']);
 }
 
 /**

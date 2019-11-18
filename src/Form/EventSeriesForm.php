@@ -10,6 +10,9 @@ use Drupal\recurring_events\EventCreationService;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Datetime\DateFormatter;
+use Drupal\Core\Entity\EntityFieldManager;
+use Drupal\Core\Field\FieldTypePluginManager;
+use Drupal\recurring_events\Plugin\Field\FieldWidget\ConsecutiveRecurringDateWidget;
 
 /**
  * Form controller for the eventseries entity create form.
@@ -54,6 +57,20 @@ class EventSeriesForm extends ContentEntityForm {
   protected $dateFormatter;
 
   /**
+   * The entity field manager.
+   *
+   * @var Drupal\Core\Entity\EntityFieldManager
+   */
+  protected $entityFieldManager;
+
+  /**
+   * The field type plugin manager.
+   *
+   * @var Drupal\Core\Field\FieldTypePluginManager
+   */
+  protected $fieldTypePluginManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
@@ -62,7 +79,9 @@ class EventSeriesForm extends ContentEntityForm {
       $container->get('entity_type.manager')->getStorage('eventseries'),
       $container->get('entity.manager'),
       $container->get('messenger'),
-      $container->get('date.formatter')
+      $container->get('date.formatter'),
+      $container->get('entity_field.manager'),
+      $container->get('plugin.manager.field.field_type')
     );
   }
 
@@ -79,12 +98,18 @@ class EventSeriesForm extends ContentEntityForm {
    *   The messenger service.
    * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *   The date formatter service.
+   * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
+   *   The entity field manager.
+   * @param \Drupal\Core\Field\FieldTypePluginManager $field_type_plugin_manager
+   *   The field type plugin manager.
    */
-  public function __construct(EventCreationService $creation_service, EntityStorageInterface $storage, EntityManagerInterface $entity_manager, Messenger $messenger, DateFormatter $date_formatter) {
+  public function __construct(EventCreationService $creation_service, EntityStorageInterface $storage, EntityManagerInterface $entity_manager, Messenger $messenger, DateFormatter $date_formatter, EntityFieldManager $entity_field_manager, FieldTypePluginManager $field_type_plugin_manager) {
     $this->creationService = $creation_service;
     $this->storage = $storage;
     $this->messenger = $messenger;
     $this->dateFormatter = $date_formatter;
+    $this->entityFieldManager = $entity_field_manager;
+    $this->fieldTypePluginManager = $field_type_plugin_manager;
     parent::__construct($entity_manager);
   }
 
@@ -93,6 +118,8 @@ class EventSeriesForm extends ContentEntityForm {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
+
+    $config = \Drupal::config('recurring_events.eventseries.config');
 
     $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_edit_form');
 
@@ -104,6 +131,23 @@ class EventSeriesForm extends ContentEntityForm {
         ':input[name="recur_type"]' => ['value' => 'custom'],
       ],
     ];
+
+    // Get all the available recur type fields. Suppress altering so that we can
+    // get a list of all the fields, so that after we alter, we can remove the
+    // necessary fields from the entity form.
+    $recur_fields = $this->creationService->getRecurFieldTypes(FALSE);
+    $all_recur_fields = $recur_fields;
+    \Drupal::moduleHandler()->alter('recurring_events_recur_field_types', $recur_fields);
+
+    $form['recur_type']['widget']['#options'] = $recur_fields;
+
+    // Loop through all the recurring date configuration fields and if any were
+    // suppressed then also suppress the fields associated with that.
+    foreach ($all_recur_fields as $field_name => $field_label) {
+      if (!isset($recur_fields[$field_name])) {
+        unset($form[$field_name]);
+      }
+    }
 
     if ($editing) {
       $original = $this->storage->loadUnchanged($entity->id());
@@ -140,6 +184,20 @@ class EventSeriesForm extends ContentEntityForm {
             ],
             '#rows' => $diff_array,
           ];
+
+          if ($config->get('threshold_warning')) {
+            $total = ConsecutiveRecurringDateWidget::checkDuration($form_state);
+            if ($total > $config->get('threshold_count')) {
+              $message = $config->get('threshold_message');
+              $message = str_replace('@total', $total, $message);
+              $form['diff']['count_warning'] = [
+                '#type' => 'markup',
+                '#prefix' => '<p class="form-item--error-message">',
+                '#markup' => $message,
+                '#suffix' => '</p>',
+              ];
+            }
+          }
 
           $form['diff']['confirm'] = [
             '#type' => 'submit',
@@ -200,7 +258,12 @@ class EventSeriesForm extends ContentEntityForm {
     $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_edit_form');
     $trigger = $form_state->getTriggeringElement();
 
-    if ($trigger['#id'] !== 'edit-confirm' && $editing) {
+    $ignored_triggers = [
+      'consecutive_recurring_date[0][duration]',
+      'consecutive_recurring_date[0][duration_units]',
+    ];
+
+    if ($trigger['#id'] !== 'edit-confirm' && array_search($trigger['#name'], $ignored_triggers) === FALSE && $editing) {
       $original = $this->storage->loadUnchanged($entity->id());
       if ($this->creationService->checkForFormRecurConfigChanges($original, $form_state)) {
         $this->step = 1;

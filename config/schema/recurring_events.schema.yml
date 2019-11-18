@@ -29,6 +29,21 @@ recurring_events.eventseries.config:
     includes:
       type: integer
       label: 'Enable eventseries level included dates'
+    enabled_fields:
+      type: string
+      label: 'Which recur type fields are available in the creation form'
+    threshold_warning:
+      type: integer
+      label: 'Show a warning when too many event instances are being created'
+    threshold_count:
+      type: integer
+      label: 'The number of event instances to trigger the warning'
+    threshold_message:
+      type: string
+      label: 'The warning to show when too many instances are being created'
+    threshold_prevent_save:
+      type: integer
+      label: 'Prevent saving a series if too many instances are being created'
 
 recurring_events.eventinstance.config:
   type: config_object

@@ -50,8 +50,11 @@ class EventSeriesSettingsForm extends ConfigFormBase {
       ->set('limit', $form_state->getValue('limit'))
       ->set('excludes', $form_state->getValue('excludes'))
       ->set('includes', $form_state->getValue('includes'))
-      ->set('excluded_dates', implode(',', array_filter($form_state->getValue('excluded_dates'))))
-      ->set('included_dates', implode(',', array_filter($form_state->getValue('included_dates'))))
+      ->set('enabled_fields', implode(',', array_filter($form_state->getValue('enabled_fields'))))
+      ->set('threshold_warning', $form_state->getValue('threshold_warning'))
+      ->set('threshold_count', $form_state->getValue('threshold_count'))
+      ->set('threshold_message', $form_state->getValue('threshold_message'))
+      ->set('threshold_prevent_save', $form_state->getValue('threshold_prevent_save'))
       ->save();
 
     parent::submitForm($form, $form_state);
@@ -159,6 +162,60 @@ class EventSeriesSettingsForm extends ConfigFormBase {
         '@link' => Link::createFromRoute($this->t('included dates tab'), 'entity.included_dates.collection')->toString(),
       ]),
       '#default_value' => $config->get('includes'),
+    ];
+
+    $fields = \Drupal::service('recurring_events.event_creation_service')->getRecurFieldTypes(FALSE);
+
+    $form['creation']['enabled_fields'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Enabled Recur Field Types'),
+      '#required' => TRUE,
+      '#options' => $fields,
+      '#description' => $this->t('Select the recur field types to enable.'),
+      '#default_value' => explode(',', $config->get('enabled_fields')),
+    ];
+
+    $form['creation']['threshold_warning'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show Event Instance Threshold Warning?'),
+      '#description' => $this->t('Display a warning when too many event instances may be created?'),
+      '#default_value' => $config->get('threshold_warning'),
+    ];
+
+    $form['creation']['threshold_count'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Event Instance Threshold Count'),
+      '#description' => $this->t('The number of event instances to trigger the warning'),
+      '#default_value' => $config->get('threshold_count'),
+      '#states' => [
+        'visible' => [
+          'input[name="threshold_warning"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    $form['creation']['threshold_message'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Event Instance Threshold Message'),
+      '#description' => $this->t('Enter the message to be displayed. Use @total as a placeholder for the amount of instances being created.'),
+      '#default_value' => $config->get('threshold_message'),
+      '#states' => [
+        'visible' => [
+          'input[name="threshold_warning"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
+    $form['creation']['threshold_prevent_save'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Event Instance Threshold Prevent Save'),
+      '#description' => $this->t('Prevent saving a series if the threshold is exceeded?'),
+      '#default_value' => $config->get('threshold_prevent_save'),
+      '#states' => [
+        'visible' => [
+          'input[name="threshold_warning"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $form['display'] = [

@@ -4,6 +4,7 @@ namespace Drupal\recurring_events\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem;
 use Drupal\recurring_events\RecurringEventsFieldTypeInterface;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\Core\Form\FormStateInterface;
@@ -12,17 +13,17 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\recurring_events\Plugin\RecurringEventsFieldTrait;
 
 /**
- * Plugin implementation of the 'weekly_recurring_date' field type.
+ * Plugin implementation of the 'daily_recurring_date' field type.
  *
  * @FieldType (
- *   id = "weekly_recurring_date",
- *   label = @Translation("Weekly Event"),
- *   description = @Translation("Stores a weekly recurring date configuration"),
- *   default_widget = "weekly_recurring_date",
- *   default_formatter = "weekly_recurring_date"
+ *   id = "daily_recurring_date",
+ *   label = @Translation("Daily Event"),
+ *   description = @Translation("Stores a daily recurring date configuration"),
+ *   default_widget = "daily_recurring_date",
+ *   default_formatter = "daily_recurring_date"
  * )
  */
-class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsFieldTypeInterface {
+class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTypeInterface {
 
   use RecurringEventsFieldTrait;
 
@@ -32,9 +33,14 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
     $schema = parent::schema($field_definition);
 
-    $schema['columns']['days'] = [
+    $schema['columns']['time'] = [
       'type' => 'varchar',
-      'length' => 255,
+      'length' => 20,
+    ];
+
+    $schema['columns']['duration'] = [
+      'type' => 'int',
+      'unsigned' => TRUE,
     ];
 
     return $schema;
@@ -44,8 +50,9 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
    * {@inheritdoc}
    */
   public function isEmpty() {
-    $days = $this->get('days')->getValue();
-    return parent::isEmpty() && empty($days);
+    $time = $this->get('time')->getValue();
+    $duration = $this->get('duration')->getValue();
+    return parent::isEmpty() && empty($time) && empty($duration);
   }
 
   /**
@@ -54,9 +61,14 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties = parent::propertyDefinitions($field_definition);
 
-    $properties['days'] = DataDefinition::create('string')
-      ->setLabel(t('Days'))
-      ->setDescription(t('The days of the week on which this event occurs'));
+    // Add our properties.
+    $properties['time'] = DataDefinition::create('string')
+      ->setLabel(t('Time'))
+      ->setDescription(t('The time the event begins'));
+
+    $properties['duration'] = DataDefinition::create('integer')
+      ->setLabel(t('Duration'))
+      ->setDescription(t('The duration of the event in minutes'));
 
     return $properties;
   }
@@ -66,11 +78,10 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
    */
   public static function convertEntityConfigToArray(EventSeries $event) {
     $config = [];
-    $config['start_date'] = $event->getWeeklyStartDate();
-    $config['end_date'] = $event->getWeeklyEndDate();
-    $config['time'] = $event->getWeeklyStartTime();
-    $config['duration'] = $event->getWeeklyDuration();
-    $config['days'] = $event->getWeeklyDays();
+    $config['start_date'] = $event->getDailyStartDate();
+    $config['end_date'] = $event->getDailyEndDate();
+    $config['time'] = $event->getDailyStartTime();
+    $config['duration'] = $event->getDailyDuration();
     return $config;
   }
 
@@ -84,15 +95,15 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
     $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
     $user_input = $form_state->getUserInput();
 
-    $time = $user_input['weekly_recurring_date'][0]['time'];
+    $time = $user_input['daily_recurring_date'][0]['time'];
     $time_parts = static::convertTimeTo24hourFormat($time);
     $timestamp = implode(':', $time_parts) . ':00';
 
-    $start_timestamp = $user_input['weekly_recurring_date'][0]['value']['date'] . 'T' . $timestamp;
+    $start_timestamp = $user_input['daily_recurring_date'][0]['value']['date'] . 'T' . $timestamp;
     $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
     $start_date->setTime(0, 0, 0);
 
-    $end_timestamp = $user_input['weekly_recurring_date'][0]['end_value']['date'] . 'T' . $timestamp;
+    $end_timestamp = $user_input['daily_recurring_date'][0]['end_value']['date'] . 'T' . $timestamp;
     $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
     $end_date->setTime(0, 0, 0);
 
@@ -100,8 +111,7 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
     $config['end_date'] = $end_date;
 
     $config['time'] = $time;
-    $config['duration'] = $user_input['weekly_recurring_date'][0]['duration'];
-    $config['days'] = array_filter(array_values($user_input['weekly_recurring_date'][0]['days']));
+    $config['duration'] = $user_input['daily_recurring_date'][0]['duration'];
     return $config;
   }
 
@@ -140,14 +150,6 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
       ];
     }
 
-    if ($entity_config['days'] !== $form_config['days']) {
-      $diff['days'] = [
-        'label' => t('Days'),
-        'stored' => implode(',', $entity_config['days']),
-        'override' => implode(',', $form_config['days']),
-      ];
-    }
-
     return $diff;
   }
 
@@ -158,28 +160,23 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
     $dates = $events_to_create = [];
     $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
 
-    // Loop through each weekday and find occurrences of it in the
-    // date range provided.
-    foreach ($form_data['days'] as $weekday) {
-      $weekday_dates = static::findWeekdaysBetweenDates($weekday, $form_data['start_date'], $form_data['end_date']);
-      $dates = array_merge($dates, $weekday_dates);
-    }
+    $daily_dates = static::findDailyDatesBetweenDates($form_data['start_date'], $form_data['end_date']);
     $time_parts = static::convertTimeTo24hourFormat($form_data['time']);
 
-    if (!empty($dates)) {
-      foreach ($dates as $weekly_date) {
+    if (!empty($daily_dates)) {
+      foreach ($daily_dates as $daily_date) {
         // Set the time of the start date to be the hours and minutes.
-        $weekly_date->setTime($time_parts[0], $time_parts[1]);
+        $daily_date->setTime($time_parts[0], $time_parts[1]);
         // Configure the right timezone.
-        $weekly_date->setTimezone($utc_timezone);
+        $daily_date->setTimezone($utc_timezone);
         // Create a clone of this date.
-        $weekly_date_end = clone $weekly_date;
+        $daily_date_end = clone $daily_date;
         // Add the number of seconds specified in the duration field.
-        $weekly_date_end->modify('+' . $form_data['duration'] . ' seconds');
+        $daily_date_end->modify('+' . $form_data['duration'] . ' seconds');
         // Set this event to be created.
-        $events_to_create[$weekly_date->format('r')] = [
-          'start_date' => $weekly_date,
-          'end_date' => $weekly_date_end,
+        $events_to_create[$daily_date->format('r')] = [
+          'start_date' => $daily_date,
+          'end_date' => $daily_date_end,
         ];
       }
     }
@@ -188,10 +185,8 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
   }
 
   /**
-   * Find all the weekday occurrences between two dates.
+   * Find all the daily date occurrences between two dates.
    *
-   * @param string $weekday
-   *   The name of the day of the week.
    * @param Drupal\Core\Datetime\DrupalDateTime $start_date
    *   The start date.
    * @param Drupal\Core\Datetime\DrupalDateTime $end_date
@@ -200,7 +195,7 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
    * @return array
    *   An array of matching dates.
    */
-  public static function findWeekdaysBetweenDates($weekday, DrupalDateTime $start_date, DrupalDateTime $end_date) {
+  public static function findDailyDatesBetweenDates(DrupalDateTime $start_date, DrupalDateTime $end_date) {
     $dates = [];
 
     // Clone the date as we do not want to make changes to the original object.
@@ -217,19 +212,13 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
       return $dates;
     }
 
-    // If the start date is not the weekday we are seeking, jump to the next
-    // instance of that weekday.
-    if ($start->format('l') != ucwords($weekday)) {
-      $start->modify('next ' . $weekday);
-    }
-
     // Loop through a week at a time, storing the date in the array to return
     // until the end date is surpassed.
     while ($start->getTimestamp() < $end->getTimestamp()) {
       // If we do not clone here we end up modifying the value of start in
       // the array and get some funky dates returned.
       $dates[] = clone $start;
-      $start->modify('+1 week');
+      $start->modify('+1 day');
     }
 
     return $dates;

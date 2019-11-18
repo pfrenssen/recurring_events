@@ -14,6 +14,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 
 /**
  * Implements hook_help().
@@ -407,6 +409,37 @@ function recurring_events_recurring_events_event_instances_pre_create_alter(arra
           unset($event_instances[$key]);
         }
       }
+    }
+  }
+}
+
+/**
+ * Implements callback_allowed_values_function().
+ */
+function recurring_events_allowed_values_function(FieldStorageDefinitionInterface $definition, FieldableEntityInterface $entity = NULL) {
+  $values = ['custom' => t('Custom Event')];
+  $fields = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions('eventseries');
+  foreach ($fields as $field_name => $field) {
+    $field_definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($field->getType());
+    $class = new \ReflectionClass($field_definition['class']);
+    if ($class->implementsInterface('\Drupal\recurring_events\RecurringEventsFieldTypeInterface')) {
+      $values[$field->getName()] = $field->getLabel();
+    }
+  }
+  return $values;
+}
+
+/**
+ * Implements hook_recurring_events_recur_field_types_alter().
+ */
+function recurring_events_recurring_events_recur_field_types_alter(&$fields) {
+  // Enable/disable the recur field types based on the eventseries settings.
+  $config = \Drupal::config('recurring_events.eventseries.config');
+  $enabled_fields = explode(',', $config->get('enabled_fields'));
+
+  foreach ($fields as $field_name => $field_label) {
+    if (array_search($field_name, $enabled_fields) === FALSE) {
+      unset($fields[$field_name]);
     }
   }
 }

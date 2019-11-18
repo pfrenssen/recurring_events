@@ -60,7 +60,7 @@ class EventInstanceSettingsForm extends ConfigFormBase {
    *   Form definition array.
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('recurring_events.eventinstance.config');
+    $config = $this->config('recurring_events.eventseries.config');
 
     $php_date_url = Url::fromUri('https://secure.php.net/manual/en/function.date.php');
     $php_date_link = Link::fromTextAndUrl($this->t('PHP date/time format'), $php_date_url);

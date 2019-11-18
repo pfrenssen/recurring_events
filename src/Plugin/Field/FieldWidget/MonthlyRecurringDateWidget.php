@@ -28,7 +28,7 @@ class MonthlyRecurringDateWidget extends WeeklyRecurringDateWidget {
     $element['#type'] = 'container';
     $element['#states'] = [
       'visible' => [
-        ':input[name="recur_type"]' => ['value' => 'monthly'],
+        ':input[name="recur_type"]' => ['value' => 'monthly_recurring_date'],
       ],
     ];
 

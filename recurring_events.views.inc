@@ -55,20 +55,4 @@ function recurring_events_views_data_alter(array &$data) {
   if (!$set) {
     $data['eventinstance_field_data']['table']['base']['defaults']['field'] = 'id';
   }
-
-  // @todo Remove these declarations when
-  // https://www.drupal.org/project/drupal/issues/2489476 is resolved.
-  $data['eventinstance_field_data']['date__value']['filter']['id'] = 'datetime';
-  $data['eventinstance_field_data']['date__value']['filter']['field_name'] = 'date';
-  $data['eventinstance_field_data']['date__value']['sort']['id'] = 'datetime';
-  $data['eventinstance_field_data']['date__value']['sort']['field_name'] = 'date';
-  $data['eventinstance_field_data']['date__value']['argument']['id'] = 'datetime';
-  $data['eventinstance_field_data']['date__value']['argument']['field_name'] = 'date';
-
-  $data['eventinstance_field_data']['date__end_value']['filter']['id'] = 'datetime';
-  $data['eventinstance_field_data']['date__end_value']['filter']['field_name'] = 'date';
-  $data['eventinstance_field_data']['date__end_value']['sort']['id'] = 'datetime';
-  $data['eventinstance_field_data']['date__end_value']['sort']['field_name'] = 'date';
-  $data['eventinstance_field_data']['date__end_value']['argument']['id'] = 'datetime';
-  $data['eventinstance_field_data']['date__end_value']['argument']['field_name'] = 'date';
 }

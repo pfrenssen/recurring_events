@@ -373,29 +373,46 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setTranslatable(FALSE)
       ->setRequired(TRUE)
       ->setCardinality(1)
-      ->setSetting('allowed_values', [
-        'weekly' => t('Weekly Event'),
-        'monthly' => t('Monthly Event'),
-        'custom' => t('Custom Event'),
-      ])
+      ->setSetting('allowed_values_function', 'recurring_events_allowed_values_function')
       ->setDisplayOptions('form', [
         'type' => 'options_buttons',
-        'settings' => [
-          'allowed_values' => [
-            'weekly' => t('Weekly Event'),
-            'monthly' => t('Monthly Event'),
-            'custom' => t('Custom Event'),
-          ],
-        ],
-        'weight' => 1,
+        'weight' => 0,
       ])
       ->setDisplayOptions('view', [
         'label' => 'above',
         'weight' => 10,
       ]);
 
+    $fields['consecutive_recurring_date'] = BaseFieldDefinition::create('consecutive_recurring_date')
+      ->setLabel(t('Consecutive Event'))
+      ->setDescription('The consecutive recurring date configuration.')
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setRevisionable(TRUE)
+      ->setTranslatable(FALSE)
+      ->setCardinality(1)
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'consecutive_recurring_date',
+        'weight' => 1,
+      ]);
+
+    $fields['daily_recurring_date'] = BaseFieldDefinition::create('daily_recurring_date')
+      ->setLabel(t('Daily Event'))
+      ->setDescription('The daily recurring date configuration.')
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setRevisionable(TRUE)
+      ->setTranslatable(FALSE)
+      ->setCardinality(1)
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'daily_recurring_date',
+        'weight' => 2,
+      ]);
+
     $fields['weekly_recurring_date'] = BaseFieldDefinition::create('weekly_recurring_date')
-      ->setLabel(t('Weekly Recurring Date'))
+      ->setLabel(t('Weekly Event'))
       ->setDescription('The weekly recurring date configuration.')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
@@ -405,11 +422,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'weekly_recurring_date',
-        'weight' => 2,
+        'weight' => 3,
       ]);
 
     $fields['monthly_recurring_date'] = BaseFieldDefinition::create('monthly_recurring_date')
-      ->setLabel(t('Monthly Recurring Date'))
+      ->setLabel(t('Monthly Event'))
       ->setDescription('The monthly recurring date configuration.')
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
@@ -419,7 +436,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'monthly_recurring_date',
-        'weight' => 3,
+        'weight' => 4,
       ]);
 
     $fields['custom_date'] = BaseFieldDefinition::create('daterange')
@@ -434,7 +451,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayOptions('form', [
         'type' => 'daterange_default',
         'label' => 'above',
-        'weight' => 4,
+        'weight' => 5,
       ]);
 
     $fields['excluded_dates'] = BaseFieldDefinition::create('daterange')
@@ -575,6 +592,130 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getRecurType() {
     return $this->get('recur_type')->value;
+  }
+
+  /**
+   * Get consecutive recurring start date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the consecutive start date.
+   */
+  public function getConsecutiveStartDate() {
+    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    return $this->get('consecutive_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+  }
+
+  /**
+   * Get consecutive recurring end date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the consecutive end date.
+   */
+  public function getConsecutiveEndDate() {
+    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    return $this->get('consecutive_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+  }
+
+  /**
+   * Get consecutive recurring start time.
+   *
+   * @return string
+   *   The string for the consecutive start time.
+   */
+  public function getConsecutiveStartTime() {
+    return $this->get('consecutive_recurring_date')->time;
+  }
+
+  /**
+   * Get consecutive recurring end time.
+   *
+   * @return string
+   *   The string for the consecutive end time.
+   */
+  public function getConsecutiveEndTime() {
+    return $this->get('consecutive_recurring_date')->end_time;
+  }
+
+  /**
+   * Get consecutive recurring duration.
+   *
+   * @return int
+   *   The integer for the consecutive duration.
+   */
+  public function getConsecutiveDuration() {
+    return $this->get('consecutive_recurring_date')->duration;
+  }
+
+  /**
+   * Get consecutive recurring duration units.
+   *
+   * @return int
+   *   The value for the consecutive duration units.
+   */
+  public function getConsecutiveDurationUnits() {
+    return $this->get('consecutive_recurring_date')->duration_units;
+  }
+
+  /**
+   * Get consecutive recurring buffer.
+   *
+   * @return int
+   *   The integer for the consecutive buffer.
+   */
+  public function getConsecutiveBuffer() {
+    return $this->get('consecutive_recurring_date')->buffer;
+  }
+
+  /**
+   * Get consecutive recurring duration units.
+   *
+   * @return int
+   *   The value for the consecutive duration units.
+   */
+  public function getConsecutiveBufferUnits() {
+    return $this->get('consecutive_recurring_date')->buffer_units;
+  }
+
+  /**
+   * Get daily recurring start date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the daily start date.
+   */
+  public function getDailyStartDate() {
+    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    return $this->get('daily_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+  }
+
+  /**
+   * Get daily recurring end date.
+   *
+   * @return Drupal\Core\Datetime\DrupalDateTime
+   *   The date object for the daily end date.
+   */
+  public function getDailyEndDate() {
+    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    return $this->get('daily_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+  }
+
+  /**
+   * Get daily recurring start time.
+   *
+   * @return string
+   *   The string for the daily start time.
+   */
+  public function getDailyStartTime() {
+    return $this->get('daily_recurring_date')->time;
+  }
+
+  /**
+   * Get daily recurring duration.
+   *
+   * @return int
+   *   The integer for the daily duration.
+   */
+  public function getDailyDuration() {
+    return $this->get('daily_recurring_date')->duration;
   }
 
   /**
