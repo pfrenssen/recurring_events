@@ -18,16 +18,21 @@ class ConsecutiveRecurringDateTest extends UnitTestCase {
    */
   public function setUp() {
     parent::setUp();
+    // Some of Drupal's global functions are unavailable so we mock them up in
+    // a separate file to keep them from muddying the global scope.
     require_once 'includes/OverriddenGlobalFunctions.php';
 
+    // We need a mocked container which is used by DrupalDateTime.
     $container = new ContainerBuilder();
     \Drupal::setContainer($container);
 
+    // DrupalDateTime also needs the language manager and a mocked language.
     $language_manager_mock = $this->getMockBuilder('Drupal\\Core\\Language\\LanguageManagerInterface')
       ->disableOriginalConstructor()
       ->getMock();
     $language_mock = $this->createMock('Drupal\\Core\\Language\\LanguageInterface');
 
+    // Ensure that getCurrentLanguage returns the mocked language.
     $language_manager_mock->expects($this->any())
       ->method('getCurrentLanguage')
       ->will($this->returnValue($language_mock));
@@ -39,6 +44,7 @@ class ConsecutiveRecurringDateTest extends UnitTestCase {
    * Tests ConsecutiveRecurringDate::findDailyDatesBetweenDates().
    */
   public function testFindDailyDatesBetweenDates() {
+    // We want to test for generating all the days between Jan 1st and Jan 7th.
     $start_date = new DrupalDateTime('2019-01-01 00:00:00');
     $end_date = new DrupalDateTime('2019-01-07 00:00:00');
 
@@ -56,6 +62,8 @@ class ConsecutiveRecurringDateTest extends UnitTestCase {
 
     $date_objects = ConsecutiveRecurringDate::findDailyDatesBetweenDates($start_date, $end_date);
 
+    // Because the objects themselves will be different we convert each of the
+    // date time objects into an ISO standard date format for comparison.
     foreach ($expected_date_objects as $date) {
       $expected_dates[] = $date->format('r');
     }
@@ -71,6 +79,8 @@ class ConsecutiveRecurringDateTest extends UnitTestCase {
    * Tests ConsecutiveRecurringDate::findSlotsBetweenTimes().
    */
   public function testFindSlotsBetweenTimes() {
+    // We want to test for generating all the time slots between midnight and
+    // 1am with a 10min duration and 5min buffer.
     $start_date = new DrupalDateTime('2019-01-01 00:00:00');
 
     $form_data = [
@@ -93,6 +103,8 @@ class ConsecutiveRecurringDateTest extends UnitTestCase {
 
     $date_objects = ConsecutiveRecurringDate::findSlotsBetweenTimes($start_date, $form_data);
 
+    // Because the objects themselves will be different we convert each of the
+    // date time objects into an ISO standard date format for comparison.
     foreach ($expected_date_objects as $date) {
       $expected_dates[] = $date->format('r');
     }
