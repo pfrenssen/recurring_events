@@ -8,8 +8,16 @@ entity.registrant.collection:
   weight: 100
 
 registrant.admin.structure.settings:
-  title: 'Registrant settings'
+  title: 'Registrant Settings'
   description: 'Configure Registrant entities'
   route_name: registrant.settings
   parent: events.admin.overview
   weight: 12
+
+# Registrant types admin page.
+entity.registrant_type.collection:
+  title: 'Registrant Types'
+  description: 'Configure Registrant Types'
+  route_name: entity.registrant_type.collection
+  parent: events.admin.overview
+  weight: 13

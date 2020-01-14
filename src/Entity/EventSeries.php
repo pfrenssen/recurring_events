@@ -96,13 +96,15 @@ use Drupal\user\UserInterface;
  *   translatable = TRUE,
  *   admin_permission = "administer eventseries entity",
  *   fieldable = TRUE,
+ *   bundle_entity_type = "eventseries_type",
  *   entity_keys = {
  *     "id" = "id",
  *     "revision" = "vid",
  *     "published" = "status",
  *     "langcode" = "langcode",
  *     "label" = "title",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "bundle" = "type",
  *   },
  *   revision_metadata_keys = {
  *     "revision_user" = "revision_uid",
@@ -111,6 +113,8 @@ use Drupal\user\UserInterface;
  *   },
  *   links = {
  *     "canonical" = "/events/series/{eventseries}",
+ *     "add-page" = "/events/add",
+ *     "add-form" = "/events/add/{eventseries_type}",
  *     "edit-form" = "/events/series/{eventseries}/edit",
  *     "delete-form" = "/events/series/{eventseries}/delete",
  *     "collection" = "/events/series",
@@ -122,7 +126,7 @@ use Drupal\user\UserInterface;
  *     "revision_delete" = "/events/series/{eventseries}/revisions/{eventseries_revision}/delete",
  *     "translation_revert" = "/events/series/{eventseries}/revisions/{eventseries_revision}/revert/{langcode}",
  *   },
- *   field_ui_base_route = "eventseries.settings",
+ *   field_ui_base_route = "entity.eventseries_type.edit_form",
  * )
  *
  * The 'links' above are defined by their path. For core to find the
@@ -200,6 +204,13 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
     if (!$this->getRevisionUser()) {
       $this->setRevisionUserId($this->getOwnerId());
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getType() {
+    return $this->bundle();
   }
 
   /**
@@ -323,6 +334,12 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the event entity.'))
+      ->setReadOnly(TRUE);
+
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The eventseries type.'))
+      ->setSetting('target_type', 'eventseries_type')
       ->setReadOnly(TRUE);
 
     // Title field for the event.
@@ -602,7 +619,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getConsecutiveStartDate() {
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('consecutive_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    if (!empty($this->get('consecutive_recurring_date')->start_date)) {
+      return $this->get('consecutive_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -613,7 +633,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getConsecutiveEndDate() {
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('consecutive_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    if (!empty($this->get('consecutive_recurring_date')->end_date)) {
+      return $this->get('consecutive_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -684,7 +707,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getDailyStartDate() {
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('daily_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    if (!empty($this->get('daily_recurring_date')->start_date)) {
+      return $this->get('daily_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -695,7 +721,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getDailyEndDate() {
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('daily_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    if (!empty($this->get('daily_recurring_date')->end_date)) {
+      return $this->get('daily_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -726,7 +755,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getWeeklyStartDate() {
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('weekly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    if (!empty($this->get('weekly_recurring_date')->start_date)) {
+      return $this->get('weekly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -737,7 +769,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getWeeklyEndDate() {
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('weekly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    if (!empty($this->get('weekly_recurring_date')->end_date)) {
+      return $this->get('weekly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -816,7 +851,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getMonthlyStartDate() {
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('monthly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    if (!empty($this->get('monthly_recurring_date')->start_date)) {
+      return $this->get('monthly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -827,7 +865,10 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    */
   public function getMonthlyEndDate() {
     $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('monthly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    if (!empty($this->get('monthly_recurring_date')->end_date)) {
+      return $this->get('monthly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**

@@ -16,6 +16,8 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 /**
  * Implements hook_help().
@@ -184,6 +186,10 @@ function recurring_events_theme() {
     'template' => 'eventseries',
   ];
 
+  $theme['eventseries_add_list'] = [
+    'variables' => ['content' => NULL],
+  ];
+
   return $theme;
 }
 
@@ -222,6 +228,30 @@ function template_preprocess_eventseries(array &$variables) {
 }
 
 /**
+ * Prepares variables for list of available eventseries type templates.
+ *
+ * Default template: eventseries-add-list.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - content: An array of eventseries types.
+ */
+function template_preprocess_eventseries_add_list(array &$variables) {
+  $variables['types'] = [];
+  if (!empty($variables['content'])) {
+    foreach ($variables['content'] as $type) {
+      $variables['types'][$type->id()] = [
+        'type' => $type->id(),
+        'add_link' => Link::fromTextAndUrl($type->label(), new Url('entity.eventseries.add_form', ['eventseries_type' => $type->id()])),
+        'description' => [
+          '#markup' => $type->getDescription(),
+        ],
+      ];
+    }
+  }
+}
+
+/**
  * Implements hook_ENTITY_TYPE_presave().
  */
 function recurring_events_eventseries_presave(EntityInterface $entity) {
@@ -255,6 +285,76 @@ function recurring_events_eventseries_insert(EntityInterface $entity) {
         $instance->setNewRevision(FALSE);
         $instance->save();
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function recurring_events_eventseries_type_insert(EntityInterface $entity) {
+  // Event series types are tied to event instance types, and optionally
+  // registrant types. Therefore, we need to create equivalent instance and
+  // registrant types every time an event series type is created.
+  $series_type_label = $entity->label();
+  $series_type_description = $entity->getDescription();
+  $series_type_id = $entity->id();
+
+  $instance_types = \Drupal::entityTypeManager()->getStorage('eventinstance_type')->load($series_type_id);
+  if (empty($instance_types)) {
+    $instance_type = \Drupal::entityTypeManager()->getStorage('eventinstance_type')->create([
+      'id' => $series_type_id,
+      'label' => $series_type_label,
+      'description' => $series_type_description,
+    ]);
+    $instance_type->save();
+  }
+
+  if (\Drupal::moduleHandler()->moduleExists('recurring_events_registration')) {
+    $registrant_types = \Drupal::entityTypeManager()->getStorage('registrant_type')->load($series_type_id);
+    if (empty($registrant_types)) {
+      $registrant_type = \Drupal::entityTypeManager()->getStorage('registrant_type')->create([
+        'id' => $series_type_id,
+        'label' => $series_type_label,
+        'description' => $series_type_description,
+      ]);
+      $registrant_type->save();
+    }
+  }
+
+  \Drupal::cache('menu')->invalidateAll();
+  \Drupal::service('plugin.manager.menu.link')->rebuild();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function recurring_events_eventseries_type_delete(EntityInterface $entity) {
+  // Event series types are tied to event instance types, and optionally
+  // registrant types. Therefore, we need to delete equivalent instance and
+  // registrant types every time an event series type is deleted.
+  $id = $entity->id();
+
+  $instance_type = \Drupal::entityTypeManager()->getStorage('eventinstance_type')->load($id);
+  if (!empty($instance_type)) {
+    $instance_type->delete();
+  }
+
+  if (\Drupal::moduleHandler()->moduleExists('recurring_events_registration')) {
+    $registrant_type = \Drupal::entityTypeManager()->getStorage('registrant_type')->load($id);
+    if (!empty($registrant_type)) {
+      $registrant_type->delete();
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+function recurring_events_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'eventinstance_type') {
+    if (!empty($operations['delete'])) {
+      unset($operations['delete']);
     }
   }
 }
@@ -442,4 +542,36 @@ function recurring_events_recurring_events_recur_field_types_alter(&$fields) {
       unset($fields[$field_name]);
     }
   }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function recurring_events_theme_suggestions_eventseries(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#eventseries'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'eventseries__' . $sanitized_view_mode;
+  $suggestions[] = 'eventseries__' . $entity->bundle();
+  $suggestions[] = 'eventseries__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'eventseries__' . $entity->id();
+  $suggestions[] = 'eventseries__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function recurring_events_theme_suggestions_eventinstance(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#eventinstance'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'eventinstance__' . $sanitized_view_mode;
+  $suggestions[] = 'eventinstance__' . $entity->bundle();
+  $suggestions[] = 'eventinstance__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'eventinstance__' . $entity->id();
+  $suggestions[] = 'eventinstance__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
 }

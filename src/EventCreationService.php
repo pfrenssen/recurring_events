@@ -451,6 +451,7 @@ class EventCreationService {
         'value' => $start_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
         'end_value' => $end_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
       ],
+      'type' => $event->getType(),
     ];
 
     \Drupal::moduleHandler()->alter('recurring_events_event_instance', $data);

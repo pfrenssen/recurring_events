@@ -2,17 +2,18 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.registrant.registrant.field_first_name
-    - field.field.registrant.registrant.field_last_name
-    - field.field.registrant.registrant.field_phone
+    - field.field.registrant.default.field_first_name
+    - field.field.registrant.default.field_last_name
+    - field.field.registrant.default.field_phone
+    - recurring_events_registration.registrant_type.default
   module:
     - recurring_events_registration
     - user
 _core:
   default_config_hash: 3clqPdEmzURlNSnHkS8qcIi_HNNeDJgzA336NT77DCE
-id: registrant.registrant.default
+id: registrant.default.default
 targetEntityType: registrant
-bundle: registrant
+bundle: default
 mode: default
 content:
   email:

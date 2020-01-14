@@ -295,7 +295,7 @@ class RegistrantForm extends ContentEntityForm {
    *   The form state interface.
    */
   protected function hideFormFields(array &$form, FormStateInterface $form_state) {
-    $form_fields = $this->fieldManager->getFieldDefinitions('registrant', 'registrant');
+    $form_fields = $this->fieldManager->getFieldDefinitions('registrant', $this->entity->getBundle());
 
     $availability = $this->creationService->retrieveAvailability();
     $waitlist = $this->creationService->hasWaitlist();

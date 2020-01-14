@@ -51,3 +51,16 @@ function recurring_events_registration_update_8001() {
     ->set('title', '[registrant:email]')
     ->save(TRUE);
 }
+
+/**
+ * Install the new type basefields for registrant.
+ */
+function recurring_events_registration_update_8002() {
+  $registrant_type = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Bundle'))
+    ->setDescription(t('The registrant type.'))
+    ->setSetting('target_type', 'registrant_type')
+    ->setReadOnly(TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('bundle', 'registrant', 'registrant', $registrant_type);
+}

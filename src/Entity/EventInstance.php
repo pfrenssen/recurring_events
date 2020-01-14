@@ -96,13 +96,15 @@ use Drupal\user\UserInterface;
  *   translatable = TRUE,
  *   admin_permission = "administer eventinstance entity",
  *   fieldable = TRUE,
+ *   bundle_entity_type = "eventinstance_type",
  *   entity_keys = {
  *     "id" = "id",
  *     "revision" = "vid",
  *     "published" = "status",
  *     "langcode" = "langcode",
  *     "uuid" = "uuid",
- *     "label" = "title"
+ *     "label" = "title",
+ *     "bundle" = "type",
  *   },
  *   revision_metadata_keys = {
  *     "revision_user" = "revision_uid",
@@ -122,7 +124,7 @@ use Drupal\user\UserInterface;
  *     "revision_delete" = "/events/{eventinstance}/revisions/{eventinstance_revision}/delete",
  *     "translation_revert" = "/events/{eventinstance}/revisions/{eventinstance_revision}/revert/{langcode}",
  *   },
- *   field_ui_base_route = "eventinstance.settings",
+ *   field_ui_base_route = "entity.eventinstance_type.edit_form",
  * )
  *
  * The 'links' above are defined by their path. For core to find the
@@ -201,6 +203,13 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
     if (!$this->getRevisionUser()) {
       $this->setRevisionUserId($this->getOwnerId());
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getType() {
+    return $this->bundle();
   }
 
   /**
@@ -326,6 +335,12 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the event entity.'))
+      ->setReadOnly(TRUE);
+
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The eventinstance type.'))
+      ->setSetting('target_type', 'eventinstance_type')
       ->setReadOnly(TRUE);
 
     $fields['body'] = BaseFieldDefinition::create('text_long')

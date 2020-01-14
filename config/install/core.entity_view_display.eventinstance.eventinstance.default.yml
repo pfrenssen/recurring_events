@@ -5,9 +5,9 @@ dependencies:
     - datetime_range
     - recurring_events
     - text
-id: eventinstance.eventinstance.default
+id: eventinstance.default.default
 targetEntityType: eventinstance
-bundle: eventinstance
+bundle: default
 mode: default
 content:
   date:

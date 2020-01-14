@@ -13,6 +13,9 @@ use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Entity\EntityFieldManager;
 use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\recurring_events\Plugin\Field\FieldWidget\ConsecutiveRecurringDateWidget;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Component\Datetime\TimeInterface;
 
 /**
  * Form controller for the eventseries entity create form.
@@ -81,7 +84,10 @@ class EventSeriesForm extends ContentEntityForm {
       $container->get('messenger'),
       $container->get('date.formatter'),
       $container->get('entity_field.manager'),
-      $container->get('plugin.manager.field.field_type')
+      $container->get('plugin.manager.field.field_type'),
+      $container->get('entity.repository'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time')
     );
   }
 
@@ -103,14 +109,14 @@ class EventSeriesForm extends ContentEntityForm {
    * @param \Drupal\Core\Field\FieldTypePluginManager $field_type_plugin_manager
    *   The field type plugin manager.
    */
-  public function __construct(EventCreationService $creation_service, EntityStorageInterface $storage, EntityManagerInterface $entity_manager, Messenger $messenger, DateFormatter $date_formatter, EntityFieldManager $entity_field_manager, FieldTypePluginManager $field_type_plugin_manager) {
+  public function __construct(EventCreationService $creation_service, EntityStorageInterface $storage, EntityManagerInterface $entity_manager, Messenger $messenger, DateFormatter $date_formatter, EntityFieldManager $entity_field_manager, FieldTypePluginManager $field_type_plugin_manager, EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL) {
     $this->creationService = $creation_service;
     $this->storage = $storage;
     $this->messenger = $messenger;
     $this->dateFormatter = $date_formatter;
     $this->entityFieldManager = $entity_field_manager;
     $this->fieldTypePluginManager = $field_type_plugin_manager;
-    parent::__construct($entity_manager);
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
   }
 
   /**

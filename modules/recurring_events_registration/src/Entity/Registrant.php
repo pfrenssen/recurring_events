@@ -20,6 +20,7 @@ use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFie
  * @ContentEntityType(
  *   id = "registrant",
  *   label = @Translation("Registrant"),
+ *   bundle_label = @Translation("Registrant type"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\recurring_events_registration\RegistrantListBuilder",
@@ -44,6 +45,7 @@ use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFie
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
  *     "label" = "title",
+ *     "bundle" = "bundle",
  *   },
  *   links = {
  *     "canonical" = "/events/{eventinstance}/registrant/{registrant}",
@@ -52,7 +54,8 @@ use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFie
  *     "anon-edit-form" = "/events/{eventinstance}/registrant/{registrant}/{uuid}/edit",
  *     "anon-delete-form" = "/events/{eventinstance}/registrant/{registrant}/{uuid}/delete"
  *   },
- *   field_ui_base_route = "registrant.settings"
+ *   bundle_entity_type = "registrant_type",
+ *   field_ui_base_route = "entity.registrant_type.edit_form"
  * )
  */
 class Registrant extends ContentEntityBase implements RegistrantInterface {
@@ -66,6 +69,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
     parent::preCreate($storage_controller, $values);
     $values += [
       'user_id' => \Drupal::currentUser()->id(),
+      'bundle' => !empty(\Drupal::request()->attributes->get('eventinstance')) ? \Drupal::request()->attributes->get('eventinstance')->getType() : 'default',
     ];
   }
 
@@ -81,6 +85,13 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
       }
       recurring_events_registration_send_notification($key, $this);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBundle() {
+    return $this->bundle();
   }
 
   /**
@@ -174,6 +185,12 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the registrant entity.'))
+      ->setReadOnly(TRUE);
+
+    $fields['bundle'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Bundle'))
+      ->setDescription(t('The registrant type.'))
+      ->setSetting('target_type', 'registrant_type')
       ->setReadOnly(TRUE);
 
     $fields['eventseries_id'] = BaseFieldDefinition::create('entity_reference')

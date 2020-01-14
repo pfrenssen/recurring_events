@@ -359,3 +359,30 @@ function recurring_events_registration_entity_operation(EntityInterface $entity)
 
   return $operations;
 }
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+function recurring_events_registration_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'registrant_type') {
+    if (!empty($operations['delete'])) {
+      unset($operations['delete']);
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function recurring_events_registration_theme_suggestions_registrant(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#registrant'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'registrant__' . $sanitized_view_mode;
+  $suggestions[] = 'registrant__' . $entity->bundle();
+  $suggestions[] = 'registrant__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'registrant__' . $entity->id();
+  $suggestions[] = 'registrant__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}

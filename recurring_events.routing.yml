@@ -14,10 +14,23 @@ entity.eventseries.canonical:
 
 # Add an EventSeries.
 entity.eventseries.add_form:
-  path: '/events/add'
+  path: '/events/add/{eventseries_type}'
   defaults:
     _entity_form: eventseries.add
     _title: 'Add Event'
+  requirements:
+    _entity_create_access: 'eventseries'
+  options:
+    parameters:
+      eventseries_type:
+        type: entity:eventseries_type
+
+# Add an EventSeries.
+entity.eventseries.add_page:
+  path: '/events/add'
+  defaults:
+    _title: 'Add event'
+    _controller: '\Drupal\recurring_events\Controller\EventSeriesController::addPage'
   requirements:
     _entity_create_access: 'eventseries'
 
@@ -197,3 +210,25 @@ entity.eventinstance.admin_collection:
   requirements:
   # Checks for permission directly.
     _permission: 'access eventinstance overview'
+
+# Event Series types route.
+entity.eventseries_type.collection:
+  path: '/admin/structure/events/series/types'
+  defaults:
+    _entity_list: 'eventseries_type'
+    _title: 'Event Series types'
+  requirements:
+    _permission: 'administer eventseries types'
+  options:
+    _admin_route: TRUE
+
+# Event Instance types route.
+entity.eventinstance_type.collection:
+  path: '/admin/structure/events/instance/types'
+  defaults:
+    _entity_list: 'eventinstance_type'
+    _title: 'Event Instance types'
+  requirements:
+    _permission: 'administer eventinstance types'
+  options:
+    _admin_route: TRUE

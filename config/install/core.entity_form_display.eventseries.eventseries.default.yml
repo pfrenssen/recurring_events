@@ -5,9 +5,9 @@ dependencies:
     - datetime_range
     - recurring_events
     - text
-id: eventseries.eventseries.default
+id: eventseries.default.default
 targetEntityType: eventseries
-bundle: eventseries
+bundle: default
 mode: default
 content:
   body:

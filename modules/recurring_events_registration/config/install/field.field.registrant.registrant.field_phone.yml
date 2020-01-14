@@ -3,12 +3,13 @@ status: true
 dependencies:
   config:
     - field.storage.registrant.field_phone
+    - recurring_events_registration.registrant_type.default
   module:
     - recurring_events_registration
-id: registrant.registrant.field_phone
+id: registrant.default.field_phone
 field_name: field_phone
 entity_type: registrant
-bundle: registrant
+bundle: default
 label: Phone
 description: 'Enter your phone number.'
 required: false

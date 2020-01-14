@@ -3,12 +3,13 @@ status: true
 dependencies:
   config:
     - field.storage.registrant.field_first_name
+    - recurring_events_registration.registrant_type.default
   module:
     - recurring_events_registration
-id: registrant.registrant.field_first_name
+id: registrant.default.field_first_name
 field_name: field_first_name
 entity_type: registrant
-bundle: registrant
+bundle: default
 label: 'First Name'
 description: 'Enter your first name.'
 required: false

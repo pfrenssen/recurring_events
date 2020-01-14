@@ -5,6 +5,7 @@
  * Installation and update functionality for the recurring_events module.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Field\BaseFieldDefinition;
 
@@ -168,4 +169,107 @@ function recurring_events_update_8004() {
   $config->set('threshold_message', 'Saving this series will create up to @total event instances. This could result in memory exhaustion or site instability.');
   $config->set('threshold_prevent_save', 0);
   $config->save(TRUE);
+}
+
+/**
+ * Install the new config entities for event series and instance bundles.
+ */
+function recurring_events_update_8005() {
+  /*
+   * @see https://www.drupal.org/node/3069090
+   */
+  \Drupal::entityDefinitionUpdateManager()->installEntityType(new ConfigEntityType([
+    'id' => 'eventseries_type',
+    'label' => new TranslatableMarkup('Event series type'),
+    'handlers' => [
+      'view_builder' => 'Drupal\Core\Entity\EntityViewBuilder',
+      'list_builder' => 'Drupal\recurring_events\EventSeriesTypeListBuilder',
+      'form' => [
+        'add' => 'Drupal\recurring_events\Form\EventSeriesTypeForm',
+        'edit' => 'Drupal\recurring_events\Form\EventSeriesTypeForm',
+        'delete' => 'Drupal\recurring_events\Form\EventSeriesTypeDeleteForm',
+      ],
+      'route_provider' => [
+        'html' => 'Drupal\recurring_events\EventSeriesTypeHtmlRouteProvider',
+      ],
+    ],
+    'config_prefix' => 'eventseries_type',
+    'bundle_of' => 'eventseries',
+    'admin_permission' => 'administer eventseries entity',
+    'entity_keys' => [
+      'id' => 'id',
+      'label' => 'label',
+      'uuid' => 'uuid',
+    ],
+    'links' => [
+      'canonical' => '/admin/structure/events/series/types/eventseries_type/{eventseries_type}',
+      'add-form' => '/admin/structure/events/series/types/eventseries_type/add',
+      'edit-form' => '/admin/structure/events/series/types/eventseries_type/{eventseries_type}/edit',
+      'delete-form' => '/admin/structure/events/series/types/eventseries_type/{eventseries_type}/delete',
+      'collection' => '/admin/structure/events/series/types/eventseries_type',
+    ],
+    'config_export' => [
+      'label',
+      'id',
+      'description',
+    ],
+  ]));
+
+  \Drupal::entityDefinitionUpdateManager()->installEntityType(new ConfigEntityType([
+    'id' => 'eventinstance_type',
+    'label' => new TranslatableMarkup('Event instance type'),
+    'handlers' => [
+      'view_builder' => 'Drupal\Core\Entity\EntityViewBuilder',
+      'list_builder' => 'Drupal\recurring_events\EventSeriesTypeListBuilder',
+      'form' => [
+        'add' => 'Drupal\recurring_events\Form\EventSeriesTypeForm',
+        'edit' => 'Drupal\recurring_events\Form\EventSeriesTypeForm',
+        'delete' => 'Drupal\recurring_events\Form\EventSeriesTypeDeleteForm',
+      ],
+      'route_provider' => [
+        'html' => 'Drupal\recurring_events\EventSeriesTypeHtmlRouteProvider',
+      ],
+    ],
+    'config_prefix' => 'eventinstance_type',
+    'bundle_of' => 'eventinstance',
+    'admin_permission' => 'administer eventinstance entity',
+    'entity_keys' => [
+      'id' => 'id',
+      'label' => 'label',
+      'uuid' => 'uuid',
+    ],
+    'links' => [
+      'canonical' => '/admin/structure/events/instance/types/eventinstance_type/{eventinstance_type}',
+      'add-form' => '/admin/structure/events/instance/types/eventinstance_type/add',
+      'edit-form' => '/admin/structure/events/instance/types/eventinstance_type/{eventinstance_type}/edit',
+      'delete-form' => '/admin/structure/events/instance/types/eventinstance_type/{eventinstance_type}/delete',
+      'collection' => '/admin/structure/events/instance/types/eventinstance_type',
+    ],
+    'config_export' => [
+      'label',
+      'id',
+      'description',
+    ],
+  ]));
+}
+
+/**
+ * Install the new type basefields for series and instances.
+ */
+function recurring_events_update_8006() {
+  $series_type = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Type'))
+    ->setDescription(t('The eventseries type.'))
+    ->setSetting('target_type', 'eventseries_type')
+    ->setReadOnly(TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('type', 'eventseries', 'eventseries', $series_type);
+
+  $instance_type = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Type'))
+    ->setDescription(t('The eventinstance type.'))
+    ->setSetting('target_type', 'eventinstance_type')
+    ->setReadOnly(TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('type', 'eventinstance', 'eventinstance', $instance_type);
 }

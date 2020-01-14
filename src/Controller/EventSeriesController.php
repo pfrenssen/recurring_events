@@ -81,6 +81,62 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
   }
 
   /**
+   * Displays add content links for available event series types.
+   *
+   * Redirects to events/add/[type] if only one type is available.
+   *
+   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+   *   A render array for a list of the node types that can be added; however,
+   *   if there is only one node type defined for the site, the function
+   *   will return a RedirectResponse to the node add page for that one node
+   *   type.
+   */
+  public function addPage() {
+    $build = [
+      '#theme' => 'eventseries_add_list',
+      '#cache' => [
+        'tags' => $this->entityManager()->getDefinition('eventseries_type')->getListCacheTags(),
+      ],
+    ];
+
+    $content = [];
+
+    // Only use eventseries types the user has access to.
+    foreach ($this->entityManager()->getStorage('eventseries_type')->loadMultiple() as $type) {
+      $access = $this->entityManager()->getAccessControlHandler('eventseries')->createAccess($type->id(), NULL, [], TRUE);
+      if ($access->isAllowed()) {
+        $content[$type->id()] = $type;
+      }
+      $this->renderer->addCacheableDependency($build, $access);
+    }
+
+    // Bypass the node/add listing if only one content type is available.
+    if (count($content) == 1) {
+      $type = array_shift($content);
+      return $this->redirect('entity.eventseries.add_form', ['eventseries_type' => $type->id()]);
+    }
+
+    $build['#content'] = $content;
+
+    return $build;
+  }
+
+  /**
+   * Create a new event.
+   *
+   * @var \Drupal\recurring_events\EventSeriesTypeInterface $eventseries_type
+   */
+  public function add(EventSeriesTypeInterface $eventseries_type) {
+    $eventseries = $this->entityManager()->getStorage('eventseries')->create([
+      'type' => $eventseries_type->id(),
+    ]);
+
+    $form = $this->entityFormBuilder()->getForm($eventseries);
+
+    return $form;
+  }
+
+  /**
    * Displays an eventseries revision.
    *
    * @param int $eventseries_revision
