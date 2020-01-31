@@ -31,6 +31,20 @@ function recurring_events_registration_install() {
 
   \Drupal::entityDefinitionUpdateManager()
     ->installFieldStorageDefinition('event_registration', 'eventseries', 'eventseries', $storage_definition);
+
+  // When enabling registrations make sure we create all the registrant types
+  // to match the existing series and instance types.
+  foreach (\Drupal::entityTypeManager()->getStorage('eventseries_type')->loadMultiple() as $type) {
+    $registrant_type = \Drupal::entityTypeManager()->getStorage('registrant_type')->load($type->id());
+    if (empty($registrant_type)) {
+      $registrant_type = \Drupal::entityTypeManager()->getStorage('registrant_type')->create([
+        'id' => $type->id(),
+        'label' => $type->label(),
+        'description' => $type->getDescription(),
+      ]);
+      $registrant_type->save();
+    }
+  }
 }
 
 /**
