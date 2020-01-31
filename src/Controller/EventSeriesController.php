@@ -95,15 +95,15 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
     $build = [
       '#theme' => 'eventseries_add_list',
       '#cache' => [
-        'tags' => $this->entityManager()->getDefinition('eventseries_type')->getListCacheTags(),
+        'tags' => $this->entityTypeManager()->getDefinition('eventseries_type')->getListCacheTags(),
       ],
     ];
 
     $content = [];
 
     // Only use eventseries types the user has access to.
-    foreach ($this->entityManager()->getStorage('eventseries_type')->loadMultiple() as $type) {
-      $access = $this->entityManager()->getAccessControlHandler('eventseries')->createAccess($type->id(), NULL, [], TRUE);
+    foreach ($this->entityTypeManager()->getStorage('eventseries_type')->loadMultiple() as $type) {
+      $access = $this->entityTypeManager()->getAccessControlHandler('eventseries')->createAccess($type->id(), NULL, [], TRUE);
       if ($access->isAllowed()) {
         $content[$type->id()] = $type;
       }
@@ -127,7 +127,7 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
    * @var \Drupal\recurring_events\EventSeriesTypeInterface $eventseries_type
    */
   public function add(EventSeriesTypeInterface $eventseries_type) {
-    $eventseries = $this->entityManager()->getStorage('eventseries')->create([
+    $eventseries = $this->entityTypeManager()->getStorage('eventseries')->create([
       'type' => $eventseries_type->id(),
     ]);
 
