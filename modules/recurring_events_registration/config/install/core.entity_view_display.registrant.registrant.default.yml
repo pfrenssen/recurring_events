@@ -9,8 +9,6 @@ dependencies:
   module:
     - recurring_events_registration
     - user
-_core:
-  default_config_hash: 3clqPdEmzURlNSnHkS8qcIi_HNNeDJgzA336NT77DCE
 id: registrant.default.default
 targetEntityType: registrant
 bundle: default
