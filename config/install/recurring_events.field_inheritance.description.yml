@@ -1,9 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: description
-label: Description
-type: append
-sourceField: body
-entityField: body
-plugin: text_inheritance

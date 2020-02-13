@@ -1,7 +1,7 @@
 {
   "name": "drupal/recurring_events",
   "type": "drupal-module",
-  "description": "Events and Registration Management Module",
+  "description": "Recurring Events and Registration Management Module",
   "keywords": ["Drupal"],
   "license": "GPL-2.0+",
   "homepage": "https://www.drupal.org/project/recurring_events",
@@ -10,5 +10,7 @@
     "issues": "https://www.drupal.org/project/issues/recurring_events",
     "source": "http://cgit.drupalcode.org/recurring_events"
   },
-  "require": { }
+  "require": {
+    "drupal/field_inheritance": "^1"
+  }
 }

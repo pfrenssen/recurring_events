@@ -386,3 +386,50 @@ function recurring_events_registration_theme_suggestions_registrant(array $varia
   $suggestions[] = 'registrant__' . $entity->id() . '__' . $sanitized_view_mode;
   return $suggestions;
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function recurring_events_registration_registrant_insert(EntityInterface $entity) {
+  $entity_type = $entity->getEntityTypeId();
+  $bundle = $entity->bundle();
+  $inherited_field_ids = \Drupal::entityQuery('field_inheritance')
+    ->condition('sourceEntityType', ['eventseries', 'eventinstance'], 'IN')
+    ->condition('destinationEntityType', $entity_type)
+    ->condition('destinationEntityBundle', $bundle)
+    ->execute();
+
+  if (!empty($inherited_field_ids)) {
+    $state_key = $entity_type . ':' . $entity->uuid();
+    $state = \Drupal::keyValue('field_inheritance');
+    $state_values = $state->get($state_key);
+
+    $inherited_fields = \Drupal::entityTypeManager()->getStorage('field_inheritance')->loadMultiple($inherited_field_ids);
+    $state_values = [
+      'enabled' => TRUE,
+    ];
+    if (!empty($inherited_fields)) {
+      foreach ($inherited_fields as $inherited_field) {
+        $name = $inherited_field->idWithoutTypeAndBundle();
+
+        $referenced_entity = NULL;
+        switch ($inherited_field->sourceEntityType()) {
+          case 'eventseries':
+            $referenced_entity = $entity->getEventSeries();
+            break;
+
+          case 'eventseries':
+            $referenced_entity = $entity->getEventInstance();
+            break;
+
+        }
+        if (!empty($referenced_entity)) {
+          $state_values[$name] = [
+            'entity' => $referenced_entity->id(),
+          ];
+        }
+      }
+    }
+    $state->set($state_key, $state_values);
+  }
+}

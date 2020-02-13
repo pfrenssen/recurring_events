@@ -8,14 +8,6 @@ entity.eventseries.add_page:
     - entity.eventinstance.admin_collection
     - entity.eventinstance.collection
 
-
-# Add Field Inheritance button.
-entity.field_inheritance.add_form:
-  route_name: entity.field_inheritance.add_form
-  title: 'Add Field inheritance'
-  appears_on:
-    - entity.field_inheritance.collection
-
 entity.eventseries_type.add_form:
   route_name: entity.eventseries_type.add_form
   title: 'Add Event Series Type'

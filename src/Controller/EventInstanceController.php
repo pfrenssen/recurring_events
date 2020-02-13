@@ -96,9 +96,17 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
    *   The title of the page.
    */
   public function getTitle(EventInterface $eventinstance) {
-    $title = $eventinstance->title->value;
+    $title = '';
+    $value = $eventinstance->get('title')->getValue();
+    if (!empty($value[0]['value'])) {
+      $title = $value[0]['value'];
+    }
+
     if ($eventinstance->hasTranslation($this->langCode)) {
-      $title = $eventinstance->getTranslation($this->langCode)->title->value;
+      $value = $eventinstance->getTranslation($this->langCode)->get('title')->getValue();
+      if (!empty($value[0]['value'])) {
+        $title = $value[0]['value'];
+      }
     }
     return $title;
   }
