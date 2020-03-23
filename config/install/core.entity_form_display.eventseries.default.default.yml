@@ -1,6 +1,8 @@
 langcode: en
 status: true
 dependencies:
+  config:
+    - recurring_events.eventseries_type.default
   module:
     - datetime_range
     - recurring_events
