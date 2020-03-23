@@ -110,7 +110,7 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
         ];
 
         $options = [];
-        $timezone = new \DateTimeZone(drupal_get_user_timezone());
+        $timezone = new \DateTimeZone(date_default_timezone_get());
         foreach ($instances as $instance) {
           $date = $instance->date->start_date;
           $date->setTimezone($timezone);

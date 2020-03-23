@@ -618,7 +618,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the consecutive start date.
    */
   public function getConsecutiveStartDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($this->get('consecutive_recurring_date')->start_date)) {
       return $this->get('consecutive_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
     }
@@ -632,7 +632,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the consecutive end date.
    */
   public function getConsecutiveEndDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($this->get('consecutive_recurring_date')->end_date)) {
       return $this->get('consecutive_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
     }
@@ -706,7 +706,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the daily start date.
    */
   public function getDailyStartDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($this->get('daily_recurring_date')->start_date)) {
       return $this->get('daily_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
     }
@@ -720,7 +720,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the daily end date.
    */
   public function getDailyEndDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($this->get('daily_recurring_date')->end_date)) {
       return $this->get('daily_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
     }
@@ -754,7 +754,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the weekly start date.
    */
   public function getWeeklyStartDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($this->get('weekly_recurring_date')->start_date)) {
       return $this->get('weekly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
     }
@@ -768,7 +768,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the weekly end date.
    */
   public function getWeeklyEndDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($this->get('weekly_recurring_date')->end_date)) {
       return $this->get('weekly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
     }
@@ -850,7 +850,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the monthly start date.
    */
   public function getMonthlyStartDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($this->get('monthly_recurring_date')->start_date)) {
       return $this->get('monthly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
     }
@@ -864,7 +864,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the monthly end date.
    */
   public function getMonthlyEndDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($this->get('monthly_recurring_date')->end_date)) {
       return $this->get('monthly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
     }

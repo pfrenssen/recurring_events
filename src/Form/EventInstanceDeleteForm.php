@@ -75,7 +75,7 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
       return $this
         ->t('Are you sure you want to delete the @language translation of the @entity-type %label?', [
           '@language' => $entity->language()->getName(),
-          '@entity-type' => $this->getEntity()->getEntityType()->getLowercaseLabel(),
+          '@entity-type' => $this->getEntity()->getEntityType()->getSingularLabel(),
           '%label' => $this->entity->getEventSeries()->title->value,
         ]);
     }

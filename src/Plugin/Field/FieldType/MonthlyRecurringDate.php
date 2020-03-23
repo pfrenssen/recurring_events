@@ -115,7 +115,7 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
   public static function convertFormConfigToArray(FormStateInterface $form_state) {
     $config = [];
 
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
     $user_input = $form_state->getUserInput();
 
