@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\recurring_events\Entity\EventSeries;
+use Drupal\recurring_events\EventInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -464,7 +465,7 @@ function recurring_events_form_alter(&$form, FormStateInterface $form_state, $fo
  */
 function recurring_events_form_content_moderation_entity_moderation_form_alter(&$form, FormStateInterface $form_state) {
   $entity = $form_state->get('entity');
-  if ($entity->getEntityTypeId() === 'eventseries') {
+  if ($entity instanceof EventInterface && $entity->getEntityTypeId() === 'eventseries') {
     $original = \Drupal::entityTypeManager()->getStorage('eventseries')->load($entity->id());
     $creation_service = \Drupal::service('recurring_events.event_creation_service');
     if ($creation_service->checkForOriginalRecurConfigChanges($entity, $original)) {
