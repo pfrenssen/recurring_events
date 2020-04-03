@@ -281,21 +281,6 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
 
   /**
    * {@inheritdoc}
-   */
-  public function getRevisionAuthor() {
-    return $this->getRevisionUser();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRevisionAuthorId($uid) {
-    $this->setRevisionUserId($uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
    *
    * Define the field properties here.
    *
@@ -327,6 +312,7 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
           'match_operator' => 'CONTAINS',
           'size' => '60',
           'placeholder' => '',
+          'match_limit' => 10,
         ],
       ])
       ->setDisplayConfigurable('form', TRUE);
