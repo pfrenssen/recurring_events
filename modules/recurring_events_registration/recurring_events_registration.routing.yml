@@ -180,3 +180,14 @@ entity.registrant.instance_contact:
     parameters:
       eventinstance:
         type: entity:eventinstance
+
+# Registrant types route.
+entity.registrant_type.collection:
+  path: '/admin/structure/events/registrant/types'
+  defaults:
+    _entity_list: 'registrant_type'
+    _title: 'Registrant types'
+  requirements:
+    _permission: 'administer registrant types'
+  options:
+    _admin_route: TRUE

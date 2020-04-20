@@ -32,9 +32,13 @@ resend registrant emails:
 contact registrants:
   title: 'Contact registrants'
   decription: 'Allow a role to set contact registrants'
-administer registrant entities:
+administer registrant entity:
   title: 'Administer registrant entities'
   description: 'Allow to access the administration form to configure registrant entities'
+  restrict access: true
+administer registrant types:
+  title: 'Administer registrant types'
+  description: 'Manage types of registrant'
   restrict access: true
 
 # Registrant Administration.
