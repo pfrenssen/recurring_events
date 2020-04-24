@@ -61,23 +61,25 @@ function recurring_events_views_views_query_alter(ViewExecutable $view, QueryPlu
 
       if (!empty($eventinstance_id)) {
         $eventinstance = \Drupal::entityTypeManager()->getStorage('eventinstance')->load($eventinstance_id);
-        $service = \Drupal::service('recurring_events_registration.creation_service');
-        $service->setEventInstance($eventinstance);
-        switch ($service->getRegistrationType()) {
-          case 'instance':
-            $field = 'registrant.eventinstance_id';
-            $value = [
-              $eventinstance->id(),
-            ];
-            break;
+        if (!empty($eventinstance)) {
+          $service = \Drupal::service('recurring_events_registration.creation_service');
+          $service->setEventInstance($eventinstance);
+          switch ($service->getRegistrationType()) {
+            case 'instance':
+              $field = 'registrant.eventinstance_id';
+              $value = [
+                $eventinstance->id(),
+              ];
+              break;
 
-          case 'series':
-          default:
-            $field = 'registrant.eventseries_id';
-            $value = [
-              $eventinstance->getEventSeries()->id(),
-            ];
-            break;
+            case 'series':
+            default:
+              $field = 'registrant.eventseries_id';
+              $value = [
+                $eventinstance->getEventSeries()->id(),
+              ];
+              break;
+          }
         }
 
         if (!empty($field) && !empty($value)) {
