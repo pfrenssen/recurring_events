@@ -42,6 +42,10 @@ function recurring_events_views_local_tasks_alter(&$local_tasks) {
       $local_tasks['entity.registrant.instance_listing']['route_name'] = 'view.registrations.event_registrant_list';
       $local_tasks['entity.registrant.instance_listing']['id'] = 'view.registrations.event_registrant_list';
     }
+
+    if (!empty($local_tasks['views_view:view.registrations.user_event_registrations'])) {
+      unset($local_tasks['entity.user.registrations']);
+    }
   }
 }
 

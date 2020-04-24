@@ -2495,6 +2495,15 @@ display:
           entity_type: eventinstance
           entity_field: date
           plugin_id: datetime
+      menu:
+        type: tab
+        title: Registrations
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
+        menu_name: account
     cache_metadata:
       max-age: -1
       contexts:
