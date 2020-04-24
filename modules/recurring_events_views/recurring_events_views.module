@@ -107,28 +107,30 @@ function recurring_events_views_views_pre_render(ViewExecutable $view) {
       if (!empty($eventinstance_id)) {
         $eventinstance = \Drupal::entityTypeManager()->getStorage('eventinstance')->load($eventinstance_id);
         $service = \Drupal::service('recurring_events_registration.creation_service');
-        $service->setEventInstance($eventinstance);
-        $config = \Drupal::config('recurring_events.eventinstance.config');
-        $format = $config->get('date_format');
-        $name = $eventinstance->title->value;
-        switch ($service->getRegistrationType()) {
-          case 'instance':
-            $title = t('Registrations for %name on %date', [
-              '%name' => $name,
-              '%date' => $eventinstance->date->start_date->format($format),
-            ]);
-            break;
+        if (!empty($eventinstance)) {
+          $service->setEventInstance($eventinstance);
+          $config = \Drupal::config('recurring_events.eventinstance.config');
+          $format = $config->get('date_format');
+          $name = $eventinstance->title->value;
+          switch ($service->getRegistrationType()) {
+            case 'instance':
+              $title = t('Registrations for %name on %date', [
+                '%name' => $name,
+                '%date' => $eventinstance->date->start_date->format($format),
+              ]);
+              break;
 
-          case 'series':
-          default:
-            $title = t('Registrations for series: %name', [
-              '%name' => $name,
-            ]);
-            break;
-        }
+            case 'series':
+            default:
+              $title = t('Registrations for series: %name', [
+                '%name' => $name,
+              ]);
+              break;
+          }
 
-        if (!empty($title)) {
-          $view->setTitle($title);
+          if (!empty($title)) {
+            $view->setTitle($title);
+          }
         }
       }
     }
