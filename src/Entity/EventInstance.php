@@ -389,7 +389,7 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
         'settings' => [
           'display_label' => TRUE,
         ],
-        'weight' => 120,
+        'weight' => 12,
       ])
       ->setDisplayConfigurable('form', TRUE);
 

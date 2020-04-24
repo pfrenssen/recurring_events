@@ -122,7 +122,7 @@ function recurring_events_registration_entity_base_field_info_alter(&$fields, En
       ->setTargetEntityTypeId($entity_type->id())
       ->setDisplayOptions('form', [
         'type' => 'event_registration',
-        'weight' => 4,
+        'weight' => 10,
       ]);
   }
 }

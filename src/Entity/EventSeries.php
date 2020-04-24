@@ -307,7 +307,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
+        'weight' => 11,
         'settings' => [
           'match_operator' => 'CONTAINS',
           'size' => '60',
@@ -339,11 +339,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
-        'weight' => -6,
+        'weight' => 0,
       ])
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'weight' => 10,
+        'weight' => 0,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
@@ -359,11 +359,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',
-        'weight' => -4,
+        'weight' => 1,
       ])
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'weight' => 10,
+        'weight' => 1,
       ])
       ->setDisplayConfigurable('form', TRUE);
 
@@ -379,11 +379,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setSetting('allowed_values_function', 'recurring_events_allowed_values_function')
       ->setDisplayOptions('form', [
         'type' => 'options_buttons',
-        'weight' => 0,
+        'weight' => 2,
       ])
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'weight' => 10,
+        'weight' => 2,
       ]);
 
     $fields['consecutive_recurring_date'] = BaseFieldDefinition::create('consecutive_recurring_date')
@@ -397,7 +397,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'consecutive_recurring_date',
-        'weight' => 1,
+        'weight' => 3,
       ]);
 
     $fields['daily_recurring_date'] = BaseFieldDefinition::create('daily_recurring_date')
@@ -411,7 +411,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'daily_recurring_date',
-        'weight' => 2,
+        'weight' => 4,
       ]);
 
     $fields['weekly_recurring_date'] = BaseFieldDefinition::create('weekly_recurring_date')
@@ -425,7 +425,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'weekly_recurring_date',
-        'weight' => 3,
+        'weight' => 5,
       ]);
 
     $fields['monthly_recurring_date'] = BaseFieldDefinition::create('monthly_recurring_date')
@@ -439,7 +439,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'monthly_recurring_date',
-        'weight' => 4,
+        'weight' => 6,
       ]);
 
     $fields['custom_date'] = BaseFieldDefinition::create('daterange')
@@ -453,7 +453,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'daterange_default',
-        'weight' => 5,
+        'weight' => 7,
       ]);
 
     $fields['excluded_dates'] = BaseFieldDefinition::create('daterange')
@@ -468,7 +468,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setSetting('datetime_type', 'date')
       ->setDisplayOptions('form', [
         'type' => 'daterange_default',
-        'weight' => 6,
+        'weight' => 8,
         'settings' => [
           'format_type' => 'html_date',
           'datetime_type' => 'date',
@@ -487,7 +487,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setSetting('datetime_type', 'date')
       ->setDisplayOptions('form', [
         'type' => 'daterange_default',
-        'weight' => 6,
+        'weight' => 9,
         'settings' => [
           'format_type' => 'html_date',
           'datetime_type' => 'date',
@@ -503,7 +503,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayOptions('view', [
         'type' => 'recurring_events_eventinstance_date',
         'label' => 'above',
-        'weight' => 10,
+        'weight' => 3,
         'settings' => [
           'link' => TRUE,
           'date_format' => 'F jS, Y h:iA',
@@ -533,7 +533,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
         'settings' => [
           'display_label' => TRUE,
         ],
-        'weight' => 120,
+        'weight' => 12,
       ])
       ->setDisplayConfigurable('form', TRUE);
 
