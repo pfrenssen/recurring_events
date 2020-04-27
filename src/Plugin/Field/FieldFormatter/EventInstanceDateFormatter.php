@@ -155,7 +155,7 @@ class EventInstanceDateFormatter extends EntityReferenceFormatterBase {
       $elements[$delta]['#cache']['tags'] = $entity->getCacheTags();
     }
 
-    usort($elements, function($a, $b) {
+    usort($elements, function ($a, $b) {
       $a_date = $a['#options']['entity']->date->start_date->getTimestamp();
       $b_date = $b['#options']['entity']->date->start_date->getTimestamp();
       if ($a_date == $b_date) {
