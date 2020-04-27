@@ -241,7 +241,9 @@ class RegistrantForm extends ContentEntityForm {
       $form['availability'] = [
         '#type' => 'markup',
         '#prefix' => '<span class="registration-availability">',
-        '#markup' => $this->t('Spaces Available: @availability', ['@availability' => $availability]),
+        '#markup' => $this->t('Spaces Available: @availability', [
+          '@availability' => ($availability == -1) ? $this->t('Unlimited') : $availability
+        ]),
         '#suffix' => '</span>',
         '#weight' => -99,
       ];

@@ -227,7 +227,8 @@ class RegistrationCreationService {
 
     $capacity = $this->eventSeries->event_registration->capacity;
     if (empty($capacity)) {
-      $capacity = 0;
+      // Set capacity to unlimited if no capacity is specified.
+      return -1;
     }
     $availability = $capacity - count($parties);
     if ($availability < 0) {

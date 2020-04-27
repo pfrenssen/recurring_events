@@ -130,7 +130,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
     $element['capacity'] = [
       '#type' => 'number',
       '#title' => $this->t('Total Number of Spaces Available'),
-      '#description' => $this->t('Maximum number of attendees available for each series, or individual event.'),
+      '#description' => $this->t('Maximum number of attendees available for each series, or individual event. Leave blank for unlimited.'),
       '#weight' => 4,
       '#default_value' => $items[$delta]->capacity ?: '',
       '#min' => 0,
