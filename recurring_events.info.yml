@@ -7,3 +7,4 @@ package: 'Recurring Events'
 dependencies:
   - drupal:datetime_range
   - drupal:options
+  - field_inheritance:field_inheritance

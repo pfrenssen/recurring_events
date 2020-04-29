@@ -5,8 +5,10 @@ namespace Drupal\recurring_events\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Component\Datetime\TimeInterface;
 
 /**
  * Form controller for the eventinstance entity edit forms.
@@ -23,26 +25,48 @@ class EventInstanceForm extends ContentEntityForm {
   protected $messenger;
 
   /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
+
+  /**
+   * The time service.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface
+   */
+  protected $time;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager'),
-      $container->get('messenger')
+      $container->get('entity.repository'),
+      $container->get('messenger'),
+      $container->get('current_user'),
+      $container->get('datetime.time')
     );
   }
 
   /**
    * Construct an EventInstanceForm.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager service.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository service.
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
+   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   *   The current user.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    */
-  public function __construct(EntityManagerInterface $entity_manager, Messenger $messenger) {
+  public function __construct(EntityRepositoryInterface $entity_repository, Messenger $messenger, AccountProxyInterface $current_user, TimeInterface $time) {
     $this->messenger = $messenger;
-    parent::__construct($entity_manager);
+    $this->currentUser = $current_user;
+    $this->time = $time;
+    parent::__construct($entity_repository);
   }
 
   /**
@@ -96,8 +120,8 @@ class EventInstanceForm extends ContentEntityForm {
       $entity->setNewRevision();
 
       // If a new revision is created, save the current user as revision author.
-      $entity->setRevisionCreationTime(REQUEST_TIME);
-      $entity->setRevisionUserId(\Drupal::currentUser()->id());
+      $entity->setRevisionCreationTime($this->time->getRequestTime());
+      $entity->setRevisionUserId($this->currentUser->id());
     }
     else {
       $entity->setNewRevision(FALSE);
@@ -106,12 +130,12 @@ class EventInstanceForm extends ContentEntityForm {
     parent::save($form, $form_state);
 
     if ($entity->isDefaultTranslation()) {
-      $message = t('Event instance of %label has been saved.', [
+      $message = $this->t('Event instance of %label has been saved.', [
         '%label' => $entity->getEventSeries()->title->value,
       ]);
     }
     else {
-      $message = t('@language translation of the Event Instance %label has been saved.', [
+      $message = $this->t('@language translation of the Event Instance %label has been saved.', [
         '@language' => $entity->language()->getName(),
         '%label' => $entity->getUntranslated()->getEventSeries()->title->value,
       ]);

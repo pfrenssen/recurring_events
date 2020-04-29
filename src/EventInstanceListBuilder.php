@@ -122,7 +122,7 @@ class EventInstanceListBuilder extends EntityListBuilder {
       '#url' => $entity->getEventSeries()->toUrl(),
     ];
     $config = $this->config->get('recurring_events.eventinstance.config');
-    $timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $timezone = new \DateTimeZone(date_default_timezone_get());
     $entity->date->start_date->setTimezone($timezone);
     $row['date'] = $entity->date->start_date->format($config->get('date_format'));
     $row['author']['data'] = [

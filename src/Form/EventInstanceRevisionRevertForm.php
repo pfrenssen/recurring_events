@@ -10,6 +10,7 @@ use Drupal\Core\Url;
 use Drupal\recurring_events\EventInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides a form for reverting an eventinstance revision.
@@ -17,6 +18,8 @@ use Drupal\Core\Messenger\Messenger;
  * @ingroup recurring_events
  */
 class EventInstanceRevisionRevertForm extends ConfirmFormBase {
+
+  use StringTranslationTrait;
 
   /**
    * The eventinstance revision.
@@ -84,7 +87,7 @@ class EventInstanceRevisionRevertForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to revert to the revision from %revision-date?', ['%revision-date' => $this->dateFormatter->format($this->revision->getRevisionCreationTime())]);
+    return $this->t('Are you sure you want to revert to the revision from %revision-date?', ['%revision-date' => $this->dateFormatter->format($this->revision->getRevisionCreationTime())]);
   }
 
   /**
@@ -98,7 +101,7 @@ class EventInstanceRevisionRevertForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getConfirmText() {
-    return t('Revert');
+    return $this->t('Revert');
   }
 
   /**
@@ -127,11 +130,11 @@ class EventInstanceRevisionRevertForm extends ConfirmFormBase {
     $original_revision_timestamp = $this->revision->getRevisionCreationTime();
 
     $this->revision = $this->prepareRevertedRevision($this->revision, $form_state);
-    $this->revision->revision_log = t('Copy of the revision from %date.', ['%date' => $this->dateFormatter->format($original_revision_timestamp)]);
+    $this->revision->revision_log = $this->t('Copy of the revision from %date.', ['%date' => $this->dateFormatter->format($original_revision_timestamp)]);
     $this->revision->save();
 
     $this->logger('content')->notice('eventinstance: reverted %title revision %revision.', ['%title' => $this->revision->label(), '%revision' => $this->revision->getRevisionId()]);
-    $this->messenger->addMessage(t('eventinstance %title has been reverted to the revision from %revision-date.', [
+    $this->messenger->addMessage($this->t('eventinstance %title has been reverted to the revision from %revision-date.', [
       '%title' => $this->revision->label(),
       '%revision-date' => $this->dateFormatter->format($original_revision_timestamp),
     ]));
@@ -155,7 +158,7 @@ class EventInstanceRevisionRevertForm extends ConfirmFormBase {
   protected function prepareRevertedRevision(EventInterface $revision, FormStateInterface $form_state) {
     $revision->setNewRevision();
     $revision->isDefaultRevision(TRUE);
-    $revision->setRevisionCreationTime(REQUEST_TIME);
+    $revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
 
     return $revision;
   }

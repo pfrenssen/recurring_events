@@ -91,8 +91,7 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
   public static function convertFormConfigToArray(FormStateInterface $form_state) {
     $config = [];
 
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
     $user_input = $form_state->getUserInput();
 
     $time = $user_input['daily_recurring_date'][0]['time'];
@@ -157,7 +156,7 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
    * {@inheritdoc}
    */
   public static function calculateInstances(array $form_data) {
-    $dates = $events_to_create = [];
+    $events_to_create = [];
     $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
 
     $daily_dates = static::findDailyDatesBetweenDates($form_data['start_date'], $form_data['end_date']);

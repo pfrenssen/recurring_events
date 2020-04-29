@@ -96,13 +96,15 @@ use Drupal\user\UserInterface;
  *   translatable = TRUE,
  *   admin_permission = "administer eventseries entity",
  *   fieldable = TRUE,
+ *   bundle_entity_type = "eventseries_type",
  *   entity_keys = {
  *     "id" = "id",
  *     "revision" = "vid",
  *     "published" = "status",
  *     "langcode" = "langcode",
  *     "label" = "title",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "bundle" = "type",
  *   },
  *   revision_metadata_keys = {
  *     "revision_user" = "revision_uid",
@@ -111,6 +113,8 @@ use Drupal\user\UserInterface;
  *   },
  *   links = {
  *     "canonical" = "/events/series/{eventseries}",
+ *     "add-page" = "/events/add",
+ *     "add-form" = "/events/add/{eventseries_type}",
  *     "edit-form" = "/events/series/{eventseries}/edit",
  *     "delete-form" = "/events/series/{eventseries}/delete",
  *     "collection" = "/events/series",
@@ -122,7 +126,7 @@ use Drupal\user\UserInterface;
  *     "revision_delete" = "/events/series/{eventseries}/revisions/{eventseries_revision}/delete",
  *     "translation_revert" = "/events/series/{eventseries}/revisions/{eventseries_revision}/revert/{langcode}",
  *   },
- *   field_ui_base_route = "eventseries.settings",
+ *   field_ui_base_route = "entity.eventseries_type.edit_form",
  * )
  *
  * The 'links' above are defined by their path. For core to find the
@@ -205,6 +209,13 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
   /**
    * {@inheritdoc}
    */
+  public function getType() {
+    return $this->bundle();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCreatedTime() {
     return $this->get('created')->value;
   }
@@ -271,21 +282,6 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
 
   /**
    * {@inheritdoc}
-   */
-  public function getRevisionAuthor() {
-    return $this->getRevisionUser();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setRevisionAuthorId($uid) {
-    $this->setRevisionUserId($uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
    *
    * Define the field properties here.
    *
@@ -311,11 +307,12 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setTranslatable(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
+        'weight' => 11,
         'settings' => [
           'match_operator' => 'CONTAINS',
           'size' => '60',
           'placeholder' => '',
+          'match_limit' => 10,
         ],
       ])
       ->setDisplayConfigurable('form', TRUE);
@@ -323,6 +320,12 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the event entity.'))
+      ->setReadOnly(TRUE);
+
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The eventseries type.'))
+      ->setSetting('target_type', 'eventseries_type')
       ->setReadOnly(TRUE);
 
     // Title field for the event.
@@ -336,11 +339,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ])
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
-        'weight' => -6,
+        'weight' => 0,
       ])
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'weight' => 10,
+        'weight' => 0,
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE)
@@ -356,11 +359,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',
-        'weight' => -4,
+        'weight' => 1,
       ])
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'weight' => 10,
+        'weight' => 1,
       ])
       ->setDisplayConfigurable('form', TRUE);
 
@@ -376,11 +379,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setSetting('allowed_values_function', 'recurring_events_allowed_values_function')
       ->setDisplayOptions('form', [
         'type' => 'options_buttons',
-        'weight' => 0,
+        'weight' => 2,
       ])
       ->setDisplayOptions('view', [
         'label' => 'above',
-        'weight' => 10,
+        'weight' => 2,
       ]);
 
     $fields['consecutive_recurring_date'] = BaseFieldDefinition::create('consecutive_recurring_date')
@@ -394,7 +397,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'consecutive_recurring_date',
-        'weight' => 1,
+        'weight' => 3,
       ]);
 
     $fields['daily_recurring_date'] = BaseFieldDefinition::create('daily_recurring_date')
@@ -408,7 +411,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'daily_recurring_date',
-        'weight' => 2,
+        'weight' => 4,
       ]);
 
     $fields['weekly_recurring_date'] = BaseFieldDefinition::create('weekly_recurring_date')
@@ -422,7 +425,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'weekly_recurring_date',
-        'weight' => 3,
+        'weight' => 5,
       ]);
 
     $fields['monthly_recurring_date'] = BaseFieldDefinition::create('monthly_recurring_date')
@@ -436,7 +439,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'monthly_recurring_date',
-        'weight' => 4,
+        'weight' => 6,
       ]);
 
     $fields['custom_date'] = BaseFieldDefinition::create('daterange')
@@ -450,8 +453,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'daterange_default',
-        'label' => 'above',
-        'weight' => 5,
+        'weight' => 7,
       ]);
 
     $fields['excluded_dates'] = BaseFieldDefinition::create('daterange')
@@ -466,8 +468,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setSetting('datetime_type', 'date')
       ->setDisplayOptions('form', [
         'type' => 'daterange_default',
-        'label' => 'above',
-        'weight' => 6,
+        'weight' => 8,
         'settings' => [
           'format_type' => 'html_date',
           'datetime_type' => 'date',
@@ -486,8 +487,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setSetting('datetime_type', 'date')
       ->setDisplayOptions('form', [
         'type' => 'daterange_default',
-        'label' => 'above',
-        'weight' => 6,
+        'weight' => 9,
         'settings' => [
           'format_type' => 'html_date',
           'datetime_type' => 'date',
@@ -503,7 +503,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setDisplayOptions('view', [
         'type' => 'recurring_events_eventinstance_date',
         'label' => 'above',
-        'weight' => 10,
+        'weight' => 3,
         'settings' => [
           'link' => TRUE,
           'date_format' => 'F jS, Y h:iA',
@@ -533,7 +533,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
         'settings' => [
           'display_label' => TRUE,
         ],
-        'weight' => 120,
+        'weight' => 12,
       ])
       ->setDisplayConfigurable('form', TRUE);
 
@@ -601,8 +601,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the consecutive start date.
    */
   public function getConsecutiveStartDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('consecutive_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
+    if (!empty($this->get('consecutive_recurring_date')->start_date)) {
+      return $this->get('consecutive_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -612,8 +615,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the consecutive end date.
    */
   public function getConsecutiveEndDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('consecutive_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
+    if (!empty($this->get('consecutive_recurring_date')->end_date)) {
+      return $this->get('consecutive_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -683,8 +689,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the daily start date.
    */
   public function getDailyStartDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('daily_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
+    if (!empty($this->get('daily_recurring_date')->start_date)) {
+      return $this->get('daily_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -694,8 +703,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the daily end date.
    */
   public function getDailyEndDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('daily_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
+    if (!empty($this->get('daily_recurring_date')->end_date)) {
+      return $this->get('daily_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -725,8 +737,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the weekly start date.
    */
   public function getWeeklyStartDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('weekly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
+    if (!empty($this->get('weekly_recurring_date')->start_date)) {
+      return $this->get('weekly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -736,8 +751,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the weekly end date.
    */
   public function getWeeklyEndDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('weekly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
+    if (!empty($this->get('weekly_recurring_date')->end_date)) {
+      return $this->get('weekly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -815,8 +833,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the monthly start date.
    */
   public function getMonthlyStartDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('monthly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
+    if (!empty($this->get('monthly_recurring_date')->start_date)) {
+      return $this->get('monthly_recurring_date')->start_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**
@@ -826,8 +847,11 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
    *   The date object for the monthly end date.
    */
   public function getMonthlyEndDate() {
-    $user_timezone = new \DateTimeZone(drupal_get_user_timezone());
-    return $this->get('monthly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    $user_timezone = new \DateTimeZone(date_default_timezone_get());
+    if (!empty($this->get('monthly_recurring_date')->end_date)) {
+      return $this->get('monthly_recurring_date')->end_date->setTimezone($user_timezone)->setTime(0, 0, 0);
+    }
+    return NULL;
   }
 
   /**

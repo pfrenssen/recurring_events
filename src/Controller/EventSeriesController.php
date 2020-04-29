@@ -12,6 +12,7 @@ use Drupal\recurring_events\EventInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
+use Drupal\recurring_events\Entity\EventSeriesTypeInterface;
 
 /**
  * The EventSeriesController class.
@@ -78,6 +79,124 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
    */
   public function contentPage() {
     return $this->systemManager->getBlockContents();
+  }
+
+  /**
+   * Displays add content links for available event series types.
+   *
+   * Redirects to events/add/[type] if only one type is available.
+   *
+   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+   *   A render array for a list of the node types that can be added; however,
+   *   if there is only one node type defined for the site, the function
+   *   will return a RedirectResponse to the node add page for that one node
+   *   type.
+   */
+  public function addPage() {
+    $build = [
+      '#theme' => 'eventseries_add_list',
+      '#cache' => [
+        'tags' => $this->entityTypeManager()->getDefinition('eventseries_type')->getListCacheTags(),
+      ],
+    ];
+
+    $content = [];
+
+    // Only use eventseries types the user has access to.
+    foreach ($this->entityTypeManager()->getStorage('eventseries_type')->loadMultiple() as $type) {
+      $access = $this->entityTypeManager()->getAccessControlHandler('eventseries')->createAccess($type->id(), NULL, [], TRUE);
+      if ($access->isAllowed()) {
+        $content[$type->id()] = $type;
+      }
+      $this->renderer->addCacheableDependency($build, $access);
+    }
+
+    // Bypass the node/add listing if only one content type is available.
+    if (count($content) == 1) {
+      $type = array_shift($content);
+      return $this->redirect('entity.eventseries.add_form', ['eventseries_type' => $type->id()]);
+    }
+
+    $build['#content'] = $content;
+
+    return $build;
+  }
+
+  /**
+   * Create a new event.
+   *
+   * @param \Drupal\recurring_events\Entity\EventSeriesTypeInterface $eventseries_type
+   *   The eventseries type.
+   */
+  public function add(EventSeriesTypeInterface $eventseries_type) {
+    $eventseries = $this->entityTypeManager()->getStorage('eventseries')->create([
+      'type' => $eventseries_type->id(),
+    ]);
+
+    $form = $this->entityFormBuilder()->getForm($eventseries);
+
+    return $form;
+  }
+
+  /**
+   * The _title_callback for the entity.eventseries.add_form route.
+   *
+   * @param \Drupal\recurring_events\Entity\EventSeriesTypeInterface $eventseries_type
+   *   The eventseries type.
+   *
+   * @return string
+   *   The page title.
+   */
+  public function addPageTitle(EventSeriesTypeInterface $eventseries_type) {
+    return $this->t('Create %name Event', ['%name' => $eventseries_type->label()]);
+  }
+
+  /**
+   * The _title_callback for the entity.eventseries.edit_form route.
+   *
+   * @param \Drupal\recurring_events\EventInterface $eventseries
+   *   The eventseries type.
+   *
+   * @return string
+   *   The page title.
+   */
+  public function editPageTitle(EventInterface $eventseries) {
+    return $this->t('Edit %type Event %title', [
+      '%type' => $eventseries->bundle(),
+      '%title' => $eventseries->label(),
+    ]);
+  }
+
+  /**
+   * The _title_callback for the entity.eventseries.delete_form route.
+   *
+   * @param \Drupal\recurring_events\EventInterface $eventseries
+   *   The eventseries type.
+   *
+   * @return string
+   *   The page title.
+   */
+  public function deletePageTitle(EventInterface $eventseries) {
+    return $this->t('Delete %type Event %title', [
+      '%type' => $eventseries->bundle(),
+      '%title' => $eventseries->label(),
+    ]);
+  }
+
+  /**
+   * The _title_callback for the entity.eventseries.clone_form route.
+   *
+   * @param \Drupal\recurring_events\EventInterface $eventseries
+   *   The eventseries type.
+   *
+   * @return string
+   *   The page title.
+   */
+  public function clonePageTitle(EventInterface $eventseries) {
+    return $this->t('Clone %type Event %title', [
+      '%type' => $eventseries->bundle(),
+      '%title' => $eventseries->label(),
+    ]);
   }
 
   /**

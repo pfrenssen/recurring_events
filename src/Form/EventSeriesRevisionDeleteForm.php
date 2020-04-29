@@ -10,6 +10,7 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Provides a form for deleting an eventseries revision.
@@ -17,6 +18,8 @@ use Drupal\Core\Messenger\Messenger;
  * @ingroup recurring_events
  */
 class EventSeriesRevisionDeleteForm extends ConfirmFormBase {
+
+  use StringTranslationTrait;
 
   /**
    * The eventseries revision.
@@ -96,7 +99,7 @@ class EventSeriesRevisionDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to delete the revision from %revision-date?', [
+    return $this->t('Are you sure you want to delete the revision from %revision-date?', [
       '%revision-date' => $this->dateFormatter->format($this->revision->getRevisionCreationTime()),
     ]);
   }
@@ -112,7 +115,7 @@ class EventSeriesRevisionDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getConfirmText() {
-    return t('Delete');
+    return $this->t('Delete');
   }
 
   /**
@@ -132,7 +135,7 @@ class EventSeriesRevisionDeleteForm extends ConfirmFormBase {
     $this->eventSeriesStorage->deleteRevision($this->revision->getRevisionId());
 
     $this->logger('content')->notice('eventseries: deleted %title revision %revision.', ['%title' => $this->revision->label(), '%revision' => $this->revision->getRevisionId()]);
-    $this->messenger->addMessage(t('Revision from %revision-date of eventseries %title has been deleted.', [
+    $this->messenger->addMessage($this->t('Revision from %revision-date of eventseries %title has been deleted.', [
       '%revision-date' => $this->dateFormatter->format($this->revision->getRevisionCreationTime()),
       '%title' => $this->revision->label(),
     ]));

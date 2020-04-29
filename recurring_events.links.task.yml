@@ -94,12 +94,6 @@ entity.eventinstance.settings:
   title: Event Instance Settings
   base_route: eventinstance.settings
 
-# Field Inheritance settings admin page.
-entity.field_inheritance.collection:
-  route_name: entity.field_inheritance.collection
-  title: Field Inheritance
-  base_route: eventinstance.settings
-
 # Excluded dates settings admin page.
 entity.excluded_dates.collection:
   route_name: entity.excluded_dates.collection

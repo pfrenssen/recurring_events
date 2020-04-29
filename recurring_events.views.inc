@@ -29,30 +29,22 @@ function recurring_events_views_data_alter(array &$data) {
     ],
   ];
 
-  // Create a views field for each of the inherited fields.
-  $inherited_fields = \Drupal::entityTypeManager()->getStorage('field_inheritance')->loadMultiple();
-  $set = FALSE;
-  if (!empty($inherited_fields)) {
-    foreach ($inherited_fields as $field) {
-      if ($field->id() == 'title') {
-        $data['eventinstance_field_data']['table']['base']['defaults']['field'] = 'title';
-        $set = TRUE;
-      }
-      $data['eventinstance_field_data'][$field->id()] = [
-        'title' => $field->label(),
-        'field' => [
-          'title' => $field->label(),
-          'help' => t('The inherited @field field', [
-            '@field' => $field->label(),
-          ]),
-          'id' => 'inherited_field',
-          'field_name' => $field->id(),
-        ],
-      ];
-    }
-  }
+  // Set the default field for a view based on eventinstances.
+  $data['eventinstance_field_data']['table']['base']['defaults']['field'] = 'id';
 
-  if (!$set) {
-    $data['eventinstance_field_data']['table']['base']['defaults']['field'] = 'id';
-  }
+  // @todo Remove these declarations when
+  // https://www.drupal.org/project/drupal/issues/2489476 is resolved.
+  $data['eventinstance_field_data']['date__value']['filter']['id'] = 'datetime';
+  $data['eventinstance_field_data']['date__value']['filter']['field_name'] = 'date';
+  $data['eventinstance_field_data']['date__value']['sort']['id'] = 'datetime';
+  $data['eventinstance_field_data']['date__value']['sort']['field_name'] = 'date';
+  $data['eventinstance_field_data']['date__value']['argument']['id'] = 'datetime';
+  $data['eventinstance_field_data']['date__value']['argument']['field_name'] = 'date';
+
+  $data['eventinstance_field_data']['date__end_value']['filter']['id'] = 'datetime';
+  $data['eventinstance_field_data']['date__end_value']['filter']['field_name'] = 'date';
+  $data['eventinstance_field_data']['date__end_value']['sort']['id'] = 'datetime';
+  $data['eventinstance_field_data']['date__end_value']['sort']['field_name'] = 'date';
+  $data['eventinstance_field_data']['date__end_value']['argument']['id'] = 'datetime';
+  $data['eventinstance_field_data']['date__end_value']['argument']['field_name'] = 'date';
 }

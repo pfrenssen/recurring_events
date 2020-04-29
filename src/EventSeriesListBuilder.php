@@ -125,7 +125,7 @@ class EventSeriesListBuilder extends EntityListBuilder {
     $row['type'] = $entity->recur_type->value;
     $row['instances'] = $entity->getInstanceCount();
     $row['starts'] = $this->t('None');
-    $timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $timezone = new \DateTimeZone(date_default_timezone_get());
     if (!empty($entity->getSeriesStart())) {
       $config = $this->config->get('recurring_events.eventseries.config');
       $start_date = $entity->getSeriesStart();

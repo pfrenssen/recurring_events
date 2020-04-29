@@ -5,7 +5,7 @@ namespace Drupal\recurring_events_registration\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\recurring_events_registration\RegistrationCreationService;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -75,7 +75,7 @@ class RegistrantForm extends ContentEntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager'),
+      $container->get('entity.repository'),
       $container->get('messenger'),
       $container->get('recurring_events_registration.creation_service'),
       $container->get('current_user'),
@@ -89,8 +89,8 @@ class RegistrantForm extends ContentEntityForm {
   /**
    * Construct an RegistrantForm.
    *
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager service.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   *   The entity repository service.
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
    * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
@@ -107,7 +107,7 @@ class RegistrantForm extends ContentEntityForm {
    *   The entity type manager service.
    */
   public function __construct(
-    EntityManagerInterface $entity_manager,
+    EntityRepositoryInterface $entity_repository,
     Messenger $messenger,
     RegistrationCreationService $creation_service,
     AccountProxyInterface $current_user,
@@ -122,7 +122,7 @@ class RegistrantForm extends ContentEntityForm {
     $this->fieldManager = $field_manager;
     $this->routeMatch = $route_match;
     $this->entityTypeManager = $entity_type_manager;
-    parent::__construct($entity_manager);
+    parent::__construct($entity_repository);
   }
 
   /**
@@ -241,7 +241,9 @@ class RegistrantForm extends ContentEntityForm {
       $form['availability'] = [
         '#type' => 'markup',
         '#prefix' => '<span class="registration-availability">',
-        '#markup' => $this->t('Spaces Available: @availability', ['@availability' => $availability]),
+        '#markup' => $this->t('Spaces Available: @availability', [
+          '@availability' => ($availability == -1) ? $this->t('Unlimited') : $availability,
+        ]),
         '#suffix' => '</span>',
         '#weight' => -99,
       ];
@@ -295,12 +297,11 @@ class RegistrantForm extends ContentEntityForm {
    *   The form state interface.
    */
   protected function hideFormFields(array &$form, FormStateInterface $form_state) {
-    $form_fields = $this->fieldManager->getFieldDefinitions('registrant', 'registrant');
+    $form_fields = $this->fieldManager->getFieldDefinitions('registrant', $this->entity->getBundle());
 
     $availability = $this->creationService->retrieveAvailability();
     $waitlist = $this->creationService->hasWaitlist();
     $registration_open = $this->creationService->registrationIsOpen();
-    $reg_type = $this->creationService->getRegistrationType();
 
     // Prevent the form being displayed if registration is closed, or there are
     // no spaces left, and no waitlist.
@@ -351,7 +352,6 @@ class RegistrantForm extends ContentEntityForm {
       $availability = $this->creationService->retrieveAvailability();
       $waitlist = $this->creationService->hasWaitlist();
       $registration_open = $this->creationService->registrationIsOpen();
-      $reg_type = $this->creationService->getRegistrationType();
 
       $add_to_waitlist = $form_state->getValue('add_to_waitlist');
 
@@ -381,8 +381,6 @@ class RegistrantForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $entity = $this->entity;
-
     $event_series = $form_state->getTemporaryValue('series');
     // We need to grab a fresh copy of the series to check for updates.
     $event_series = $this->entityTypeManager->getStorage('eventseries')->load($event_series->id());

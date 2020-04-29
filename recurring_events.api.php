@@ -90,7 +90,7 @@ function hook_recurring_events_form_config_array_alter(array &$form_config = [])
  */
 function hook_recurring_events_entity_config_array_alter(array &$entity_config = []) {
   // Remove the first custom date.
-  unset($form_config['custom_dates'][0]);
+  unset($entity_config['custom_dates'][0]);
 }
 
 /**
@@ -101,21 +101,7 @@ function hook_recurring_events_entity_config_array_alter(array &$entity_config =
  */
 function hook_recurring_events_diff_array_alter(array &$diff = []) {
   // Do not show differences in custom dates.
-  unset($form_config['custom_dates']);
-}
-
-/**
- * Alter the inheritance class used to build the inherited basefield.
- *
- * @var string $class
- *   The class to alter.
- * @var Drupal\Core\Field\FieldDefinitionInterface $field
- *   The field context.
- */
-function hook_recurring_events_inheritance_class_alter(&$class, $field) {
-  if ($field->plugin() === 'entity_reference_inheritance') {
-    $class = '\Drupal\my_module\EntityReferenceFieldInheritanceFactory';
-  }
+  unset($diff['custom_dates']);
 }
 
 /**

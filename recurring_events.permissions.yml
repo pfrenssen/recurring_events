@@ -78,3 +78,15 @@ access eventseries overview:
 access eventinstance overview:
   title: 'Access the eventinstance overview page'
   description: 'View the table view of eventinstance'
+
+# Event Series Types Administration.
+administer eventseries types:
+  title: 'Administer eventseries types'
+  description: 'Manage types of eventseries.'
+  restrict access: true
+
+# Event Instance Types Administration.
+administer eventinstance types:
+  title: 'Administer eventinstance types'
+  description: 'Manage types of eventinstance.'
+  restrict access: true

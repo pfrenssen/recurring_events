@@ -81,7 +81,7 @@ function recurring_events_tokens($type, $tokens, array $data, array $options, Bu
   if ($type == 'eventinstance' && !empty($data['eventinstance'])) {
     $event_instance = $data['eventinstance'];
     $date_format = \Drupal::config('recurring_events.eventinstance.config')->get('date_format');
-    $timezone = new \DateTimeZone(drupal_get_user_timezone());
+    $timezone = new \DateTimeZone(date_default_timezone_get());
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'title':
