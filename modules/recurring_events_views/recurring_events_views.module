@@ -126,9 +126,10 @@ function recurring_events_views_views_pre_render(ViewExecutable $view) {
           $name = $eventinstance->title->value;
           switch ($service->getRegistrationType()) {
             case 'instance':
+              $timezone = new \DateTimeZone(date_default_timezone_get());
               $title = t('Registrations for %name on %date', [
                 '%name' => $name,
-                '%date' => $eventinstance->date->start_date->format($format),
+                '%date' => $eventinstance->date->start_date->setTimezone($timezone)->format($format),
               ]);
               break;
 
