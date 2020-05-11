@@ -227,43 +227,63 @@ function recurring_events_eventseries_insert(EntityInterface $entity) {
   // the series at that point. Now that the eventseries is properly saved we can
   // go and set the eventseries_id on the eventinstances.
   $instances = $entity->event_instances->referencedEntities();
+  $creation_service = \Drupal::service('recurring_events.event_creation_service');
   if (!empty($instances)) {
     foreach ($instances as $instance) {
-      if (empty($instance->eventseries_id->value)) {
+      if (empty($instance->eventseries_id->target_id)) {
         $instance->set('eventseries_id', $entity->id());
         $instance->setNewRevision(FALSE);
-
-        // Configure the field inheritances for this instance.
-        $entity_type = $instance->getEntityTypeId();
-        $bundle = $instance->bundle();
-        $inherited_field_ids = \Drupal::entityQuery('field_inheritance')
-          ->condition('sourceEntityType', 'eventseries')
-          ->condition('destinationEntityType', $entity_type)
-          ->condition('destinationEntityBundle', $bundle)
-          ->execute();
-
-        if (!empty($inherited_field_ids)) {
-          $state_key = $entity_type . ':' . $instance->uuid();
-          $state = \Drupal::keyValue('field_inheritance');
-          $state_values = $state->get($state_key);
-
-          $inherited_fields = \Drupal::entityTypeManager()->getStorage('field_inheritance')->loadMultiple($inherited_field_ids);
-          $state_values = [
-            'enabled' => TRUE,
-          ];
-          if (!empty($inherited_fields)) {
-            foreach ($inherited_fields as $inherited_field) {
-              $name = $inherited_field->idWithoutTypeAndBundle();
-              $state_values[$name] = [
-                'entity' => $instance->getEventSeries()->id(),
-              ];
-            }
-          }
-          $state->set($state_key, $state_values);
-        }
-
         $instance->save();
+
+        $creation_service->configureDefaultInheritances($instance, $entity->id());
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function recurring_events_field_inheritance_insert(EntityInterface $entity) {
+  if ($entity->sourceEntityType() === 'eventseries' && $entity->destinationEntityType() === 'eventinstance') {
+    $creation_service = \Drupal::service('recurring_events.event_creation_service');
+    $bundle = $entity->destinationEntityBundle();
+
+    $instances = \Drupal::entityTypeManager()->getStorage('eventinstance')->loadByProperties(['type' => $bundle]);
+    if (!empty($instances)) {
+      foreach ($instances as $instance) {
+        $creation_service->addNewDefaultInheritance($instance, $entity);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function recurring_events_field_inheritance_update(EntityInterface $entity) {
+  if ($entity->sourceEntityType() === 'eventseries' && $entity->destinationEntityType() === 'eventinstance') {
+    $creation_service = \Drupal::service('recurring_events.event_creation_service');
+    $bundle = $entity->destinationEntityBundle();
+
+    $instances = \Drupal::entityTypeManager()->getStorage('eventinstance')->loadByProperties(['type' => $bundle]);
+    if (!empty($instances)) {
+      foreach ($instances as $instance) {
+        $creation_service->addNewDefaultInheritance($instance, $entity);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function recurring_events_eventseries_update(EntityInterface $entity) {
+  $creation_service = \Drupal::service('recurring_events.event_creation_service');
+  $instances = $entity->event_instances->referencedEntities();
+  if (!empty($instances)) {
+    foreach ($instances as $instance) {
+      $creation_service->configureDefaultInheritances($instance, $entity->id());
     }
   }
 }
@@ -315,6 +335,16 @@ function recurring_events_eventseries_type_insert(EntityInterface $entity) {
     ]);
     $instance_description->save();
   }
+
+  // Ensure that field_inheritance is enabled for the new instance bundle.
+  $config = \Drupal::configFactory()->getEditable('field_inheritance.config');
+  $data = $config->getRawData();
+  $included_bundles = $data['included_bundles'];
+  $included_bundles = explode(',', $included_bundles);
+  $included_bundles[] = 'eventinstance:' . $series_type_id;
+  sort($included_bundles);
+  $data['included_bundles'] = implode(',', $included_bundles);
+  $config->setData($data)->save();
 
   if (\Drupal::moduleHandler()->moduleExists('recurring_events_registration')) {
     $registrant_types = \Drupal::entityTypeManager()->getStorage('registrant_type')->load($series_type_id);
