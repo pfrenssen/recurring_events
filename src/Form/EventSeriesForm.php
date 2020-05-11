@@ -316,7 +316,7 @@ class EventSeriesForm extends ContentEntityForm {
 
     if ($trigger['#id'] !== 'edit-confirm' && array_search($trigger['#name'], $ignored_triggers) === FALSE && $editing) {
       $original = $this->storage->loadUnchanged($entity->id());
-      if ($this->creationService->checkForFormRecurConfigChanges($original, $form_state)) {
+      if (empty($form_state->getErrors()) && $this->creationService->checkForFormRecurConfigChanges($original, $form_state)) {
         $this->step = 1;
         $form_state->setRebuild(TRUE);
       }
