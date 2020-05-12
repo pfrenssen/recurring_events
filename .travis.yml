@@ -49,7 +49,7 @@ before_script:
   - export SIMPLETEST_DB=mysql://root:@127.0.0.1/$MODULE
 
   # Create a new Drupal project using the appropriate version using Composer.
-  - COMPOSER_MEMORY_LIMIT=-1 composer create-project drupal/recommended-project:$DRUPAL_CORE drupal --stability dev --no-interaction
+  - COMPOSER_MEMORY_LIMIT=-1 composer create-project drupal/recommended-project:$DRUPAL_CORE drupal --stability dev --dev --no-interaction
   - cd drupal
   - DRUPAL_ROOT=$(pwd)
 
@@ -86,7 +86,7 @@ script:
   - ./vendor/bin/drush runserver --default-server=builtin 8888 > /dev/null &
 
   # Run the PHPUnit tests.
-  - ./vendor/bin/phpunit -c ./web/modules/contrib/$MODULE/phpunit.xml --verbose --group=$MODULE
+  - ./vendor/bin/phpunit -c ./web/core/phpunit.xml.dist --verbose --group=$MODULE ./web/modules/contrib/$MODULE
 
   # Run the deprecation checks.
   - ./vendor/bin/drupal-check ./web/modules/contrib/$MODULE
