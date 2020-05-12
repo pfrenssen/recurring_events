@@ -86,7 +86,7 @@ script:
   - ./vendor/bin/drush runserver --default-server=builtin 8888 > /dev/null &
 
   # Run the PHPUnit tests.
-  - ./vendor/bin/phpunit -c ./web/core/phpunit.xml.dist --verbose --group=$MODULE ./web/modules/contrib/$MODULE
+  - ./vendor/bin/phpunit -c ./web/modules/contrib/$MODULE/phpunit.xml --verbose --group=$MODULE
 
   # Run the deprecation checks.
   - ./vendor/bin/drupal-check ./web/modules/contrib/$MODULE
