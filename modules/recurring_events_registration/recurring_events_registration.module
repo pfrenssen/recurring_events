@@ -14,93 +14,28 @@ use Drupal\recurring_events_registration\Entity\Registrant;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\Core\Url;
+use Drupal\Component\Utility\Html;
 
 /**
  * Implements hook_help().
  */
 function recurring_events_registration_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
-    // Main module help for the recurring_events_registration module.
+    // Main module help for the recurring_events_views module.
     case 'help.page.recurring_events_registration':
-      $output = '';
-      $output .= '<h2>' . t('Introduction') . '</h2>';
-      $output .= '<p>' . t('The Recurring Events Registration module is a submodule of <code>recurring_events</code>. It provides a registration system designed to be site agnostic and extensible.') . '</p>';
-      $output .= '<h2>' . t('Data Modeling Concepts') . '</h2>';
-      $output .= '<p>' . t('The <code>registrant</code> custom entity type represents a single person who has registered for an <code>eventseries</code> or <code>eventinstance</code> - depending on the registration configuration for the <code>eventseries</code>. The <code>registrant</code> entity type is only available when the <code>recurring_events_registration</code> sub-module is enabled.') . '</p>';
-      $output .= '<p>' . t('The <code>registrant</code> entity type has one base field - <code>email</code>, because email is so integral to most registration systems. The entity is also fieldable and the module ships with some installation configuration to add first name, last name and phone number. These are added using the Fields API, so they can be removed or edited as needed.') . '</p>';
-      $output .= '<p>' . t('Registrants are not revisionable or translatable.') . '</p>';
-      $output .= '<p>' . t('If an <code>eventseries</code> is set to have registrations enabled, then a number of things are checked:') . '</p>';
-      $output .= '<ol>';
-      $output .= '<li>' . t('What is the capacity of the event?') . '</li>';
-      $output .= '<li>' . t('How many users are already registered?') . '</li>';
-      $output .= '<li>' . t('Is there a waiting list?') . '</li>';
-      $output .= '</ol>';
-      $output .= '<p>' . t('The answer to those questions dictates what experience a user has when they try to register for an event. If registration is enabled and there is capacity then the user will be able to register for the event one at a time. If there is no capacity left, but there is a waiting list the verbiage will change a little and the user will be added to a waitlist instead. If there is no capacity and no waitlist, then the user cannot register.') . '</p>';
-      $output .= '<p>' . t('There are several settings related to registration for events:') . '</p>';
-      $output .= '<ol>';
-      $output .= '<li>' . t('Registration type');
-      $output .= '<p>' . t('There are two registration types:') . '</p>';
-      $output .= '<ol>';
-      $output .= '<li>' . t('Series Registration - when this mode is used users register for all instances in a series with one registration. This is helpful should a user need to attend all instances in a series, for example if the series was a set of six computer classes.') . '</li>';
-      $output .= '<li>' . t('Instance Registration - when this mode is used users register for individual instances in a series. This is helpful if a user does not need to attend every event, for example if the series is a recurring story time at a library with limited capacity.') . '</li>';
-      $output .= '</ol></li>';
-      $output .= '<li>' . t('Registration Dates');
-      $output .= '<p>' . t('A user creating an event series can specify when registration is allowed for an event series or instance. There are two options:') . '</p>';
-      $output .= '<ol>';
-      $output .= '<li>' . t('Open Registration - when this mode is enabled then registration for an event instance is available from the moment the instance is published, until the moment the instance begins. For series registration users are able to register from the moment the instances are published until the moment the first event in the series begins.') . '</li>';
-      $output .= '<li>' . t('Scheduled Registration - when registering for an entire series, users are able to specify the date and time that event registration opens and closes. For individual instance registration a user can specify how many days or hours prior to the instance start date that registration opens - in this case, registration closes when the event instance begins.') . '</li>';
-      $output .= '</ol></li>';
-      $output .= '<li>' . t('Capacity');
-      $output .= '<p>' . t('Users can specify how many registrants can attend an event. If event series registration is enabled, then the capacity applies across all instances. If individual event instance registration is enabled, then each instance will have the same capacity.') . '</p></li>';
-      $output .= '<li>' . t('Waitlist');
-      $output .= '<p>' . t('Users can specify whether an event has a waitlist. If event series registration is enabled, then the waitlist applies across all instances. If individual event instance registration is enabled, then each instance will have its own waitlist. When an event is full users will automatically get added to the waitlist if enabled. If a spot opens up on the registration list because someone deleted their registration, then the first person on the waitlist is automatically promoted to the registration list.') . '</p></li>';
-      $output .= '</ol>';
-      $output .= '<p>' . t('Users with appropriate permissions will be allowed to view the list of registrants for an event and modify or delete them.') . '</p>';
-      $output .= '<p>' . t('<code>Authenticated users</code> are able to modify and delete their own registrations through their account page via a new <code>Registrations</code> tab in the user profile.') . '</p>';
-      $output .= '<p>' . t('<code>Anonymous users</code> can optionally receive an email to the email address provided, with a unique URL to edit/cancel their registration. The URL will contain a UUID value to make them difficult to guess and therefore reduce the risk of gaming the system. An <code>anonymous user</code> will be unable to view a list of their registrations anywhere because they do not have an account page. Instead, they will manage their registrations purely through emails and links within those emails.') . '</p>';
-      $output .= '<h2>' . t('Registration Emails') . '</h2>';
-      $output .= '<p>' . t('The ability to enable/disable individual registration emails or modify their subject/body fields is built in to the core of the module. This gives users lots of flexibility when it comes to messaging registrants. There are a number of tokens available to administrators to use in the emails.') . '</p>';
-      $output .= '<p>' . t('Out-of-the-box the following registrant emails are available') . '</p>';
-      $output .= '<table><thead><tr>';
-      $output .= '<th>' . t('Email') . '</th>';
-      $output .= '<th>' . t('Notes') . '</th></tr></thead>';
-      $output .= '<tr>';
-      $output .= '<td>' . t('Registration') . '</td>';
-      $output .= '<td>' . t('Send an email to a registrant to confirm they were registered for an event') . '</td>';
-      $output .= '</tr>';
-      $output .= '<tr>';
-      $output .= '<td>' . t('Waitlist') . '</td>';
-      $output .= '<td>' . t('Send an email to a registrant to confirm they were added to the waitlist') . '</td>';
-      $output .= '</tr>';
-      $output .= '<tr>';
-      $output .= '<td>' . t('Promotion') . '</td>';
-      $output .= '<td>' . t('Send an email to a registrant to confirm they were promoted from the waitlist') . '</td>';
-      $output .= '</tr>';
-      $output .= '<tr>';
-      $output .= '<td>' . t('Instance Deletion') . '</td>';
-      $output .= '<td>' . t('Send an email to a registrant to confirm an instance deletion') . '</td>';
-      $output .= '</tr>';
-      $output .= '<tr>';
-      $output .= '<td>' . t('Series Deletion') . '</td>';
-      $output .= '<td>' . t('Send an email to a registrant to confirm a series deletion') . '</td>';
-      $output .= '</tr>';
-      $output .= '<tr>';
-      $output .= '<td>' . t('Instance Modification') . '</td>';
-      $output .= '<td>' . t('Send an email to a registrant to confirm an instance modification') . '</td>';
-      $output .= '</tr>';
-      $output .= '<tr>';
-      $output .= '<td>' . t('Series Modification') . '</td>';
-      $output .= '<td>' . t('Send an email to a registrant to confirm a series modification') . '</td>';
-      $output .= '</tr>';
-      $output .= '</table>';
-      $output .= '<p>' . t('More can be added using the Registrant API by implementing the <code>hook_recurring_events_registration_notification_types_alter</code> hook.') . '</p>';
-      $output .= '<p>' . t('Users with appropriate permissions are also able to resend emails to registrants in the case that an email was not delivered. This is available from the registrant list pages.') . '</p>';
-      $output .= '<p>' . t('Users with appropriate permissions can also contact all registrants of an event through a form where they can specify the subject and body of the email, again with tokens available. Users can specify whether to contact just registrants, just waitlisted users, or both.') . '</p>';
-      $output .= '<h2>' . t('Hooks, extensibility and APIs') . '</h2>';
-      $output .= '<p>' . t('The Recurring Events Registration module exposes its own hooks to use to modify core functionality. These hooks are defined in: <code>recurring_events_registration.api.php</code>.') . '</p>';
-      return $output;
-
-    default:
+      $text = file_get_contents(__DIR__ . '/README.md');
+      if (!\Drupal::moduleHandler()->moduleExists('markdown')) {
+        return '<pre>' . Html::escape($text) . '</pre>';
+      }
+      else {
+        // Use the Markdown filter to render the README.
+        $filter_manager = \Drupal::service('plugin.manager.filter');
+        $settings = \Drupal::configFactory()->get('markdown.settings')->getRawData();
+        $config = ['settings' => $settings];
+        $filter = $filter_manager->createInstance('markdown', $config);
+        return $filter->process($text, 'en');
+      }
+      break;
   }
 }
 
