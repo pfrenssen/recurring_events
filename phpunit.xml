@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit colors="true"
-         beStrictAboutTestsThatDoNotTestAnything="true"
-         beStrictAboutOutputDuringTests="true"
-         beStrictAboutChangesToGlobalState="true"
-         printerClass="\Drupal\Tests\Listeners\HtmlOutputPrinter">
+<phpunit colors="true">
     <php>
         <!-- Set error reporting to E_ALL. -->
         <ini name="error_reporting" value="32767"/>
