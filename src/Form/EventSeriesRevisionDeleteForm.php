@@ -79,9 +79,8 @@ class EventSeriesRevisionDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    $entity_manager = $container->get('entity.manager');
     return new static(
-      $entity_manager->getStorage('eventseries'),
+      $container->get('entity_type.manager')->getStorage('eventseries'),
       $container->get('database'),
       $container->get('date.formatter'),
       $container->get('messenger')

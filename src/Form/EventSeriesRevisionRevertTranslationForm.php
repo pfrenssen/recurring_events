@@ -61,7 +61,7 @@ class EventSeriesRevisionRevertTranslationForm extends EventSeriesRevisionRevert
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager')->getStorage('eventseries'),
+      $container->get('entity_type.manager')->getStorage('eventseries'),
       $container->get('date.formatter'),
       $container->get('language_manager'),
       $container->get('datetime.time')

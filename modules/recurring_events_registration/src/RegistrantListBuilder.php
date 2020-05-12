@@ -47,7 +47,7 @@ class RegistrantListBuilder extends EntityListBuilder {
   protected $entityFieldManager;
 
   /**
-   * Constructs a new EventInstanceListBuilder object.
+   * Constructs a new RegistrantListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
@@ -79,7 +79,7 @@ class RegistrantListBuilder extends EntityListBuilder {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('entity_type.manager')->getStorage($entity_type->id()),
       $container->get('config.factory'),
       $container->get('request_stack'),
       $container->get('recurring_events_registration.creation_service'),

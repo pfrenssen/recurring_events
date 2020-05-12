@@ -79,9 +79,8 @@ class EventInstanceRevisionDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    $entity_manager = $container->get('entity.manager');
     return new static(
-      $entity_manager->getStorage('eventinstance'),
+      $container->get('entity_type.manager')->getStorage('eventinstance'),
       $container->get('database'),
       $container->get('date.formatter'),
       $container->get('messenger')
