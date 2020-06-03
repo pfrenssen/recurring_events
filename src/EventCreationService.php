@@ -220,10 +220,12 @@ class EventCreationService {
 
     $config['type'] = $user_input['recur_type'];
 
-    $config['excluded_dates'] = $config['included_dates'] = [];
+    $config['excluded_dates'] = [];
     if (!empty($user_input['excluded_dates'])) {
       $config['excluded_dates'] = $this->getDatesFromForm($user_input['excluded_dates']);
     }
+
+    $config['included_dates'] = [];
     if (!empty($user_input['included_dates'])) {
       $config['included_dates'] = $this->getDatesFromForm($user_input['included_dates']);
     }
