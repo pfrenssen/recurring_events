@@ -134,22 +134,12 @@ class RegistrantForm extends ContentEntityForm {
     /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
     $entity = $this->entity;
 
-    if (!$entity->isNew()) {
-      $event_instance = $entity->getEventInstance();
-      $editing = TRUE;
-    }
-    else {
-      $event_instance = $this->routeMatch->getParameter('eventinstance');
-      $editing = FALSE;
-    }
+    $event_instance = $this->routeMatch->getParameter('eventinstance');
+    $editing = !$entity->isNew();
 
     if (empty($event_instance)) {
       throw new NotFoundHttpException();
     }
-
-    $event_series = $event_instance->getEventSeries();
-    $form_state->setTemporaryValue('series', $event_series);
-    $form_state->setTemporaryValue('event', $event_instance);
 
     // Use the registration creation service to grab relevant data.
     $this->creationService->setEventInstance($event_instance);
@@ -337,12 +327,8 @@ class RegistrantForm extends ContentEntityForm {
     // Only perform the checks if the entity is new.
     if ($entity->isNew()) {
 
-      $event_series = $form_state->getTemporaryValue('series');
-      // We need to grab a fresh copy of the series to check for updates.
-      $event_series = $this->entityTypeManager->getStorage('eventseries')->load($event_series->id());
-
-      // Grab the event instance so we can check if registration is open.
-      $event_instance = $form_state->getTemporaryValue('event');
+      $event_instance = $this->routeMatch->getParameter('eventinstance');
+      $event_series = $event_instance->getEventSeries();
 
       // Use the registration creation service to grab relevant data.
       $this->creationService->setEventInstance($event_instance);
@@ -357,16 +343,16 @@ class RegistrantForm extends ContentEntityForm {
 
       // Registration has closed.
       if (!$registration_open) {
-        $form_state->setError($form, '');
+        $form_state->setError($form, $this->t('Unfortunately, registration has closed.'));
       }
       // Capacity is full, there is a waitlist, but user was not being added to
       // the waitlist.
       elseif (!$add_to_waitlist && $availability == 0 && $waitlist) {
-        $form_state->setError($form, '');
+        $form_state->setError($form, $this->t('Unfortunately, this event is now full and you must join the waitlist.'));
       }
       // There are no spaces left, and there is no waitlist.
       elseif ($availability == 0 && !$waitlist) {
-        $form_state->setError($form, '');
+        $form_state->setError($form, $this->t('Unfortunately, this event is now full.'));
       }
     }
     else {
@@ -381,10 +367,8 @@ class RegistrantForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $event_series = $form_state->getTemporaryValue('series');
-    // We need to grab a fresh copy of the series to check for updates.
-    $event_series = $this->entityTypeManager->getStorage('eventseries')->load($event_series->id());
-    $event_instance = $form_state->getTemporaryValue('event');
+    $event_instance = $this->routeMatch->getParameter('eventinstance');
+    $event_series = $event_instance->getEventSeries();
 
     // Use the registration creation service to grab relevant data.
     $this->creationService->setEventInstance($event_instance);
