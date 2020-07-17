@@ -147,6 +147,26 @@ class RegistrationCreationService {
   }
 
   /**
+   * Get the event instance.
+   *
+   * @return Drupal\recurring_events\Entity\EventInstance $event_instance
+   *   The event instance.
+   */
+  public function getEventInstance() {
+    return $this->eventInstance;
+  }
+
+  /**
+   * Get the event series.
+   *
+   * @return Drupal\recurring_events\Entity\EventSeries $event_series
+   *   The event series.
+   */
+  public function getEventSeries() {
+    return $this->eventSeries;
+  }
+
+  /**
    * Retreive all registered parties.
    *
    * @param bool $include_nonwaitlisted
