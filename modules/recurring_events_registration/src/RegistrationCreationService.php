@@ -149,7 +149,7 @@ class RegistrationCreationService {
   /**
    * Get the event instance.
    *
-   * @return Drupal\recurring_events\Entity\EventInstance $event_instance
+   * @return Drupal\recurring_events\Entity\EventInstance
    *   The event instance.
    */
   public function getEventInstance() {
@@ -159,7 +159,7 @@ class RegistrationCreationService {
   /**
    * Get the event series.
    *
-   * @return Drupal\recurring_events\Entity\EventSeries $event_series
+   * @return Drupal\recurring_events\Entity\EventSeries
    *   The event series.
    */
   public function getEventSeries() {
