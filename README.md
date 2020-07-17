@@ -1,9 +1,11 @@
+[![Build Status](https://travis-ci.org/owenbush/recurring_events.svg?branch=2.0.x)](https://travis-ci.org/owenbush/recurring_events)
+
 Introduction
 ------------
 
-The main module offers the basic building blocks to build a recurring events
-management system, and the APIs and integrations enable developers and site
-builders to extend and enhance the core functionality.
+The recurring events module offers the basic building blocks to build a
+recurring events management system, and the APIs and integrations enable
+developers and site builders to extend and enhance the core functionality.
 
 ### Module Hierarchy
 
