@@ -16,6 +16,7 @@ function recurring_events_views_data_alter(array &$data) {
       'title' => t('Event series instance count'),
       'help' => t('The number of event instances in a series.'),
       'id' => 'eventseries_instance_count',
+      'click sortable' => FALSE,
     ],
   ];
 
@@ -26,6 +27,7 @@ function recurring_events_views_data_alter(array &$data) {
       'title' => t('Event series start date'),
       'help' => t('The date on which an event first occurs.'),
       'id' => 'eventseries_start_date',
+      'click sortable' => FALSE,
     ],
   ];
 

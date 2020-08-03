@@ -19,6 +19,7 @@ function recurring_events_registration_views_data_alter(array &$data) {
       'help' => t('The number of registration spaces available for an event instance.'),
       'field' => 'event_registration__capacity',
       'id' => 'eventinstance_registration_availability',
+      'click sortable' => FALSE,
     ],
     'filter' => [
       'title' => t('Registration Availability'),
@@ -34,6 +35,7 @@ function recurring_events_registration_views_data_alter(array &$data) {
       'title' => t('Capacity'),
       'help' => t('The number of registration spaces available for an event instance'),
       'id' => 'eventinstance_capacity',
+      'click sortable' => FALSE,
     ],
   ];
 
@@ -43,6 +45,7 @@ function recurring_events_registration_views_data_alter(array &$data) {
       'title' => t('Registration Count'),
       'help' => t('The number of registrations for an event instance.'),
       'id' => 'eventinstance_registration_count',
+      'click sortable' => FALSE,
     ],
   ];
 
@@ -52,6 +55,7 @@ function recurring_events_registration_views_data_alter(array &$data) {
       'title' => t('Waitlist Count'),
       'help' => t('The number of waitlisted registrants for an event instance.'),
       'id' => 'eventinstance_waitlist_count',
+      'click sortable' => FALSE,
     ],
   ];
 
