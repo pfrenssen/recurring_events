@@ -5,7 +5,6 @@ language: php
 sudo: true
 
 php:
-  - 7.1
   - 7.2
   - 7.3
 
@@ -23,8 +22,6 @@ env:
 matrix:
   fast_finish: true
   exclude:
-    - php: 7.1
-      env: DRUPAL_CORE=9.0.x DRUSH_VER=10.0
     - php: 7.2
       env: DRUPAL_CORE=9.0.x DRUSH_VER=10.0
 
@@ -62,7 +59,7 @@ before_script:
   # fullcalendar_view, tests fail if those modules do not exist, so here we add
   # them manually to prevent failing tests.
   - COMPOSER_MEMORY_LIMIT=-1 composer require drupal/group:1.x-dev
-  - COMPOSER_MEMORY_LIMIT=-1 composer require fullcalendar_view
+  - COMPOSER_MEMORY_LIMIT=-1 composer require drupal/fullcalendar_view
 
   - cd $DRUPAL_ROOT
 
