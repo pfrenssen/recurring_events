@@ -4,7 +4,7 @@ namespace Drupal\recurring_events\Plugin\FullcalendarViewProcessor;
 
 use Drupal\fullcalendar_view\Plugin\FullcalendarViewProcessorBase;
 use Drupal\recurring_events\Entity\EventInstance;
-use Drupal\Component\Utility\Xss;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Recurring Events Full Calendar View Processor plugin.
@@ -18,6 +18,8 @@ use Drupal\Component\Utility\Xss;
  * )
  */
 class RecurringEventsFullCalendarProcessor extends FullcalendarViewProcessorBase {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -55,7 +57,7 @@ class RecurringEventsFullCalendarProcessor extends FullcalendarViewProcessorBase
         $title = $fields[$options['title']]->advancedRender($row);
       }
       else {
-        $title = t('Invalid event title');
+        $title = $this->t('Invalid event title');
       }
 
       $entries[$key]['title'] = $title;
