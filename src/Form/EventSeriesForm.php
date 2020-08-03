@@ -289,7 +289,7 @@ class EventSeriesForm extends ContentEntityForm {
     $form['meta']['author'] = [
       '#type' => 'item',
       '#title' => $this->t('Author'),
-      '#markup' => $entity->getOwner()->getUsername(),
+      '#markup' => $entity->getOwner()->getDisplayName(),
       '#wrapper_attributes' => ['class' => ['entity-meta__author']],
     ];
 
