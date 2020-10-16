@@ -15,6 +15,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 
 /**
  * Form controller for Registrant edit forms.
@@ -85,6 +87,8 @@ class RegistrantForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.repository'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time'),
       $container->get('messenger'),
       $container->get('recurring_events_registration.creation_service'),
       $container->get('current_user'),
@@ -101,6 +105,10 @@ class RegistrantForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle service.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
    * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
@@ -120,6 +128,8 @@ class RegistrantForm extends ContentEntityForm {
    */
   public function __construct(
     EntityRepositoryInterface $entity_repository,
+    EntityTypeBundleInfoInterface $entity_type_bundle_info,
+    TimeInterface $time,
     Messenger $messenger,
     RegistrationCreationService $creation_service,
     AccountProxyInterface $current_user,
@@ -136,7 +146,7 @@ class RegistrantForm extends ContentEntityForm {
     $this->routeMatch = $route_match;
     $this->entityTypeManager = $entity_type_manager;
     $this->cacheTagsInvalidator = $cache_tags_invalidator;
-    parent::__construct($entity_repository);
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
   }
 
   /**
