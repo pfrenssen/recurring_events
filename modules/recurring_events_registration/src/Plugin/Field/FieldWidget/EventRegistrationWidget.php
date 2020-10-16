@@ -39,11 +39,11 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       '#type' => 'radios',
       '#options' => [
         '1' => $this->t('Show'),
-        '0' => $this->t('Hide')
+        '0' => $this->t('Hide'),
       ],
       '#title' => $this->t('Enable Waiting List'),
       '#default_value' => $this->getSetting('show_enable_waitlist'),
-      '#description' => $this->t('This will show/hide the "Enable Waiting List" checkbox in the Add/Edit Series form')
+      '#description' => $this->t('This will show/hide the "Enable Waiting List" checkbox in the Add/Edit Series form'),
     ];
 
     return $element;
@@ -56,7 +56,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
     $summary = [];
 
     $enable_waitlist = $this->getSetting('show_enable_waitlist') ? $this->t('On') : $this->t('Off');
-    $summary[] = $this->t('Enable Waiting list is: @value', array('@value' => $enable_waitlist));
+    $summary[] = $this->t('Enable Waiting list is: @value', ['@value' => $enable_waitlist]);
 
     return $summary;
   }
