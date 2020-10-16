@@ -25,6 +25,45 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings() {
+    return [
+      'show_enable_waitlist' => TRUE,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element['show_enable_waitlist'] = [
+      '#type' => 'radios',
+      '#options' => [
+        '1' => $this->t('Show'),
+        '0' => $this->t('Hide')
+      ],
+      '#title' => $this->t('Enable Waiting List'),
+      '#default_value' => $this->getSetting('show_enable_waitlist'),
+      '#description' => $this->t('This will show/hide the "Enable Waiting List" checkbox in the Add/Edit Series form')
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+
+    $enable_waitlist = $this->getSetting('show_enable_waitlist') ? $this->t('On') : $this->t('Off');
+    $summary[] = $this->t('Enable Waiting list is: @value', array('@value' => $enable_waitlist));
+
+    return $summary;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
@@ -231,17 +270,21 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       ],
     ];
 
+    $enable_waitlist = $this->getSetting('show_enable_waitlist');
+    $waitlist_default_value = $enable_waitlist ? ($items[$delta]->waitlist ?? FALSE) : FALSE;
+    $items[$delta]->waitlist = 1;
     $element['waitlist'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable Waiting List'),
       '#description' => $this->t('Enable a waiting list if the number of registrations reaches capacity.'),
       '#weight' => 6,
-      '#default_value' => $items[$delta]->waitlist ?: '',
+      '#default_value' => $waitlist_default_value,
       '#states' => [
         'visible' => [
           ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
         ],
       ],
+      '#access' => $enable_waitlist ? TRUE : FALSE,
     ];
 
     return $element;

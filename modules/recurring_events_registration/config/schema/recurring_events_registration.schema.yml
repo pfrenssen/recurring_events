@@ -80,3 +80,11 @@ recurring_events_registration.registrant.config:
     series_modification_notification_body:
       type: string
       label: 'The email body for the series modification emails'
+
+field.widget.settings.event_registration:
+  type: mapping
+  label: 'Recurring Events Show Enable Waitlist'
+  mapping:
+    show_enable_waitlist:
+      type: boolean
+      label: 'Enable Waiting List'
