@@ -58,7 +58,7 @@ before_script:
   # Because recurring_events integrates with, but does not require group and
   # fullcalendar_view, tests fail if those modules do not exist, so here we add
   # them manually to prevent failing tests.
-  - COMPOSER_MEMORY_LIMIT=-1 composer require drupal/group:1.x-dev
+  - COMPOSER_MEMORY_LIMIT=-1 composer require drupal/group:1.x
   - COMPOSER_MEMORY_LIMIT=-1 composer require drupal/fullcalendar_view
 
   - cd $DRUPAL_ROOT
