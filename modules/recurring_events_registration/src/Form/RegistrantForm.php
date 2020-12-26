@@ -411,7 +411,7 @@ class RegistrantForm extends ContentEntityForm {
 
     $form_state->setRedirect('entity.registrant.add_form', ['eventinstance' => $event_instance->id()]);
 
-    if ($registration && $registration_open && ($availability > 0 || $waitlist)) {
+    if ($registration && $registration_open && ($availability > 0 || $availability == -1 || $waitlist)) {
       $add_to_waitlist = (int) $form_state->getValue('add_to_waitlist');
       $this->entity->setEventSeries($event_series);
       $this->entity->setEventInstance($event_instance);
