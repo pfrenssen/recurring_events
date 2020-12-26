@@ -175,3 +175,18 @@ function recurring_events_registration_update_8003() {
     }
   }
 }
+
+/**
+ * Add the default registration message configurations.
+ */
+function recurring_events_registration_update_8004() {
+  // Configure the registrantion messages.
+  \Drupal::configFactory()->getEditable('recurring_events_registration.registrant.config')
+    ->set('successfully_registered', 'Registrant successfully created.')
+    ->set('successfully_registered_waitlist', 'Successfully registered to the waitlist.')
+    ->set('successfully_updated', 'Registrant successfully updated.')
+    ->set('successfully_updated_waitlist', 'Successfully updated waitlist registrant.')
+    ->set('already_registered', 'ser already registered for this event.')
+    ->set('registration_closed', 'Unfortunately, registration is not available at this time.')
+    ->save(TRUE);
+}
