@@ -421,16 +421,16 @@ class RegistrantForm extends ContentEntityForm {
 
       switch ($status) {
         case SAVED_NEW:
-          $message = $this->t('Registrant successfully created.');
+          $message = $this->t($this->config('recurring_events_registration.registrant.config')->get('successfully_registered'));
           if ($add_to_waitlist) {
-            $message = $this->t('Successfully registered to the waitlist.');
+            $message = $this->t($this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist'));
           }
           break;
 
         default:
-          $message = $this->t('Registrant successfully updated.');
+          $message = $this->t($this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist'));
           if ($add_to_waitlist) {
-            $message = $this->t('Successfully updated waitlist registrant.');
+            $message = $this->t($this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist'));
           }
           break;
       }
@@ -452,7 +452,7 @@ class RegistrantForm extends ContentEntityForm {
       $this->cacheTagsInvalidator->invalidateTags($tags);
     }
     else {
-      $this->messenger->addMessage($this->t('Unfortunately, registration is not available at this time.'));
+      $this->messenger->addMessage($this->t($this->config('recurring_events_registration.registrant.config')->get('registration_closed')));
     }
 
   }
