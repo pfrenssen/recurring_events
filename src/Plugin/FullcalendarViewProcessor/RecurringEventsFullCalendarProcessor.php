@@ -25,7 +25,7 @@ class RecurringEventsFullCalendarProcessor extends FullcalendarViewProcessorBase
    * {@inheritdoc}
    */
   public function process(array &$variables) {
-    /* @var \Drupal\views\ViewExecutable $view */
+    /** @var \Drupal\views\ViewExecutable $view */
     $view = $variables['view'];
     $options = $view->style_plugin->options;
     $fields = $view->field;

@@ -8,7 +8,7 @@ use Drupal\Core\Messenger\Messenger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class EventSeriesTypeForm.
+ * Provides a form for creating event series types.
  */
 class EventSeriesTypeForm extends EntityForm {
 

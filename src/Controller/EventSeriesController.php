@@ -249,7 +249,12 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
     $has_translations = (count($languages) > 1);
     $eventseries_storage = $this->entityTypeManager()->getStorage('eventseries');
 
-    $build['#title'] = $has_translations ? $this->t('@langname revisions for %title', ['@langname' => $langname, '%title' => $eventseries->label()]) : $this->t('Revisions for %title', ['%title' => $eventseries->label()]);
+    $build['#title'] = $has_translations ? $this->t('@langname revisions for %title', [
+      '@langname' => $langname,
+      '%title' => $eventseries->label(),
+      ]) : $this->t('Revisions for %title', [
+        '%title' => $eventseries->label(),
+      ]);
     $header = [$this->t('Revision'), $this->t('Operations')];
 
     $revert_permission = (($account->hasPermission("revert all eventseries revisions") || $account->hasPermission('administer eventseries entities')));
@@ -275,7 +280,10 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
         // Use revision link to link to revisions that are not active.
         $date = $this->dateFormatter->format($revision->getRevisionCreationTime(), 'short');
         if ($vid != $eventseries->getRevisionId()) {
-          $link = Link::fromTextAndUrl($date, new Url('entity.eventseries.revision', ['eventseries' => $eventseries->id(), 'eventseries_revision' => $vid]));
+          $link = Link::fromTextAndUrl($date, new Url('entity.eventseries.revision', [
+            'eventseries' => $eventseries->id(),
+            'eventseries_revision' => $vid,
+          ]));
         }
         else {
           $link = $eventseries->toLink($date);
@@ -289,7 +297,10 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
             '#context' => [
               'date' => $link->toString(),
               'username' => $this->renderer->renderPlain($username),
-              'message' => ['#markup' => $revision->getRevisionLogMessage(), '#allowed_tags' => Xss::getHtmlTagList()],
+              'message' => [
+                '#markup' => $revision->getRevisionLogMessage(),
+                '#allowed_tags' => Xss::getHtmlTagList(),
+              ],
             ],
           ],
         ];
@@ -331,7 +342,10 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
           if ($delete_permission) {
             $links['delete'] = [
               'title' => $this->t('Delete'),
-              'url' => Url::fromRoute('entity.eventseries.revision_delete', ['eventseries' => $eventseries->id(), 'eventseries_revision' => $vid]),
+              'url' => Url::fromRoute('entity.eventseries.revision_delete', [
+                'eventseries' => $eventseries->id(),
+                'eventseries_revision' => $vid,
+              ]),
             ];
           }
 

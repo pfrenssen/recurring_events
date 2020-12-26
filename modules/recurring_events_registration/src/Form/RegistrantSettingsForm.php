@@ -12,7 +12,7 @@ use Drupal\recurring_events_registration\RegistrationCreationService;
 use Drupal\Core\Extension\ModuleHandler;
 
 /**
- * Class RegistrantSettingsForm.
+ * Provides a form for managing registration settings.
  *
  * @ingroup recurring_events_registration
  */
@@ -202,7 +202,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['messages']['successfully_registered_waitlist'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Successful Registration (Waitlist)'),
-      '#description' => $this->t('This message will show in the message area when a user successfully registers for an event\'s waitlist.'),
+      '#description' => $this->t("This message will show in the message area when a user successfully registers for an event's waitlist."),
       '#default_value' => $config->get('successfully_registered_waitlist'),
     ];
 
@@ -216,7 +216,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['messages']['successfully_updated_waitlist'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Successful Update (Waitlist)'),
-      '#description' => $this->t('This message will show in the message area when a user successfully updates a registration for an event\'s waitlist.'),
+      '#description' => $this->t("This message will show in the message area when a user successfully updates a registration for an event's waitlist."),
       '#default_value' => $config->get('successfully_updated_waitlist'),
     ];
 

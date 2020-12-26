@@ -8,7 +8,7 @@ use Drupal\Core\Messenger\Messenger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class IncludedDatesForm.
+ * Provides a form for creating included date config entities.
  */
 class IncludedDatesForm extends EntityForm {
 

@@ -8,7 +8,7 @@ use Drupal\Core\Messenger\Messenger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class EventInstanceTypeForm.
+ * Provides a form for editing event instance types.
  */
 class EventInstanceTypeForm extends EntityForm {
 

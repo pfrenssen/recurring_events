@@ -168,7 +168,7 @@ class RegistrantForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    /** @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
     $entity = $this->entity;
 
     $event_instance = $this->routeMatch->getParameter('eventinstance');
@@ -324,7 +324,7 @@ class RegistrantForm extends ContentEntityForm {
    *   The form state interface.
    */
   protected function hideFormFields(array &$form, FormStateInterface $form_state) {
-    /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    /** @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
     $entity = $this->entity;
     $new = $entity->isNew();
 
@@ -367,7 +367,7 @@ class RegistrantForm extends ContentEntityForm {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    /* @var $entity \Drupal\recurring_events\Entity\Registrant */
+    /** @var $entity \Drupal\recurring_events\Entity\Registrant */
     $entity = $this->entity;
 
     // Only perform the checks if the entity is new.
@@ -416,7 +416,7 @@ class RegistrantForm extends ContentEntityForm {
     $event_instance = $this->routeMatch->getParameter('eventinstance');
     $event_series = $event_instance->getEventSeries();
 
-    /* @var $entity \Drupal\recurring_events\Entity\RegistrantInterface */
+    /** @var $entity \Drupal\recurring_events\Entity\RegistrantInterface */
     $entity = $this->entity;
 
     // Use the registration creation service to grab relevant data.
@@ -440,16 +440,16 @@ class RegistrantForm extends ContentEntityForm {
 
       switch ($status) {
         case SAVED_NEW:
-          $message = $this->t($this->config('recurring_events_registration.registrant.config')->get('successfully_registered'));
+          $message = $this->config('recurring_events_registration.registrant.config')->get('successfully_registered');
           if ($add_to_waitlist) {
-            $message = $this->t($this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist'));
+            $message = $this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist');
           }
           break;
 
         default:
-          $message = $this->t($this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist'));
+          $message = $this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist');
           if ($add_to_waitlist) {
-            $message = $this->t($this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist'));
+            $message = $this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist');
           }
           break;
       }
@@ -471,12 +471,12 @@ class RegistrantForm extends ContentEntityForm {
       $this->cacheTagsInvalidator->invalidateTags($tags);
     }
     else {
-      $this->messenger->addMessage($this->t($this->config('recurring_events_registration.registrant.config')->get('registration_closed')));
+      $this->messenger->addMessage($this->config('recurring_events_registration.registrant.config')->get('registration_closed'));
     }
 
     $form_state->setRedirect('entity.registrant.add_form', ['eventinstance' => $event_instance->id()]);
 
-    // @TODO: Remove when https://www.drupal.org/node/3173241 drops.
+    // @todo: Remove when https://www.drupal.org/node/3173241 drops.
     if ($this->moderationInformation) {
       if ($this->moderationInformation->hasPendingRevision($entity) && $entity->hasLinkTemplate('latest-version')) {
         $form_state->setRedirect('entity.registrant.latest_version', [

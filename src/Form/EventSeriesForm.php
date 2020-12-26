@@ -173,7 +173,7 @@ class EventSeriesForm extends ContentEntityForm {
 
     $config = $this->configFactory->get('recurring_events.eventseries.config');
 
-    /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
+    /** @var $entity \Drupal\recurring_events\Entity\EventSeries */
     $entity = $this->entity;
 
     $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_' . $entity->bundle() . '_edit_form');
@@ -304,7 +304,7 @@ class EventSeriesForm extends ContentEntityForm {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
+    /** @var $entity \Drupal\recurring_events\Entity\EventSeries */
     $entity = $this->entity;
     $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_' . $entity->bundle() . '_edit_form');
     $trigger = $form_state->getTriggeringElement();

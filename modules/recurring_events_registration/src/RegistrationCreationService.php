@@ -15,7 +15,7 @@ use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Utility\Token;
 
 /**
- * RegistrationCreationService class.
+ * Provides a service with helper functions for registration creation.
  */
 class RegistrationCreationService {
 

@@ -79,7 +79,10 @@ class EventSeriesRevisionRevertTranslationForm extends EventSeriesRevisionRevert
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to revert @language translation to the revision from %revision-date?', ['@language' => $this->languageManager->getLanguageName($this->langcode), '%revision-date' => $this->dateFormatter->format($this->revision->getRevisionCreationTime())]);
+    return $this->t('Are you sure you want to revert @language translation to the revision from %revision-date?', [
+      '@language' => $this->languageManager->getLanguageName($this->langcode),
+      '%revision-date' => $this->dateFormatter->format($this->revision->getRevisionCreationTime()),
+    ]);
   }
 
   /**

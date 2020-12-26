@@ -108,7 +108,7 @@ class RegistrantListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    /** @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
     $series = $entity->getEventSeries();
     $instance = $entity->getEventInstance();
 

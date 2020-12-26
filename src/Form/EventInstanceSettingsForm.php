@@ -8,7 +8,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Link;
 
 /**
- * Class EventInstanceSettingsForm.
+ * Provides a form for configuring event instance settings.
  *
  * @ingroup recurring_events
  */

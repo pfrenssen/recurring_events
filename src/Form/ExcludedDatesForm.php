@@ -8,7 +8,7 @@ use Drupal\Core\Messenger\Messenger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class ExcludedDatesForm.
+ * Provides a form for creating excluded date config entities.
  */
 class ExcludedDatesForm extends EntityForm {
 

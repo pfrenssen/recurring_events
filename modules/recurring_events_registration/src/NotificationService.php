@@ -11,7 +11,7 @@ use Drupal\recurring_events_registration\Entity\RegistrantInterface;
 use Drupal\Core\Extension\ModuleHandler;
 
 /**
- * NotificationService class.
+ * Provides a service with helper functions to facilitate notifications.
  */
 class NotificationService {
 

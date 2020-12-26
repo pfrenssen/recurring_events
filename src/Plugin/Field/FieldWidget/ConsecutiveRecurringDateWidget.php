@@ -200,7 +200,7 @@ class ConsecutiveRecurringDateWidget extends DateRangeDefaultWidget {
    */
   public function changeDuration(array $form, FormStateInterface $form_state) {
     $response = new AjaxResponse();
-    /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
+    /** @var $entity \Drupal\recurring_events\Entity\EventSeries */
     $entity = $form_state->getformObject()->getEntity();
     $form_id = $form_state->getBuildInfo()['form_id'] == 'eventseries_' . $entity->bundle() . '_edit_form' ? 'eventseries-' . $entity->bundle() . '-edit-form' : 'eventseries-' . $entity->bundle() . '-add-form';
     $response->addCommand(new HtmlCommand('#' . $form_id, $form));

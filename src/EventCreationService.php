@@ -20,7 +20,7 @@ use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\field_inheritance\Entity\FieldInheritanceInterface;
 
 /**
- * EventCreationService class.
+ * Provides a service with helper functions useful during event creation.
  */
 class EventCreationService {
 
@@ -387,7 +387,10 @@ class EventCreationService {
       $create_instances = $this->checkForOriginalRecurConfigChanges($event, $original);
       if ($create_instances) {
         // Allow other modules to react prior to the deletion of all instances.
-        $this->moduleHandler->invokeAll('recurring_events_save_pre_instances_deletion', [$event, $original]);
+        $this->moduleHandler->invokeAll('recurring_events_save_pre_instances_deletion', [
+          $event,
+          $original,
+        ]);
 
         // Find all the instances and delete them.
         $instances = $event->event_instances->referencedEntities();
@@ -395,13 +398,19 @@ class EventCreationService {
           foreach ($instances as $instance) {
             // Allow other modules to react prior to deleting a specific
             // instance after a date configuration change.
-            $this->moduleHandler->invokeAll('recurring_events_save_pre_instance_deletion', [$event, $instance]);
+            $this->moduleHandler->invokeAll('recurring_events_save_pre_instance_deletion', [
+              $event,
+              $instance,
+            ]);
 
             $instance->delete();
 
             // Allow other modules to react after deleting a specific instance
             // after a date configuration change.
-            $this->moduleHandler->invokeAll('recurring_events_save_post_instance_deletion', [$event, $instance]);
+            $this->moduleHandler->invokeAll('recurring_events_save_post_instance_deletion', [
+              $event,
+              $instance,
+            ]);
           }
           $this->messenger->addStatus($this->translation->translate('A total of %count existing event instances were removed', [
             '%count' => count($instances),
@@ -409,7 +418,10 @@ class EventCreationService {
         }
 
         // Allow other modules to react after the deletion of all instances.
-        $this->moduleHandler->invokeAll('recurring_events_save_post_instances_deletion', [$event, $original]);
+        $this->moduleHandler->invokeAll('recurring_events_save_post_instances_deletion', [
+          $event,
+          $original,
+        ]);
       }
     }
 

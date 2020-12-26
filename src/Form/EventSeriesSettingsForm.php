@@ -10,7 +10,7 @@ use Drupal\recurring_events\EventCreationService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class EventSeriesSettingsForm.
+ * Provides a form for configuring event series settings.
  *
  * @ingroup recurring_events
  */

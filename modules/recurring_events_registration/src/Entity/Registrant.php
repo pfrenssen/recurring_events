@@ -252,7 +252,7 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
       ->setComputed(TRUE)
       ->setClass(ComputedRegistrantTitleFieldItemList::class);
 
-      $fields['status']
+    $fields['status']
       ->setLabel(t('Status'))
       ->setDescription(t('Is this registration complete?'))
       ->setDisplayOptions('form', [
