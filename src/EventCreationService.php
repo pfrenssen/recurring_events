@@ -15,9 +15,12 @@ use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactory;
+use Drupal\recurring_events\Entity\EventInstance;
+use Drupal\field_inheritance\Entity\FieldInheritanceInterface;
 
 /**
- * EventCreationService class.
+ * Provides a service with helper functions useful during event creation.
  */
 class EventCreationService {
 
@@ -80,6 +83,13 @@ class EventCreationService {
   protected $entityTypeManager;
 
   /**
+   * The key value storage service.
+   *
+   * @var \Drupal\Core\KeyValueStore\KeyValueFactory
+   */
+  protected $keyValueStore;
+
+  /**
    * Class constructor.
    *
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
@@ -98,8 +108,10 @@ class EventCreationService {
    *   The module handler service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
+   * @param \Drupal\Core\KeyValueStore\KeyValueFactory $key_value
+   *   The key value storage service.
    */
-  public function __construct(TranslationInterface $translation, Connection $database, LoggerChannelFactoryInterface $logger, Messenger $messenger, FieldTypePluginManager $field_type_plugin_manager, EntityFieldManager $entity_field_manager, ModuleHandler $module_handler, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(TranslationInterface $translation, Connection $database, LoggerChannelFactoryInterface $logger, Messenger $messenger, FieldTypePluginManager $field_type_plugin_manager, EntityFieldManager $entity_field_manager, ModuleHandler $module_handler, EntityTypeManagerInterface $entity_type_manager, KeyValueFactory $key_value) {
     $this->translation = $translation;
     $this->database = $database;
     $this->loggerFactory = $logger->get('recurring_events');
@@ -108,6 +120,7 @@ class EventCreationService {
     $this->entityFieldManager = $entity_field_manager;
     $this->moduleHandler = $module_handler;
     $this->entityTypeManager = $entity_type_manager;
+    $this->keyValueStore = $key_value;
   }
 
   /**
@@ -122,7 +135,8 @@ class EventCreationService {
       $container->get('plugin.manager.field.field_type'),
       $container->get('entity_field.manager'),
       $container->get('module_handler'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('keyvalue')
     );
   }
 
@@ -207,8 +221,15 @@ class EventCreationService {
 
     $config['type'] = $user_input['recur_type'];
 
-    $config['excluded_dates'] = $this->getDatesFromForm($user_input['excluded_dates']);
-    $config['included_dates'] = $this->getDatesFromForm($user_input['included_dates']);
+    $config['excluded_dates'] = [];
+    if (!empty($user_input['excluded_dates'])) {
+      $config['excluded_dates'] = $this->getDatesFromForm($user_input['excluded_dates']);
+    }
+
+    $config['included_dates'] = [];
+    if (!empty($user_input['included_dates'])) {
+      $config['included_dates'] = $this->getDatesFromForm($user_input['included_dates']);
+    }
 
     if ($config['type'] === 'custom') {
       foreach ($user_input['custom_date'] as $custom_date) {
@@ -366,7 +387,10 @@ class EventCreationService {
       $create_instances = $this->checkForOriginalRecurConfigChanges($event, $original);
       if ($create_instances) {
         // Allow other modules to react prior to the deletion of all instances.
-        $this->moduleHandler->invokeAll('recurring_events_save_pre_instances_deletion', [$event, $original]);
+        $this->moduleHandler->invokeAll('recurring_events_save_pre_instances_deletion', [
+          $event,
+          $original,
+        ]);
 
         // Find all the instances and delete them.
         $instances = $event->event_instances->referencedEntities();
@@ -374,13 +398,19 @@ class EventCreationService {
           foreach ($instances as $instance) {
             // Allow other modules to react prior to deleting a specific
             // instance after a date configuration change.
-            $this->moduleHandler->invokeAll('recurring_events_save_pre_instance_deletion', [$event, $instance]);
+            $this->moduleHandler->invokeAll('recurring_events_save_pre_instance_deletion', [
+              $event,
+              $instance,
+            ]);
 
             $instance->delete();
 
             // Allow other modules to react after deleting a specific instance
             // after a date configuration change.
-            $this->moduleHandler->invokeAll('recurring_events_save_post_instance_deletion', [$event, $instance]);
+            $this->moduleHandler->invokeAll('recurring_events_save_post_instance_deletion', [
+              $event,
+              $instance,
+            ]);
           }
           $this->messenger->addStatus($this->translation->translate('A total of %count existing event instances were removed', [
             '%count' => count($instances),
@@ -388,7 +418,10 @@ class EventCreationService {
         }
 
         // Allow other modules to react after the deletion of all instances.
-        $this->moduleHandler->invokeAll('recurring_events_save_post_instances_deletion', [$event, $original]);
+        $this->moduleHandler->invokeAll('recurring_events_save_post_instances_deletion', [
+          $event,
+          $original,
+        ]);
       }
     }
 
@@ -487,6 +520,77 @@ class EventCreationService {
   }
 
   /**
+   * Configure the default field inheritances for event instances.
+   *
+   * @param Drupal\recurring_events\Entity\EventInstance $instance
+   *   The event instance.
+   * @param int $series_id
+   *   The event series entity ID.
+   */
+  public function configureDefaultInheritances(EventInstance $instance, int $series_id = NULL) {
+    if (is_null($series_id)) {
+      $series_id = $instance->eventseries_id->target_id;
+    }
+
+    if (!empty($series_id)) {
+      // Configure the field inheritances for this instance.
+      $entity_type = $instance->getEntityTypeId();
+      $bundle = $instance->bundle();
+
+      $inherited_fields = $this->entityTypeManager->getStorage('field_inheritance')->loadByProperties([
+        'sourceEntityType' => 'eventseries',
+        'destinationEntityType' => $entity_type,
+        'destinationEntityBundle' => $bundle,
+      ]);
+
+      if (!empty($inherited_fields)) {
+        $state_key = $entity_type . ':' . $instance->uuid();
+        $state = $this->keyValueStore->get('field_inheritance');
+        $state_values = $state->get($state_key);
+        if (empty($state_values)) {
+          $state_values = [
+            'enabled' => TRUE,
+          ];
+          if (!empty($inherited_fields)) {
+            foreach ($inherited_fields as $inherited_field) {
+              $name = $inherited_field->idWithoutTypeAndBundle();
+              $state_values[$name] = [
+                'entity' => $series_id,
+              ];
+            }
+          }
+          $state->set($state_key, $state_values);
+        }
+      }
+    }
+  }
+
+  /**
+   * When adding a new field inheritance, add the default values for it.
+   *
+   * @param Drupal\recurring_events\Entity\EventInstance $instance
+   *   The event instance for which to configure default inheritance values.
+   * @param Drupal\field_inheritance\Entity\FieldInheritanceInterface $field_inheritance
+   *   The field inheritance being created or updated.
+   */
+  public function addNewDefaultInheritance(EventInstance $instance, FieldInheritanceInterface $field_inheritance) {
+    $state_key = 'eventinstance:' . $instance->uuid();
+    $state = $this->keyValueStore->get('field_inheritance');
+    $state_values = $state->get($state_key);
+    $name = $field_inheritance->idWithoutTypeAndBundle();
+
+    if (!empty($state_values[$name])) {
+      return;
+    }
+
+    $state_values[$name] = [
+      'entity' => $instance->eventseries_id->target_id,
+    ];
+
+    $state->set($state_key, $state_values);
+  }
+
+  /**
    * Get exclude/include dates from form.
    *
    * @param array $field
@@ -567,6 +671,65 @@ class EventCreationService {
       $this->moduleHandler->alter('recurring_events_recur_field_types', $recur_fields);
     }
     return $recur_fields;
+  }
+
+  /**
+   * Update instance status.
+   *
+   * @param Drupal\recurring_events\Entity\EventInstance $instance
+   *   The event instance for which to update the status.
+   * @param Drupal\recurring_events\Entity\EventSeries $event
+   *   The event series entity.
+   */
+  public function updateInstanceStatus(EventInstance $instance, EventSeries $event) {
+    $original_event = $event->original;
+    $field_name = 'status';
+
+    if ($this->moduleHandler->moduleExists('workflows')) {
+      if ($event->hasField('moderation_state') && $instance->hasField('moderation_state')) {
+        $series_query = $this->entityTypeManager->getStorage('workflow')->getQuery();
+        $series_query->condition('type_settings.entity_types.eventseries.*', $event->bundle());
+        $series_workflows = $series_query->execute();
+        $series_workflows = array_keys($series_workflows);
+        $series_workflow = reset($series_workflows);
+
+        $instance_query = $this->entityTypeManager->getStorage('workflow')->getQuery();
+        $instance_query->condition('type_settings.entity_types.eventinstance.*', $instance->bundle());
+        $instance_workflows = $instance_query->execute();
+        $instance_workflows = array_keys($instance_workflows);
+        $instance_workflow = reset($instance_workflows);
+
+        // We only want to mimic moderation state if the series and instance use
+        // the same workflows, otherwise we cannot guarantee the states match.
+        if ($instance_workflow === $series_workflow) {
+          $field_name = 'moderation_state';
+        }
+        else {
+          return FALSE;
+        }
+      }
+    }
+
+    $new_state = $event->get($field_name)->getValue();
+    $instance_state = $instance->get($field_name)->getValue();
+
+    if (!empty($original_event)) {
+      $original_state = $original_event->get($field_name)->getValue();
+    }
+    else {
+      $instance->set($field_name, $new_state);
+      return TRUE;
+    }
+
+    // If the instance state matches the original state of the series we want
+    // to also update the instance state.
+    if ($instance_state === $original_state) {
+      $instance->set($field_name, $new_state);
+      return TRUE;
+    }
+
+    return FALSE;
+
   }
 
 }

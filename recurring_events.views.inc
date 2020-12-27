@@ -16,6 +16,7 @@ function recurring_events_views_data_alter(array &$data) {
       'title' => t('Event series instance count'),
       'help' => t('The number of event instances in a series.'),
       'id' => 'eventseries_instance_count',
+      'click sortable' => FALSE,
     ],
   ];
 
@@ -26,6 +27,7 @@ function recurring_events_views_data_alter(array &$data) {
       'title' => t('Event series start date'),
       'help' => t('The date on which an event first occurs.'),
       'id' => 'eventseries_start_date',
+      'click sortable' => FALSE,
     ],
   ];
 
@@ -47,4 +49,26 @@ function recurring_events_views_data_alter(array &$data) {
   $data['eventinstance_field_data']['date__end_value']['sort']['field_name'] = 'date';
   $data['eventinstance_field_data']['date__end_value']['argument']['id'] = 'datetime';
   $data['eventinstance_field_data']['date__end_value']['argument']['field_name'] = 'date';
+
+  // We do not want people adding the recurrence fields to views as they will
+  // not work. Instead for any fields necessary we create them above.
+  $fields = [
+    'consecutive_recurring_date__',
+    'daily_recurring_date__',
+    'weekly_recurring_date__',
+    'monthly_recurring_date__',
+  ];
+  foreach ($fields as $field) {
+    foreach ($data['eventseries_field_data'] as $field_name => $field_info) {
+      if (strpos($field_name, $field) === 0) {
+        unset($data['eventseries_field_data'][$field_name]);
+      }
+    }
+
+    foreach ($data['eventseries_field_revision'] as $field_name => $field_info) {
+      if (strpos($field_name, $field) === 0) {
+        unset($data['eventseries_field_revision'][$field_name]);
+      }
+    }
+  }
 }

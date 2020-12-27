@@ -173,7 +173,7 @@ class EventSeriesForm extends ContentEntityForm {
 
     $config = $this->configFactory->get('recurring_events.eventseries.config');
 
-    /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
+    /** @var \Drupal\recurring_events\Entity\EventSeries $entity */
     $entity = $this->entity;
 
     $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_' . $entity->bundle() . '_edit_form');
@@ -289,7 +289,7 @@ class EventSeriesForm extends ContentEntityForm {
     $form['meta']['author'] = [
       '#type' => 'item',
       '#title' => $this->t('Author'),
-      '#markup' => $entity->getOwner()->getUsername(),
+      '#markup' => $entity->getOwner()->getDisplayName(),
       '#wrapper_attributes' => ['class' => ['entity-meta__author']],
     ];
 
@@ -304,7 +304,7 @@ class EventSeriesForm extends ContentEntityForm {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    /* @var $entity \Drupal\recurring_events\Entity\EventSeries */
+    /** @var \Drupal\recurring_events\Entity\EventSeries $entity */
     $entity = $this->entity;
     $editing = ($form_state->getBuildInfo()['form_id'] == 'eventseries_' . $entity->bundle() . '_edit_form');
     $trigger = $form_state->getTriggeringElement();
@@ -316,7 +316,7 @@ class EventSeriesForm extends ContentEntityForm {
 
     if ($trigger['#id'] !== 'edit-confirm' && array_search($trigger['#name'], $ignored_triggers) === FALSE && $editing) {
       $original = $this->storage->loadUnchanged($entity->id());
-      if ($this->creationService->checkForFormRecurConfigChanges($original, $form_state)) {
+      if (empty($form_state->getErrors()) && $this->creationService->checkForFormRecurConfigChanges($original, $form_state)) {
         $this->step = 1;
         $form_state->setRebuild(TRUE);
       }

@@ -13,6 +13,11 @@ use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityFieldManager;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\content_moderation\ModerationInformation;
 
 /**
  * Form controller for Registrant edit forms.
@@ -71,18 +76,36 @@ class RegistrantForm extends ContentEntityForm {
   protected $entityTypeManager;
 
   /**
+   * The cache tags invalidator.
+   *
+   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
+   */
+  protected $cacheTagsInvalidator;
+
+  /**
+   * The moderation information service.
+   *
+   * @var \Drupal\content_moderation\ModerationInformation
+   */
+  protected $moderationInformation;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.repository'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time'),
       $container->get('messenger'),
       $container->get('recurring_events_registration.creation_service'),
       $container->get('current_user'),
       $container->get('config.factory'),
       $container->get('entity_field.manager'),
       $container->get('current_route_match'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('cache_tags.invalidator'),
+      $container->has('content_moderation.moderation_information') ? $container->get('content_moderation.moderation_information') : NULL,
     );
   }
 
@@ -91,6 +114,10 @@ class RegistrantForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle service.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
    * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
@@ -105,16 +132,24 @@ class RegistrantForm extends ContentEntityForm {
    *   The route match service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
+   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
+   *   The cache tags invalidator.
+   * @param \Drupal\content_moderation\ModerationInformation $moderation_information
+   *   The moderation information service.
    */
   public function __construct(
     EntityRepositoryInterface $entity_repository,
+    EntityTypeBundleInfoInterface $entity_type_bundle_info,
+    TimeInterface $time,
     Messenger $messenger,
     RegistrationCreationService $creation_service,
     AccountProxyInterface $current_user,
     ConfigFactory $config,
     EntityFieldManager $field_manager,
     RouteMatchInterface $route_match,
-    EntityTypeManagerInterface $entity_type_manager) {
+    EntityTypeManagerInterface $entity_type_manager,
+    CacheTagsInvalidatorInterface $cache_tags_invalidator,
+    ModerationInformation $moderation_information = NULL) {
     $this->messenger = $messenger;
     $this->creationService = $creation_service;
     $this->currentUser = $current_user;
@@ -122,7 +157,9 @@ class RegistrantForm extends ContentEntityForm {
     $this->fieldManager = $field_manager;
     $this->routeMatch = $route_match;
     $this->entityTypeManager = $entity_type_manager;
-    parent::__construct($entity_repository);
+    $this->cacheTagsInvalidator = $cache_tags_invalidator;
+    $this->moderationInformation = $moderation_information;
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
   }
 
   /**
@@ -131,25 +168,15 @@ class RegistrantForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    /** @var \Drupal\recurring_events_registration\Entity\Registrant $entity */
     $entity = $this->entity;
 
-    if (!$entity->isNew()) {
-      $event_instance = $entity->getEventInstance();
-      $editing = TRUE;
-    }
-    else {
-      $event_instance = $this->routeMatch->getParameter('eventinstance');
-      $editing = FALSE;
-    }
+    $event_instance = $this->routeMatch->getParameter('eventinstance');
+    $editing = !$entity->isNew();
 
     if (empty($event_instance)) {
       throw new NotFoundHttpException();
     }
-
-    $event_series = $event_instance->getEventSeries();
-    $form_state->setTemporaryValue('series', $event_series);
-    $form_state->setTemporaryValue('event', $event_instance);
 
     // Use the registration creation service to grab relevant data.
     $this->creationService->setEventInstance($event_instance);
@@ -201,7 +228,7 @@ class RegistrantForm extends ContentEntityForm {
       'title' => [
         '#type' => 'markup',
         '#prefix' => '<h3 class="registration-notice-title">',
-        '#markup' => $this->t('We cannot complete your registration.'),
+        '#markup' => $this->t('Registration full.'),
         '#suffix' => '</h3>',
       ],
       'message' => [
@@ -297,6 +324,10 @@ class RegistrantForm extends ContentEntityForm {
    *   The form state interface.
    */
   protected function hideFormFields(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\recurring_events_registration\Entity\Registrant $entity */
+    $entity = $this->entity;
+    $new = $entity->isNew();
+
     $form_fields = $this->fieldManager->getFieldDefinitions('registrant', $this->entity->getBundle());
 
     $availability = $this->creationService->retrieveAvailability();
@@ -305,9 +336,9 @@ class RegistrantForm extends ContentEntityForm {
 
     // Prevent the form being displayed if registration is closed, or there are
     // no spaces left, and no waitlist.
-    if (($availability === 0 && !$waitlist) || !$registration_open) {
+    if ((($availability === 0 && !$waitlist) || !$registration_open) && $new) {
       foreach ($form_fields as $field_name => $field) {
-        if (isset($form[$field_name])) {
+        if (isset($form[$field_name]) && $new) {
           $form[$field_name]['#printed'] = TRUE;
         }
       }
@@ -323,6 +354,11 @@ class RegistrantForm extends ContentEntityForm {
     if (!$this->currentUser->hasPermission('modify registrant author')) {
       $form['user_id']['#access'] = FALSE;
     }
+
+    if (!$this->currentUser->hasPermission('administer registrant entity')) {
+      $form['revision_information']['#access'] = FALSE;
+      $form['status']['#access'] = FALSE;
+    }
   }
 
   /**
@@ -331,18 +367,14 @@ class RegistrantForm extends ContentEntityForm {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    /* @var $entity \Drupal\omega_events\Entity\Registrant */
+    /** @var \Drupal\recurring_events\Entity\Registrant $entity */
     $entity = $this->entity;
 
     // Only perform the checks if the entity is new.
     if ($entity->isNew()) {
 
-      $event_series = $form_state->getTemporaryValue('series');
-      // We need to grab a fresh copy of the series to check for updates.
-      $event_series = $this->entityTypeManager->getStorage('eventseries')->load($event_series->id());
-
-      // Grab the event instance so we can check if registration is open.
-      $event_instance = $form_state->getTemporaryValue('event');
+      $event_instance = $this->routeMatch->getParameter('eventinstance');
+      $event_series = $event_instance->getEventSeries();
 
       // Use the registration creation service to grab relevant data.
       $this->creationService->setEventInstance($event_instance);
@@ -357,16 +389,16 @@ class RegistrantForm extends ContentEntityForm {
 
       // Registration has closed.
       if (!$registration_open) {
-        $form_state->setError($form, '');
+        $form_state->setError($form, $this->t('Unfortunately, registration has closed.'));
       }
       // Capacity is full, there is a waitlist, but user was not being added to
       // the waitlist.
       elseif (!$add_to_waitlist && $availability == 0 && $waitlist) {
-        $form_state->setError($form, '');
+        $form_state->setError($form, $this->t('Unfortunately, this event is now full and you must join the waitlist.'));
       }
       // There are no spaces left, and there is no waitlist.
       elseif ($availability == 0 && !$waitlist) {
-        $form_state->setError($form, '');
+        $form_state->setError($form, $this->t('Unfortunately, this event is now full.'));
       }
     }
     else {
@@ -381,10 +413,11 @@ class RegistrantForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $event_series = $form_state->getTemporaryValue('series');
-    // We need to grab a fresh copy of the series to check for updates.
-    $event_series = $this->entityTypeManager->getStorage('eventseries')->load($event_series->id());
-    $event_instance = $form_state->getTemporaryValue('event');
+    $event_instance = $this->routeMatch->getParameter('eventinstance');
+    $event_series = $event_instance->getEventSeries();
+
+    /** @var \Drupal\recurring_events\Entity\RegistrantInterface $entity */
+    $entity = $this->entity;
 
     // Use the registration creation service to grab relevant data.
     $this->creationService->setEventInstance($event_instance);
@@ -397,9 +430,7 @@ class RegistrantForm extends ContentEntityForm {
     $reg_type = $this->creationService->getRegistrationType();
     $registration = $this->creationService->hasRegistration();
 
-    $form_state->setRedirect('entity.eventinstance.canonical', ['eventinstance' => $event_instance->id()]);
-
-    if ($registration && $registration_open && ($availability > 0 || $waitlist)) {
+    if ($registration && $registration_open && ($availability > 0 || $availability == -1 || $waitlist)) {
       $add_to_waitlist = (int) $form_state->getValue('add_to_waitlist');
       $this->entity->setEventSeries($event_series);
       $this->entity->setEventInstance($event_instance);
@@ -409,26 +440,51 @@ class RegistrantForm extends ContentEntityForm {
 
       switch ($status) {
         case SAVED_NEW:
-          $message = $this->t('Registrant successfully created.');
+          $message = $this->config('recurring_events_registration.registrant.config')->get('successfully_registered');
           if ($add_to_waitlist) {
-            $message = $this->t('Successfully registered to the waitlist.');
+            $message = $this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist');
           }
           break;
 
         default:
-          $message = $this->t('Registrant successfully updated.');
+          $message = $this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist');
           if ($add_to_waitlist) {
-            $message = $this->t('Successfully updated waitlist registrant.');
+            $message = $this->config('recurring_events_registration.registrant.config')->get('successfully_registered_waitlist');
           }
           break;
       }
 
       $this->messenger->addMessage($message);
+
+      // Invalidate tags to ensure that views count fields are updated.
+      $tags = [];
+      switch ($this->creationService->getRegistrationType()) {
+        case 'series':
+          $tags[] = 'eventseries:' . $event_series->id();
+          break;
+
+        case 'instance':
+        default:
+          $tags[] = 'eventinstance:' . $event_instance->id();
+          break;
+      }
+      $this->cacheTagsInvalidator->invalidateTags($tags);
     }
     else {
-      $this->messenger->addMessage($this->t('Unfortunately, registration is not available at this time.'));
+      $this->messenger->addMessage($this->config('recurring_events_registration.registrant.config')->get('registration_closed'));
     }
 
+    $form_state->setRedirect('entity.registrant.add_form', ['eventinstance' => $event_instance->id()]);
+
+    // @todo Remove when https://www.drupal.org/node/3173241 drops.
+    if ($this->moderationInformation) {
+      if ($this->moderationInformation->hasPendingRevision($entity) && $entity->hasLinkTemplate('latest-version')) {
+        $form_state->setRedirect('entity.registrant.latest_version', [
+          'eventinstance' => $entity->getEventInstance()->id(),
+          'registrant' => $entity->id(),
+        ]);
+      }
+    }
   }
 
 }

@@ -1,6 +1,3 @@
-# Recurring Events Views (recurring_events_views)
----
-
 ## Introduction
 Recurring Events  provides listings for event series, event instances and
 registrations. For many installations this will provide a satisfactory way of

@@ -161,7 +161,12 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
     $has_translations = (count($languages) > 1);
     $eventinstance_storage = $this->entityTypeManager()->getStorage('eventinstance');
 
-    $build['#title'] = $has_translations ? $this->t('@langname revisions for %title', ['@langname' => $langname, '%title' => $eventinstance->label()]) : $this->t('Revisions for %title', ['%title' => $eventinstance->label()]);
+    $build['#title'] = $has_translations ? $this->t('@langname revisions for %title', [
+      '@langname' => $langname,
+      '%title' => $eventinstance->label(),
+    ]) : $this->t('Revisions for %title', [
+      '%title' => $eventinstance->label(),
+    ]);
     $header = [$this->t('Revision'), $this->t('Operations')];
 
     $revert_permission = (($account->hasPermission("revert all eventinstance revisions") || $account->hasPermission('administer eventinstance entities')));
@@ -187,7 +192,10 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
         // Use revision link to link to revisions that are not active.
         $date = $this->dateFormatter->format($revision->getRevisionCreationTime(), 'short');
         if ($vid != $eventinstance->getRevisionId()) {
-          $link = Link::fromTextAndUrl($date, new Url('entity.eventinstance.revision', ['eventinstance' => $eventinstance->id(), 'eventinstance_revision' => $vid]));
+          $link = Link::fromTextAndUrl($date, new Url('entity.eventinstance.revision', [
+            'eventinstance' => $eventinstance->id(),
+            'eventinstance_revision' => $vid,
+          ]));
         }
         else {
           $link = $eventinstance->toLink($date);
@@ -201,7 +209,10 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
             '#context' => [
               'date' => $link->toString(),
               'username' => $this->renderer->renderPlain($username),
-              'message' => ['#markup' => $revision->getRevisionLogMessage(), '#allowed_tags' => Xss::getHtmlTagList()],
+              'message' => [
+                '#markup' => $revision->getRevisionLogMessage(),
+                '#allowed_tags' => Xss::getHtmlTagList(),
+              ],
             ],
           ],
         ];
@@ -243,7 +254,10 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
           if ($delete_permission) {
             $links['delete'] = [
               'title' => $this->t('Delete'),
-              'url' => Url::fromRoute('entity.eventinstance.revision_delete', ['eventinstance' => $eventinstance->id(), 'eventinstance_revision' => $vid]),
+              'url' => Url::fromRoute('entity.eventinstance.revision_delete', [
+                'eventinstance' => $eventinstance->id(),
+                'eventinstance_revision' => $vid,
+              ]),
             ];
           }
 

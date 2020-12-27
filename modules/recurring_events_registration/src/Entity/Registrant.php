@@ -4,7 +4,7 @@ namespace Drupal\recurring_events_registration\Entity;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\user\UserInterface;
@@ -37,19 +37,29 @@ use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFie
  *     "access" = "Drupal\recurring_events_registration\RegistrantAccessControlHandler",
  *   },
  *   base_table = "registrant",
+ *   revision_table = "registrant_revision",
+ *   show_revision_ui = TRUE,
  *   translatable = FALSE,
  *   fieldable = TRUE,
  *   admin_permission = "administer registrant entities",
  *   entity_keys = {
  *     "id" = "id",
+ *     "revision" = "revision_id",
  *     "uuid" = "uuid",
  *     "uid" = "user_id",
  *     "label" = "title",
  *     "bundle" = "bundle",
+ *     "status" = "status",
+ *     "published" = "status",
+ *   },
+ *   revision_metadata_keys = {
+ *     "revision_user" = "revision_user",
+ *     "revision_created" = "revision_created",
+ *     "revision_log_message" = "revision_log_message"
  *   },
  *   links = {
- *     "canonical" = "/events/{eventinstance}/registrations//{registrant}",
- *     "edit-form" = "/events/{eventinstance}/registrations//{registrant}/edit",
+ *     "canonical" = "/events/{eventinstance}/registrations/{registrant}",
+ *     "edit-form" = "/events/{eventinstance}/registrations/{registrant}/edit",
  *     "delete-form" = "/events/{eventinstance}/registrations/{registrant}/delete",
  *     "anon-edit-form" = "/events/{eventinstance}/registrations/{registrant}/{uuid}/edit",
  *     "anon-delete-form" = "/events/{eventinstance}/registrations/{registrant}/{uuid}/delete"
@@ -58,7 +68,7 @@ use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFie
  *   field_ui_base_route = "entity.registrant_type.edit_form"
  * )
  */
-class Registrant extends ContentEntityBase implements RegistrantInterface {
+class Registrant extends EditorialContentEntityBase implements RegistrantInterface {
 
   use EntityChangedTrait;
 
@@ -112,6 +122,14 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
   /**
    * {@inheritdoc}
    */
+  public function setStatus($status) {
+    $this->set('status', $status);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getOwner() {
     return $this->get('user_id')->entity;
   }
@@ -147,6 +165,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
 
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Authored by'))
+      ->setRevisionable(TRUE)
       ->setDescription(t('The user ID of author of the Registrant entity.'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default')
@@ -171,6 +190,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
 
     $fields['email'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email Address'))
+      ->setRevisionable(TRUE)
       ->setDescription(t('The email address of the registrant'))
       ->setDisplayOptions('form', [
         'type' => 'email_default',
@@ -205,6 +225,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
       ->setSetting('target_type', 'eventinstance');
 
     $fields['waitlist'] = BaseFieldDefinition::create('boolean')
+      ->setRevisionable(TRUE)
       ->setLabel(t('Waitlist'))
       ->setDescription(t('Whether this registrant is waitlisted.'));
 
@@ -221,6 +242,7 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
       ->setDescription(t('The time that the entity was created.'));
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setRevisionable(TRUE)
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the entity was last edited.'));
 
@@ -229,6 +251,18 @@ class Registrant extends ContentEntityBase implements RegistrantInterface {
       ->setReadOnly(TRUE)
       ->setComputed(TRUE)
       ->setClass(ComputedRegistrantTitleFieldItemList::class);
+
+    $fields['status']
+      ->setLabel(t('Status'))
+      ->setDescription(t('Is this registration complete?'))
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 120,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }

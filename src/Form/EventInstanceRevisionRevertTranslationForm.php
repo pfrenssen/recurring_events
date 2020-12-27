@@ -53,7 +53,7 @@ class EventInstanceRevisionRevertTranslationForm extends EventInstanceRevisionRe
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager')->getStorage('eventinstance'),
+      $container->get('entity_type.manager')->getStorage('eventinstance'),
       $container->get('date.formatter'),
       $container->get('language_manager')
     );
@@ -70,7 +70,10 @@ class EventInstanceRevisionRevertTranslationForm extends EventInstanceRevisionRe
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to revert @language translation to the revision from %revision-date?', ['@language' => $this->languageManager->getLanguageName($this->langcode), '%revision-date' => $this->dateFormatter->format($this->revision->getRevisionCreationTime())]);
+    return $this->t('Are you sure you want to revert @language translation to the revision from %revision-date?', [
+      '@language' => $this->languageManager->getLanguageName($this->langcode),
+      '%revision-date' => $this->dateFormatter->format($this->revision->getRevisionCreationTime()),
+    ]);
   }
 
   /**

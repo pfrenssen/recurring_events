@@ -47,7 +47,7 @@ class RegistrantListBuilder extends EntityListBuilder {
   protected $entityFieldManager;
 
   /**
-   * Constructs a new EventInstanceListBuilder object.
+   * Constructs a new RegistrantListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
@@ -79,7 +79,7 @@ class RegistrantListBuilder extends EntityListBuilder {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('entity_type.manager')->getStorage($entity_type->id()),
       $container->get('config.factory'),
       $container->get('request_stack'),
       $container->get('recurring_events_registration.creation_service'),
@@ -100,6 +100,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     }
     $header['email'] = $this->t('Email');
     $header['waitlist'] = $this->t('Waitlist');
+    $header['status'] = $this->t('Status');
     return $header + parent::buildHeader();
   }
 
@@ -107,7 +108,7 @@ class RegistrantListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /* @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    /** @var \Drupal\recurring_events_registration\Entity\Registrant $entity  */
     $series = $entity->getEventSeries();
     $instance = $entity->getEventInstance();
 
@@ -123,6 +124,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     }
     $row['email'] = $entity->get('email')->value;
     $row['waitlist'] = $entity->get('waitlist')->value ? $this->t('Yes') : $this->t('No');
+    $row['status'] = $entity->get('status')->value ? $this->t('Complete') : $this->t('Pending');
     return $row + parent::buildRow($entity);
   }
 

@@ -25,6 +25,45 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings() {
+    return [
+      'show_enable_waitlist' => TRUE,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element['show_enable_waitlist'] = [
+      '#type' => 'radios',
+      '#options' => [
+        '1' => $this->t('Show'),
+        '0' => $this->t('Hide'),
+      ],
+      '#title' => $this->t('Enable Waiting List'),
+      '#default_value' => $this->getSetting('show_enable_waitlist'),
+      '#description' => $this->t('This will show/hide the "Enable Waiting List" checkbox in the Add/Edit Series form'),
+    ];
+
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = [];
+
+    $enable_waitlist = $this->getSetting('show_enable_waitlist') ? $this->t('On') : $this->t('Off');
+    $summary[] = $this->t('Enable Waiting list is: @value', ['@value' => $enable_waitlist]);
+
+    return $summary;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
@@ -58,7 +97,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
     $element['registration_dates'] = [
       '#type' => 'radios',
       '#title' => $this->t('Registration Dates'),
-      '#description' => $this->t('Choose between open or scheduled registration.'),
+      '#description' => $this->t('Choose between open or scheduled registration. Open registration ends when the event begins.'),
       '#weight' => 2,
       '#default_value' => $items[$delta]->registration_dates ?: 'open',
       '#options' => [
@@ -106,24 +145,114 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       ],
     ];
 
-    $element['instance_registration']['time_amount'] = [
-      '#type' => 'number',
-      '#title' => $this->t('Registration Time Amount'),
-      '#description' => $this->t('Enter the amount of time in days or hours before the event(s) start time(s) that registration should open.'),
+    $element['instance_registration']['instance_schedule_open'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Registration Opens'),
+      '#description' => $this->t('Select when to open registration'),
       '#weight' => 0,
-      '#default_value' => $items[$delta]->time_amount ?: '',
+      '#default_value' => $items[$delta]->instance_schedule_open,
+      '#options' => [
+        'now' => $this->t('Now'),
+        'start' => $this->t('At the start of the event'),
+        'custom' => $this->t('Custom schedule'),
+      ],
+    ];
+
+    $element['instance_registration']['open_registration'] = [
+      '#type' => 'container',
+      '#weight' => 1,
+      '#states' => [
+        'visible' => [
+          ':input[name="event_registration[0][instance_registration][instance_schedule_open]"]' => ['value' => 'custom'],
+        ],
+      ],
+      '#attributes' => [
+        'class' => 'container-inline',
+      ],
+    ];
+
+    $element['instance_registration']['open_registration']['instance_schedule_open_amount'] = [
+      '#type' => 'number',
+      '#title' => '',
+      '#weight' => 1,
+      '#default_value' => $items[$delta]->instance_schedule_open_amount ?? '1',
       '#min' => 0,
     ];
 
-    $element['instance_registration']['time_type'] = [
+    $element['instance_registration']['open_registration']['instance_schedule_open_units'] = [
       '#type' => 'select',
-      '#title' => $this->t('Registration Time Type'),
-      '#description' => $this->t("Select either Days or Hours to choose how long before which an event's registration will open."),
-      '#weight' => 1,
-      '#default_value' => $items[$delta]->time_type ?: '',
+      '#title' => '',
+      '#weight' => 2,
+      '#default_value' => $items[$delta]->instance_schedule_open_units ?? 'month',
       '#options' => [
-        'days' => $this->t('Days'),
-        'hours' => $this->t('Hours'),
+        'month' => $this->t('months'),
+        'week' => $this->t('weeks'),
+        'day' => $this->t('days'),
+        'hour' => $this->t('hours'),
+        'minute' => $this->t('minutes'),
+        'second' => $this->t('seconds'),
+      ],
+      '#suffix' => $this->t('before the event starts'),
+    ];
+
+    $element['instance_registration']['instance_schedule_close'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Registration Closes'),
+      '#description' => $this->t('Select when to close registration'),
+      '#weight' => 3,
+      '#default_value' => $items[$delta]->instance_schedule_close,
+      '#options' => [
+        'start' => $this->t('At the start of the event'),
+        'end' => $this->t('At the end of the event'),
+        'custom' => $this->t('Custom schedule'),
+      ],
+    ];
+
+    $element['instance_registration']['close_registration'] = [
+      '#type' => 'container',
+      '#weight' => 4,
+      '#states' => [
+        'visible' => [
+          ':input[name="event_registration[0][instance_registration][instance_schedule_close]"]' => ['value' => 'custom'],
+        ],
+      ],
+      '#attributes' => [
+        'class' => 'container-inline',
+      ],
+    ];
+
+    $element['instance_registration']['close_registration']['instance_schedule_close_amount'] = [
+      '#type' => 'number',
+      '#title' => '',
+      '#weight' => 1,
+      '#default_value' => $items[$delta]->instance_schedule_close_amount ?? '1',
+      '#min' => 0,
+    ];
+
+    $element['instance_registration']['close_registration']['instance_schedule_close_units'] = [
+      '#type' => 'select',
+      '#title' => '',
+      '#weight' => 2,
+      '#default_value' => $items[$delta]->instance_schedule_close_units ?? 'week',
+      '#min' => 0,
+      '#options' => [
+        'month' => $this->t('months'),
+        'week' => $this->t('weeks'),
+        'day' => $this->t('days'),
+        'hour' => $this->t('hours'),
+        'minute' => $this->t('minutes'),
+        'second' => $this->t('seconds'),
+      ],
+    ];
+
+    $element['instance_registration']['close_registration']['instance_schedule_close_type'] = [
+      '#type' => 'select',
+      '#title' => '',
+      '#weight' => 3,
+      '#default_value' => $items[$delta]->instance_schedule_close_type ?: '',
+      '#options' => [
+        'before' => $this->t('before the event starts'),
+        'after' => $this->t('after the event starts'),
       ],
     ];
 
@@ -131,7 +260,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       '#type' => 'number',
       '#title' => $this->t('Total Number of Spaces Available'),
       '#description' => $this->t('Maximum number of attendees available for each series, or individual event. Leave blank for unlimited.'),
-      '#weight' => 4,
+      '#weight' => 5,
       '#default_value' => $items[$delta]->capacity ?: '',
       '#min' => 0,
       '#states' => [
@@ -141,17 +270,21 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       ],
     ];
 
+    $enable_waitlist = $this->getSetting('show_enable_waitlist');
+    $waitlist_default_value = $enable_waitlist ? ($items[$delta]->waitlist ?? FALSE) : FALSE;
+    $items[$delta]->waitlist = 1;
     $element['waitlist'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable Waiting List'),
       '#description' => $this->t('Enable a waiting list if the number of registrations reaches capacity.'),
-      '#weight' => 5,
-      '#default_value' => $items[$delta]->waitlist ?: '',
+      '#weight' => 6,
+      '#default_value' => $waitlist_default_value,
       '#states' => [
         'visible' => [
           ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
         ],
       ],
+      '#access' => $enable_waitlist ? TRUE : FALSE,
     ];
 
     return $element;
@@ -164,8 +297,13 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
     foreach ($values as &$item) {
       $item['value'] = $item['series_registration']['value'];
       $item['end_value'] = $item['series_registration']['end_value'];
-      $item['time_amount'] = (int) $item['instance_registration']['time_amount'];
-      $item['time_type'] = $item['instance_registration']['time_type'];
+      $item['instance_schedule_open'] = $item['instance_registration']['instance_schedule_open'];
+      $item['instance_schedule_open_amount'] = (int) $item['instance_registration']['open_registration']['instance_schedule_open_amount'];
+      $item['instance_schedule_open_units'] = $item['instance_registration']['open_registration']['instance_schedule_open_units'];
+      $item['instance_schedule_close'] = $item['instance_registration']['instance_schedule_close'];
+      $item['instance_schedule_close_amount'] = (int) $item['instance_registration']['close_registration']['instance_schedule_close_amount'];
+      $item['instance_schedule_close_units'] = $item['instance_registration']['close_registration']['instance_schedule_close_units'];
+      $item['instance_schedule_close_type'] = $item['instance_registration']['close_registration']['instance_schedule_close_type'];
       $item['capacity'] = (int) $item['capacity'];
       unset($item['series_registration']);
       unset($item['instance_registration']);
@@ -198,12 +336,32 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
         $item['waitlist'] = 0;
       }
 
-      if (empty($item['time_amount'])) {
-        $item['time_amount'] = 0;
+      if (empty($item['instance_schedule_open'])) {
+        $item['instance_schedule_open'] = '';
       }
 
-      if (empty($item['time_type'])) {
-        $item['time_type'] = '';
+      if (empty($item['instance_schedule_open_amount'])) {
+        $item['instance_schedule_open_amount'] = 0;
+      }
+
+      if (empty($item['instance_schedule_open_units'])) {
+        $item['instance_schedule_open_units'] = '';
+      }
+
+      if (empty($item['instance_schedule_close'])) {
+        $item['instance_schedule_close'] = '';
+      }
+
+      if (empty($item['instance_schedule_close_amount'])) {
+        $item['instance_schedule_close_amount'] = 0;
+      }
+
+      if (empty($item['instance_schedule_close_units'])) {
+        $item['instance_schedule_close_units'] = '';
+      }
+
+      if (empty($item['instance_schedule_close_type'])) {
+        $item['instance_schedule_close_type'] = '';
       }
 
     }

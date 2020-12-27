@@ -12,7 +12,7 @@ use Drupal\recurring_events_registration\RegistrationCreationService;
 use Drupal\Core\Extension\ModuleHandler;
 
 /**
- * Class RegistrantSettingsForm.
+ * Provides a form for managing registration settings.
  *
  * @ingroup recurring_events_registration
  */
@@ -97,6 +97,12 @@ class RegistrantSettingsForm extends ConfigFormBase {
       ->set('limit', $form_state->getValue('limit'))
       ->set('date_format', $form_state->getValue('date_format'))
       ->set('title', $form_state->getValue('title'))
+      ->set('successfully_registered', $form_state->getValue('successfully_registered'))
+      ->set('successfully_registered_waitlist', $form_state->getValue('successfully_registered_waitlist'))
+      ->set('successfully_updated', $form_state->getValue('successfully_updated'))
+      ->set('successfully_updated_waitlist', $form_state->getValue('successfully_updated_waitlist'))
+      ->set('already_registered', $form_state->getValue('already_registered'))
+      ->set('registration_closed', $form_state->getValue('registration_closed'))
       ->set('email_notifications', $form_state->getValue('email_notifications'));
 
     $notification_types = [];
@@ -179,6 +185,56 @@ class RegistrantSettingsForm extends ConfigFormBase {
     ];
 
     $form['display']['tokens'] = $registrant_tokens;
+
+    $form['messages'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Registration Messages'),
+      '#open' => TRUE,
+    ];
+
+    $form['messages']['successfully_registered'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Successful Registration'),
+      '#description' => $this->t('This message will show in the message area when a user successfully registers for an event.'),
+      '#default_value' => $config->get('successfully_registered'),
+    ];
+
+    $form['messages']['successfully_registered_waitlist'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Successful Registration (Waitlist)'),
+      '#description' => $this->t("This message will show in the message area when a user successfully registers for an event's waitlist."),
+      '#default_value' => $config->get('successfully_registered_waitlist'),
+    ];
+
+    $form['messages']['successfully_updated'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Successful Update'),
+      '#description' => $this->t('This message will show in the message area when a user successfully updates a registration for an event.'),
+      '#default_value' => $config->get('successfully_updated'),
+    ];
+
+    $form['messages']['successfully_updated_waitlist'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Successful Update (Waitlist)'),
+      '#description' => $this->t("This message will show in the message area when a user successfully updates a registration for an event's waitlist."),
+      '#default_value' => $config->get('successfully_updated_waitlist'),
+    ];
+
+    $form['messages']['already_registered'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Duplicate Registration'),
+      '#description' => $this->t('This message will show in the message area when a user tries to register a second time for the same event.'),
+      '#default_value' => $config->get('already_registered'),
+    ];
+
+    $form['messages']['registration_closed'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Registration Window Closed'),
+      '#description' => $this->t('This message will show in the message area when a user tries to register for an event for which registrations are closed.'),
+      '#default_value' => $config->get('registration_closed'),
+    ];
+
+    $form['messages']['tokens'] = $registrant_tokens;
 
     $form['notifications'] = [
       '#type' => 'details',

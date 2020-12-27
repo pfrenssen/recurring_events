@@ -355,7 +355,7 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
       ->setLabel(t('Body'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
-      ->setRequired(TRUE)
+      ->setRequired(FALSE)
       ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',

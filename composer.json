@@ -3,7 +3,7 @@
   "type": "drupal-module",
   "description": "Recurring Events and Registration Management Module",
   "keywords": ["Drupal"],
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "homepage": "https://www.drupal.org/project/recurring_events",
   "minimum-stability": "dev",
   "support": {
