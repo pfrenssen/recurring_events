@@ -370,7 +370,7 @@ function recurring_events_registration_registrant_insert(EntityInterface $entity
 /**
  * Implements hook_form_alter().
  *
- * @todo: Remove when https://www.drupal.org/node/3173241 drops.
+ * @todo Remove when https://www.drupal.org/node/3173241 drops.
  */
 function recurring_events_registration_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
   /** @var \Drupal\recurring_events_registration\Form\RegistrantForm $form_object */
@@ -391,7 +391,7 @@ function recurring_events_registration_form_alter(array &$form, FormStateInterfa
 /**
  * Implements hook_module_implements_alter().
  *
- * @todo: Remove when https://www.drupal.org/node/3173241 drops.
+ * @todo Remove when https://www.drupal.org/node/3173241 drops.
  */
 function recurring_events_registration_module_implements_alter(&$implementations, $hook) {
   if ($hook == 'form_alter') {

@@ -252,9 +252,9 @@ class EventSeriesController extends ControllerBase implements ContainerInjection
     $build['#title'] = $has_translations ? $this->t('@langname revisions for %title', [
       '@langname' => $langname,
       '%title' => $eventseries->label(),
-      ]) : $this->t('Revisions for %title', [
-        '%title' => $eventseries->label(),
-      ]);
+    ]) : $this->t('Revisions for %title', [
+      '%title' => $eventseries->label(),
+    ]);
     $header = [$this->t('Revision'), $this->t('Operations')];
 
     $revert_permission = (($account->hasPermission("revert all eventseries revisions") || $account->hasPermission('administer eventseries entities')));

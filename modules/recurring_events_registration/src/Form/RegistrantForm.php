@@ -168,7 +168,7 @@ class RegistrantForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    /** @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    /** @var \Drupal\recurring_events_registration\Entity\Registrant $entity */
     $entity = $this->entity;
 
     $event_instance = $this->routeMatch->getParameter('eventinstance');
@@ -324,7 +324,7 @@ class RegistrantForm extends ContentEntityForm {
    *   The form state interface.
    */
   protected function hideFormFields(array &$form, FormStateInterface $form_state) {
-    /** @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    /** @var \Drupal\recurring_events_registration\Entity\Registrant $entity */
     $entity = $this->entity;
     $new = $entity->isNew();
 
@@ -367,7 +367,7 @@ class RegistrantForm extends ContentEntityForm {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
-    /** @var $entity \Drupal\recurring_events\Entity\Registrant */
+    /** @var \Drupal\recurring_events\Entity\Registrant $entity */
     $entity = $this->entity;
 
     // Only perform the checks if the entity is new.
@@ -416,7 +416,7 @@ class RegistrantForm extends ContentEntityForm {
     $event_instance = $this->routeMatch->getParameter('eventinstance');
     $event_series = $event_instance->getEventSeries();
 
-    /** @var $entity \Drupal\recurring_events\Entity\RegistrantInterface */
+    /** @var \Drupal\recurring_events\Entity\RegistrantInterface $entity */
     $entity = $this->entity;
 
     // Use the registration creation service to grab relevant data.
@@ -476,7 +476,7 @@ class RegistrantForm extends ContentEntityForm {
 
     $form_state->setRedirect('entity.registrant.add_form', ['eventinstance' => $event_instance->id()]);
 
-    // @todo: Remove when https://www.drupal.org/node/3173241 drops.
+    // @todo Remove when https://www.drupal.org/node/3173241 drops.
     if ($this->moderationInformation) {
       if ($this->moderationInformation->hasPendingRevision($entity) && $entity->hasLinkTemplate('latest-version')) {
         $form_state->setRedirect('entity.registrant.latest_version', [

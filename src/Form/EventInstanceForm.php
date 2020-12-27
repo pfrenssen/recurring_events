@@ -79,7 +79,7 @@ class EventInstanceForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    /** @var $entity \Drupal\recurring_events\Entity\EventInstance */
+    /** @var \Drupal\recurring_events\Entity\EventInstance $entity */
     $event = $this->entity;
 
     $form['notifications'] = [

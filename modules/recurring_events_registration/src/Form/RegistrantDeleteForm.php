@@ -101,7 +101,7 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
    * {@inheritdoc}
    */
   public function getDescription() {
-    /** @var $entity \Drupal\recurring_events_registration\Entity\Registrant */
+    /** @var \Drupal\recurring_events_registration\Entity\Registrant $entity */
     $entity = $this->entity;
 
     $build['cancel'] = [
