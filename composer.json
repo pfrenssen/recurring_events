@@ -11,6 +11,6 @@
     "source": "http://cgit.drupalcode.org/recurring_events"
   },
   "require": {
-    "drupal/field_inheritance": "^1"
+    "drupal/field_inheritance": "^2"
   }
 }
