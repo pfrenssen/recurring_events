@@ -102,8 +102,8 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
     $config['start_date'] = $event->getDailyStartDate();
     $config['end_date'] = $event->getDailyEndDate();
     $config['time'] = strtoupper($event->getDailyStartTime());
+    $config['end_time'] = strtoupper($event->getDailyEndTime());
     $config['duration'] = $event->getDailyDuration();
-    $config['end_time'] = $event->getDailyEndTime();
     $config['duration_or_end_time'] = $event->getDailyDurationOrEndTime();
     return $config;
   }
@@ -146,8 +146,8 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
 
     $config['time'] = strtoupper($time);
     $config['end_time'] = strtoupper($end_time);
-    $config['duration_or_end_time'] = $user_input['daily_recurring_date'][0]['duration_or_end_time'];
     $config['duration'] = $user_input['daily_recurring_date'][0]['duration'];
+    $config['duration_or_end_time'] = $user_input['daily_recurring_date'][0]['duration_or_end_time'];
 
     return $config;
   }

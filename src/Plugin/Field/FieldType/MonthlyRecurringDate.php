@@ -93,8 +93,8 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
     $config['start_date'] = $event->getMonthlyStartDate();
     $config['end_date'] = $event->getMonthlyEndDate();
     $config['time'] = $event->getMonthlyStartTime();
-    $config['duration'] = $event->getMonthlyDuration();
     $config['end_time'] = $event->getMonthlyEndTime();
+    $config['duration'] = $event->getMonthlyDuration();
     $config['duration_or_end_time'] = $event->getMonthlyDurationOrEndTime();
     $config['monthly_type'] = $event->getMonthlyType();
 
@@ -147,10 +147,10 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
     $config['start_date'] = $start_date;
     $config['end_date'] = $end_date;
 
-    $config['time'] = $time;
+    $config['time'] = strtoupper($time);
+    $config['end_time'] = strtoupper($end_time);
     $config['duration'] = $user_input['monthly_recurring_date'][0]['duration'];
     $config['duration_or_end_time'] = $user_input['monthly_recurring_date'][0]['duration_or_end_time'];
-    $config['end_time'] = strtoupper($end_time);
     $config['monthly_type'] = $user_input['monthly_recurring_date'][0]['type'];
 
     switch ($config['monthly_type']) {
