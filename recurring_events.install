@@ -504,10 +504,14 @@ function recurring_events_update_8011() {
       ->execute()
       ->fetchAll();
 
-    $update_fields = array_fill_keys($field_fields, NULL);
-    $database->update($table_name)
-      ->fields($update_fields)
-      ->execute();
+    foreach ($database_values as &$value) {
+      $duration_field = $machine_name . '__duration';
+      if (property_exists($value, $duration_field)) {
+        if (empty($value->{$duration_field})) {
+          $value->{$duration_field} = 0;
+        }
+      }
+    }
 
     // Remove the existing daily/monthly/weekly recurring date field.
     $field_storage_definition = $definition_manager->getFieldStorageDefinition($machine_name, 'eventseries');
@@ -540,7 +544,7 @@ function recurring_events_update_8011() {
           $revision_key => $value->{$revision_key},
         ];
         foreach ($field_fields as $field) {
-          $values_to_restore[$field] = rtrim($value->{$field}, 's');
+          $values_to_restore[$field] = $value->{$field};
         }
         $values_to_restore[$machine_name . '__end_time'] = NULL;
         $values_to_restore[$machine_name . '__duration_or_end_time'] = 'duration';
