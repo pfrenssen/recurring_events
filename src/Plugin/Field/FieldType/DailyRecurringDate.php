@@ -218,8 +218,6 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
       foreach ($daily_dates as $daily_date) {
         // Set the time of the start date to be the hours and minutes.
         $daily_date->setTime($time_parts[0], $time_parts[1]);
-        // Configure the right timezone.
-        $daily_date->setTimezone($utc_timezone);
         // Create a clone of this date.
         $daily_date_end = clone $daily_date;
         // Check whether we are using a duration or end time.
@@ -238,6 +236,10 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
             }
             break;
         }
+
+        // Configure the storage timezone.
+        $daily_date->setTimezone($utc_timezone);
+        $daily_date_end->setTimezone($utc_timezone);
 
         // Set this event to be created.
         $events_to_create[$daily_date->format('r')] = [

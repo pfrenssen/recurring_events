@@ -155,8 +155,6 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
       foreach ($dates as $weekly_date) {
         // Set the time of the start date to be the hours and minutes.
         $weekly_date->setTime($time_parts[0], $time_parts[1]);
-        // Configure the right timezone.
-        $weekly_date->setTimezone($utc_timezone);
         // Create a clone of this date.
         $weekly_date_end = clone $weekly_date;
         // Check whether we are using a duration or end time.
@@ -175,6 +173,11 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
             }
             break;
         }
+
+        // Set the storage timezone.
+        $weekly_date->setTimezone($utc_timezone);
+        $weekly_date_end->setTimezone($utc_timezone);
+
         // Set this event to be created.
         $events_to_create[$weekly_date->format('r')] = [
           'start_date' => $weekly_date,

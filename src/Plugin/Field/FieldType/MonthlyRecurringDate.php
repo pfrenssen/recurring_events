@@ -250,8 +250,6 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
           // Set the time of the start date to be the hours and
           // minutes.
           $monthly_date->setTime($time_parts[0], $time_parts[1]);
-          // Configure the timezone.
-          $monthly_date->setTimezone($utc_timezone);
           // Create a clone of this date.
           $monthly_date_end = clone $monthly_date;
           // Check whether we are using a duration or end time.
@@ -270,6 +268,11 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
               }
               break;
           }
+
+          // Configure the timezone.
+          $monthly_date->setTimezone($utc_timezone);
+          $monthly_date_end->setTimezone($utc_timezone);
+
           // Set this event to be created.
           $events_to_create[$monthly_date->format('r')] = [
             'start_date' => $monthly_date,
