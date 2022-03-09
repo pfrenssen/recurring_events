@@ -153,8 +153,10 @@ class EventCreationService {
    *   TRUE if recurring config changes, FALSE otherwise.
    */
   public function checkForFormRecurConfigChanges(EventSeries $event, FormStateInterface $form_state) {
-    $entity_config = $this->convertEntityConfigToArray($event);
-    $form_config = $this->convertFormConfigToArray($form_state);
+    $entity_config = $this->convertArrayLowercaseSorted(
+      (array) $this->convertEntityConfigToArray($event));
+    $form_config = $this->convertArrayLowercaseSorted(
+      (array) $this->convertFormConfigToArray($form_state));
     return !(serialize($entity_config) === serialize($form_config));
   }
 
@@ -170,8 +172,10 @@ class EventCreationService {
    *   TRUE if recurring config changes, FALSE otherwise.
    */
   public function checkForOriginalRecurConfigChanges(EventSeries $event, EventSeries $original) {
-    $entity_config = $this->convertEntityConfigToArray($event);
-    $original_config = $this->convertEntityConfigToArray($original);
+    $entity_config = $this->convertArrayLowercaseSorted(
+      (array) $this->convertEntityConfigToArray($event));
+    $original_config = $this->convertArrayLowercaseSorted(
+      (array) $this->convertEntityConfigToArray($original));
     return !(serialize($entity_config) === serialize($original_config));
   }
 
@@ -276,6 +280,32 @@ class EventCreationService {
     $this->moduleHandler->alter('recurring_events_form_config_array', $config);
 
     return $config;
+  }
+
+  /**
+   * Normalize an array for equality checks, without having to worry about order
+   * or casing discrepencies.
+   *
+   * @param array $input
+   *   The array to clean and sort.
+   *
+   * @return array
+   *   A cleaned array.
+   */
+  public static function convertArrayLowercaseSorted(array $input) {
+    foreach ($input as $key => $val) {
+      if (is_object($val)) {
+        $input[$key] = self::convertArrayLowercaseSorted((array) $val);
+      }
+      if (is_array($val)) {
+        $input[$key] = self::convertArrayLowercaseSorted($val);
+      }
+      if (is_string($val)) {
+        $input[$key] = strtolower($val);
+      }
+    }
+    uksort($input, 'strcmp');
+    return $input;
   }
 
   /**
