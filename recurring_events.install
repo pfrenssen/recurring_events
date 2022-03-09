@@ -562,3 +562,12 @@ function recurring_events_update_8011() {
     }
   }
 }
+
+/**
+ * Remove the event_instance entity reference field, now use computed field.
+ */
+function recurring_events_update_8012() {
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $field_storage_definition = $definition_manager->getFieldStorageDefinition('event_instances', 'eventseries');
+  $definition_manager->uninstallFieldStorageDefinition($field_storage_definition);
+}

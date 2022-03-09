@@ -201,11 +201,15 @@ class RegistrationCreationService {
 
     switch ($this->getRegistrationType()) {
       case 'series':
-        $properties['eventseries_id'] = $this->eventSeries->id();
+        if (!empty($this->eventSeries->id())) {
+          $properties['eventseries_id'] = $this->eventSeries->id();
+        }
         break;
 
       case 'instance':
-        $properties['eventinstance_id'] = $this->eventInstance->id();
+        if (!empty($this->eventInstance->id())) {
+          $properties['eventinstance_id'] = $this->eventInstance->id();
+        }
         break;
     }
     $results = $this->storage->loadByProperties($properties);

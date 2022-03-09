@@ -401,65 +401,48 @@ class EventCreationService {
   }
 
   /**
-   * Create an event based on the form submitted values.
+   * Clear out existing event instances..
    *
    * @param Drupal\recurring_events\Entity\EventSeries $event
-   *   The stored event series entity.
-   * @param Drupal\recurring_events\Entity\EventSeries $original
-   *   The original, unsaved event series entity.
+   *   The event series entity.
    */
-  public function saveEvent(EventSeries $event, EventSeries $original = NULL) {
-    // We want to always create instances if this is a brand new series.
-    if ($event->isNew()) {
-      $create_instances = TRUE;
-    }
-    else {
-      // If there are date differences, we need to clear out the instances.
-      $create_instances = $this->checkForOriginalRecurConfigChanges($event, $original);
-      if ($create_instances) {
-        // Allow other modules to react prior to the deletion of all instances.
-        $this->moduleHandler->invokeAll('recurring_events_save_pre_instances_deletion', [
+  public function clearEventInstances(EventSeries $event) {
+    // Allow other modules to react prior to the deletion of all instances.
+    $this->moduleHandler->invokeAll('recurring_events_save_pre_instances_deletion', [
+      $event,
+      $original,
+    ]);
+
+    // Find all the instances and delete them.
+    $instances = $event->event_instances->referencedEntities();
+    if (!empty($instances)) {
+      foreach ($instances as $instance) {
+        // Allow other modules to react prior to deleting a specific
+        // instance after a date configuration change.
+        $this->moduleHandler->invokeAll('recurring_events_save_pre_instance_deletion', [
           $event,
-          $original,
+          $instance,
         ]);
 
-        // Find all the instances and delete them.
-        $instances = $event->event_instances->referencedEntities();
-        if (!empty($instances)) {
-          foreach ($instances as $instance) {
-            // Allow other modules to react prior to deleting a specific
-            // instance after a date configuration change.
-            $this->moduleHandler->invokeAll('recurring_events_save_pre_instance_deletion', [
-              $event,
-              $instance,
-            ]);
+        $instance->delete();
 
-            $instance->delete();
-
-            // Allow other modules to react after deleting a specific instance
-            // after a date configuration change.
-            $this->moduleHandler->invokeAll('recurring_events_save_post_instance_deletion', [
-              $event,
-              $instance,
-            ]);
-          }
-          $this->messenger->addStatus($this->translation->translate('A total of %count existing event instances were removed', [
-            '%count' => count($instances),
-          ]));
-        }
-
-        // Allow other modules to react after the deletion of all instances.
-        $this->moduleHandler->invokeAll('recurring_events_save_post_instances_deletion', [
+        // Allow other modules to react after deleting a specific instance
+        // after a date configuration change.
+        $this->moduleHandler->invokeAll('recurring_events_save_post_instance_deletion', [
           $event,
-          $original,
+          $instance,
         ]);
       }
+      $this->messenger->addStatus($this->translation->translate('A total of %count existing event instances were removed', [
+        '%count' => count($instances),
+      ]));
     }
 
-    // Only create instances if date changes have been made or the event is new.
-    if ($create_instances) {
-      $this->createInstances($event);
-    }
+    // Allow other modules to react after the deletion of all instances.
+    $this->moduleHandler->invokeAll('recurring_events_save_post_instances_deletion', [
+      $event,
+      $original,
+    ]);
   }
 
   /**
@@ -516,7 +499,6 @@ class EventCreationService {
     $this->messenger->addMessage($this->translation->translate('A total of %items event instances were created as part of this event series.', [
       '%items' => count($event_instances),
     ]));
-    $event->set('event_instances', $event_instances);
   }
 
   /**

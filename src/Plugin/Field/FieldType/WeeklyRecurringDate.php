@@ -68,8 +68,8 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
     $config = [];
     $config['start_date'] = $event->getWeeklyStartDate();
     $config['end_date'] = $event->getWeeklyEndDate();
-    $config['time'] = $event->getWeeklyStartTime();
-    $config['end_time'] = $event->getWeeklyEndTime();
+    $config['time'] = strtoupper($event->getWeeklyStartTime());
+    $config['end_time'] = strtoupper($event->getWeeklyEndTime());
     $config['duration'] = $event->getWeeklyDuration();
     $config['duration_or_end_time'] = $event->getWeeklyDurationOrEndTime();
     $config['days'] = $event->getWeeklyDays();

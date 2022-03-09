@@ -147,18 +147,11 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
       // Loop through all instances on the series and remove the reference to
       // this instance.
       if (!empty($series_instances)) {
-        $changed = FALSE;
-        foreach ($series_instances as $index => $instance) {
+        foreach ($series_instances as $instance) {
           if ($instance->id() == $entity->id()) {
-            $entity->getEventSeries()->event_instances->removeItem($index);
-            $changed = TRUE;
+            $instance->delete();
           }
         }
-      }
-
-      // If changes were made to the series entity, save it.
-      if ($changed) {
-        $entity->getEventSeries()->save();
       }
 
       // Allow other modules to react prior to deleting a specific instance
