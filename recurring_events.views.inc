@@ -31,8 +31,36 @@ function recurring_events_views_data_alter(array &$data) {
     ],
   ];
 
+  $data['eventseries_field_data']['term_eventseries_tid_depth'] = [
+    'help' => t('Display event series if it has the selected taxonomy terms, or children of the selected terms.'),
+    'real field' => 'id',
+    'argument' => [
+      'title' => t('Event Series has taxonomy term ID (with depth)'),
+      'id' => 'taxonomy_index_tid_eventseries_depth',
+      'accept depth modifier' => TRUE,
+    ],
+    'filter' => [
+      'title' => t('Event Series has taxonomy term ID (with depth)'),
+      'id' => 'taxonomy_index_tid_eventseries_depth',
+    ]
+  ];
+
   // Set the default field for a view based on eventinstances.
   $data['eventinstance_field_data']['table']['base']['defaults']['field'] = 'id';
+
+  $data['eventinstance_field_data']['term_eventinstance_tid_depth'] = [
+    'help' => t('Display event instance if it has the selected taxonomy terms, or children of the selected terms.'),
+    'real field' => 'id',
+    'argument' => [
+      'title' => t('Event Instance has taxonomy term ID (with depth)'),
+      'id' => 'taxonomy_index_tid_eventinstance_depth',
+      'accept depth modifier' => TRUE,
+    ],
+    'filter' => [
+      'title' => t('Event Instance has taxonomy term ID (with depth)'),
+      'id' => 'taxonomy_index_tid_eventinstance_depth',
+    ]
+  ];
 
   // @todo Remove these declarations when
   // https://www.drupal.org/project/drupal/issues/2489476 is resolved.
