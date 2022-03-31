@@ -222,9 +222,9 @@ class EventCreationService {
 
     $user_timezone = new \DateTimeZone(date_default_timezone_get());
     $utc_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
-    $user_input = $form_state->getUserInput();
+    $user_input = $form_state->getValues();
 
-    $config['type'] = $user_input['recur_type'];
+    $config['type'] = $user_input['recur_type'][0]['value'];
 
     $config['excluded_dates'] = [];
     if (!empty($user_input['excluded_dates'])) {
@@ -237,29 +237,21 @@ class EventCreationService {
     }
 
     if ($config['type'] === 'custom') {
-      foreach ($user_input['custom_date'] as $custom_date) {
+      foreach ($user_input['custom_date'] as $key => $custom_date) {
+        if (!is_numeric($key)) {
+          continue;
+        }
         $start_date = $end_date = NULL;
 
-        if (!empty($custom_date['value']['date'])
-          && !empty($custom_date['value']['time'])
-          && !empty($custom_date['end_value']['date'])
-          && !empty($custom_date['end_value']['time'])) {
+        if (!empty($custom_date['value']) && !empty($custom_date['end_value'])) {
 
-          // For some reason, sometimes we do not receive seconds from the
-          // date range picker.
-          if (strlen($custom_date['value']['time']) == 5) {
-            $custom_date['value']['time'] .= ':00';
-          }
-          if (strlen($custom_date['end_value']['time']) == 5) {
-            $custom_date['end_value']['time'] .= ':00';
-          }
+          $start_timestamp = $custom_date['value']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
+          $end_timestamp = $custom_date['end_value']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
 
-          $start_timestamp = implode('T', $custom_date['value']);
           $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
           // Convert the DateTime object back to UTC timezone.
           $start_date->setTimezone($utc_timezone);
 
-          $end_timestamp = implode('T', $custom_date['end_value']);
           $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
           // Convert the DateTime object back to UTC timezone.
           $end_date->setTimezone($utc_timezone);
@@ -409,8 +401,7 @@ class EventCreationService {
   public function clearEventInstances(EventSeries $event) {
     // Allow other modules to react prior to the deletion of all instances.
     $this->moduleHandler->invokeAll('recurring_events_save_pre_instances_deletion', [
-      $event,
-      $original,
+      $event
     ]);
 
     // Find all the instances and delete them.
@@ -440,8 +431,7 @@ class EventCreationService {
 
     // Allow other modules to react after the deletion of all instances.
     $this->moduleHandler->invokeAll('recurring_events_save_post_instances_deletion', [
-      $event,
-      $original,
+      $event
     ]);
   }
 
@@ -616,11 +606,14 @@ class EventCreationService {
     $dates = [];
 
     if (!empty($field)) {
-      foreach ($field as $date) {
-        if (!empty($date['value']['date']) && !empty($date['end_value']['date'])) {
+      foreach ($field as $key => $date) {
+        if (!is_numeric($key)) {
+          continue;
+        }
+        if (!empty($date['value']) && !empty($date['end_value'])) {
           $dates[] = [
-            'value' => $date['value']['date'],
-            'end_value' => $date['end_value']['date'],
+            'value' => $date['value']->format('Y-m-d'),
+            'end_value' => $date['end_value']->format('Y-m-d'),
           ];
         }
       }

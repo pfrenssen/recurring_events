@@ -115,7 +115,7 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
     $config = [];
 
     $user_timezone = new \DateTimeZone(date_default_timezone_get());
-    $user_input = $form_state->getUserInput();
+    $user_input = $form_state->getValues();
 
     $time = $user_input['daily_recurring_date'][0]['time'];
     if (is_array($time)) {
@@ -125,7 +125,7 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
     $time_parts = static::convertTimeTo24hourFormat($time);
     $timestamp = implode(':', $time_parts);
 
-    $start_timestamp = $user_input['daily_recurring_date'][0]['value']['date'] . 'T' . $timestamp;
+    $start_timestamp = $user_input['daily_recurring_date'][0]['value']->format('Y-m-d') . 'T' . $timestamp;
     $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
     $start_date->setTime(0, 0, 0);
 
@@ -137,7 +137,7 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
     $end_time_parts = static::convertTimeTo24hourFormat($end_time);
     $end_timestamp = implode(':', $end_time_parts);
 
-    $end_timestamp = $user_input['daily_recurring_date'][0]['end_value']['date'] . 'T' . $end_timestamp;
+    $end_timestamp = $user_input['daily_recurring_date'][0]['end_value']->format('Y-m-d') . 'T' . $end_timestamp;
     $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
     $end_date->setTime(0, 0, 0);
 
@@ -158,14 +158,14 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
   public static function buildDiffArray(array $entity_config, array $form_config) {
     $diff = [];
 
-    if ($entity_config['start_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT) !== $form_config['start_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT)) {
+    if (!empty($entity_config['start_date']) && !empty($form_config['start_date']) && $entity_config['start_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT) !== $form_config['start_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT)) {
       $diff['start_date'] = [
         'label' => t('Start Date'),
         'stored' => $entity_config['start_date']->format(DateTimeItemInterface::DATE_STORAGE_FORMAT),
         'override' => $form_config['start_date']->format(DateTimeItemInterface::DATE_STORAGE_FORMAT),
       ];
     }
-    if ($entity_config['end_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT) !== $form_config['end_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT)) {
+    if (!empty($entity_config['end_date']) && !empty($form_config['end_date']) && $entity_config['end_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT) !== $form_config['end_date']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT)) {
       $diff['end_date'] = [
         'label' => t('End Date'),
         'stored' => $entity_config['end_date']->format(DateTimeItemInterface::DATE_STORAGE_FORMAT),
