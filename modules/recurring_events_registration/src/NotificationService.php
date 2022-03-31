@@ -418,11 +418,18 @@ class NotificationService {
    *   The parsed string.
    */
   public function parseTokenizedString($string) {
-    $data = [
-      'registrant' => $this->entity,
-      'eventinstance' => $this->entity ? $this->entity->getEventInstance() : NULL,
-      'eventseries' => $this->entity ? $this->entity->getEventSeries() : NULL,
-    ];
+    // #3272196 for some reason the Registrant entity is sometimes null. So here
+    // we check first to avoid throwing PHP notices.
+    if (empty($this->entity)) {
+      $data = [];
+    }
+    else {
+      $data = [
+        'registrant' => $this->entity,
+        'eventinstance' => $this->entity ? $this->entity->getEventInstance() : NULL,
+        'eventseries' => $this->entity ? $this->entity->getEventSeries() : NULL,
+      ];
+    }
     // Double token replace to allow for global token replacements containing
     // tokens themselves.
     return $this->token->replace($this->token->replace($string, $data), $data);
