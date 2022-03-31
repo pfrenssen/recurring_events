@@ -310,7 +310,8 @@ function recurring_events_registration_recurring_events_pre_delete_instances(Eve
 function recurring_events_registration_send_notification($key, RegistrantInterface $registrant) {
   $config = \Drupal::config('recurring_events_registration.registrant.config');
   $send_email = $config->get('email_notifications');
-  if ($send_email) {
+  $send_email_key = $config->get($key . '_enabled');
+  if ($send_email && $send_email_key) {
     $params = [
       'registrant' => $registrant,
     ];
