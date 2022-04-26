@@ -474,6 +474,21 @@ function recurring_events_update_8011() {
     ],
   ];
 
+  $updates = [
+    'tables' => [
+      'eventseries_field_data',
+      'eventseries_field_revision',
+      ],
+    'fields' => [
+      'daily_recurring_date__value',
+      'daily_recurring_date__end_value',
+      'weekly_recurring_date__value',
+      'weekly_recurring_date__end_value',
+      'monthly_recurring_date__value',
+      'monthly_recurring_date__end_value',
+    ],
+  ];
+
   $entity_type_manager = \Drupal::entityTypeManager();
 
   $storage = $entity_type_manager->getStorage('eventseries');
@@ -487,6 +502,15 @@ function recurring_events_update_8011() {
 
   $database = \Drupal::database();
   $definition_manager = \Drupal::entityDefinitionUpdateManager();
+
+  foreach ($updates['tables'] as $table) {
+    foreach ($updates['fields'] as $field) {
+      $database->update($table)
+        ->fields([$field => ''])
+        ->isNull($field)
+        ->execute();
+    }
+  }
 
   $basefield_definitions = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions('eventseries');
 
