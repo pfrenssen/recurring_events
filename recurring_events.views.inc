@@ -31,6 +31,23 @@ function recurring_events_views_data_alter(array &$data) {
     ],
   ];
 
+  $data['eventseries_field_data']['event_instances_target_id'] = [
+    'title' => t('Event Instances'),
+    'help' => t('Display the event instances associated with the series'),
+    'relationship' => [
+      // Views name of the table being joined to from foo.
+      'base' => 'eventinstance_field_data',
+      // Database field name in example_table for the join.
+      'base field' => 'eventseries_id',
+      // Real database field name in foo for the join, to override
+      // 'unique_dummy_name'.
+      'field' => 'id',
+      // ID of relationship handler plugin to use.
+      'id' => 'standard',
+      'label' => t('Event Series Instances'),
+    ],
+  ];
+
   $data['eventseries_field_data']['term_eventseries_tid_depth'] = [
     'help' => t('Display event series if it has the selected taxonomy terms, or children of the selected terms.'),
     'real field' => 'id',
