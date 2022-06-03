@@ -333,6 +333,27 @@ class RegistrantForm extends ContentEntityForm {
     }
     $form['actions']['submit']['#value'] = $save_label;
 
+    // Hide the form if user is not allowed to register for this series.
+    $permitted_roles = $this->creationService->registrationPermittedRoles();
+    $role_permitted = empty($permitted_roles);
+    if (!$role_permitted) {
+      $user_roles = $this->currentUser->getRoles();
+      if (in_array('administrator', $user_roles)) {
+        $role_permitted = true;
+      }
+      else {
+        foreach($user_roles as $user_role) {
+          if (in_array($user_role, $permitted_roles)) {
+            $role_permitted = true;
+            break;
+          }
+        }
+      }
+    }
+    if (!$role_permitted) {
+      $this->messenger->addMessage('You are not allowed to register for events in this series.', $this->messenger::TYPE_WARNING);
+      $form['#disabled'] = true;
+    }
     return $form;
   }
 
