@@ -247,14 +247,8 @@ class EventCreationService {
 
           $start_timestamp = $custom_date['value']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
           $end_timestamp = $custom_date['end_value']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
-
-          $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
-          // Convert the DateTime object back to UTC timezone.
-          $start_date->setTimezone($utc_timezone);
-
-          $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
-          // Convert the DateTime object back to UTC timezone.
-          $end_date->setTimezone($utc_timezone);
+          $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $utc_timezone);
+          $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $utc_timezone);
 
           $config['custom_dates'][] = [
             'start_date' => $start_date,
@@ -361,14 +355,20 @@ class EventCreationService {
         if ($entity_config['custom_dates'] !== $form_config['custom_dates']) {
           $stored_start_ends = $overridden_start_ends = [];
 
+          $user_timezone = new \DateTimeZone(date_default_timezone_get());
+
           foreach ($entity_config['custom_dates'] as $date) {
             if (!empty($date['start_date']) && !empty($date['end_date'])) {
+              $date['start_date']->setTimezone($user_timezone);
+              $date['end_date']->setTimezone($user_timezone);
               $stored_start_ends[] = $date['start_date']->format('Y-m-d h:ia') . ' - ' . $date['end_date']->format('Y-m-d h:ia');
             }
           }
 
           foreach ($form_config['custom_dates'] as $date) {
             if (!empty($date['start_date']) && !empty($date['end_date'])) {
+              $date['start_date']->setTimezone($user_timezone);
+              $date['end_date']->setTimezone($user_timezone);
               $overridden_start_ends[] = $date['start_date']->format('Y-m-d h:ia') . ' - ' . $date['end_date']->format('Y-m-d h:ia');
             }
           }

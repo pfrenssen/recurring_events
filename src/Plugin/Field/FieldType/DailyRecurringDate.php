@@ -125,6 +125,7 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
     $time_parts = static::convertTimeTo24hourFormat($time);
     $timestamp = implode(':', $time_parts);
 
+    $user_input['daily_recurring_date'][0]['value']->setTimezone($user_timezone);
     $start_timestamp = $user_input['daily_recurring_date'][0]['value']->format('Y-m-d') . 'T' . $timestamp;
     $start_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $start_timestamp, $user_timezone);
     $start_date->setTime(0, 0, 0);
@@ -137,6 +138,7 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
     $end_time_parts = static::convertTimeTo24hourFormat($end_time);
     $end_timestamp = implode(':', $end_time_parts);
 
+    $user_input['daily_recurring_date'][0]['end_value']->setTimezone($user_timezone);
     $end_timestamp = $user_input['daily_recurring_date'][0]['end_value']->format('Y-m-d') . 'T' . $end_timestamp;
     $end_date = DrupalDateTime::createFromFormat(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $end_timestamp, $user_timezone);
     $end_date->setTime(0, 0, 0);
