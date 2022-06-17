@@ -104,7 +104,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       '#title' => $this->t('Which roles can register for this series?'),
       '#description' => $this->t('Select all the roles that can register, or leave blank to allow anybody to register.'),
       '#weight' => 1,
-      '#default_value' => $items[$delta]->permitted_roles ? explode(',', $items[$delta]->permitted_roles) : '',
+      '#default_value' => $items[$delta]->permitted_roles ? explode(',', $items[$delta]->permitted_roles) : [],
       '#options' => $role_options,
       '#states' => [
         'visible' => [
