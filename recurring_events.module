@@ -324,9 +324,9 @@ function recurring_events_eventseries_type_insert(EntityInterface $entity) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_delete().
+ * Implements hook_ENTITY_TYPE_predelete().
  */
-function recurring_events_eventseries_delete(EntityInterface $entity) {
+function recurring_events_eventseries_predelete(EntityInterface $entity) {
   // Only delete instances if we're deleting the default translation of the
   // series.
   if ($entity->isDefaultTranslation()) {
