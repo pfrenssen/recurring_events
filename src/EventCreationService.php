@@ -433,6 +433,8 @@ class EventCreationService {
     $this->moduleHandler->invokeAll('recurring_events_save_post_instances_deletion', [
       $event
     ]);
+
+    $this->entityTypeManager->getStorage('eventseries')->resetCache([$event->id()]);
   }
 
   /**
@@ -463,7 +465,9 @@ class EventCreationService {
 
           if (!empty($events_to_create)) {
             foreach ($events_to_create as $custom_event) {
-              $event_instances[] = $this->createEventInstance($event, $custom_event['start_date'], $custom_event['end_date']);
+              $instance = $this->createEventInstance($event, $custom_event['start_date'], $custom_event['end_date']);
+              $this->configureDefaultInheritances($instance, $event->id());
+              $event_instances[] = $instance;
             }
           }
         }
@@ -479,7 +483,9 @@ class EventCreationService {
 
         if (!empty($events_to_create)) {
           foreach ($events_to_create as $event_to_create) {
-            $event_instances[] = $this->createEventInstance($event, $event_to_create['start_date'], $event_to_create['end_date']);
+            $instance = $this->createEventInstance($event, $event_to_create['start_date'], $event_to_create['end_date']);
+            $this->configureDefaultInheritances($instance, $event->id());
+            $event_instances[] = $instance;
           }
         }
       }
@@ -501,7 +507,7 @@ class EventCreationService {
    * @param Drupal\Core\Datetime\DrupalDateTime $end_date
    *   The end date and time of the event.
    *
-   * @return static
+   * @return \Drupal\recurring_events\Entity\EventInstance
    *   The created event instance entity object.
    */
   public function createEventInstance(EventSeries $event, DrupalDateTime $start_date, DrupalDateTime $end_date) {
