@@ -144,6 +144,10 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
     else {
       $series_instances = $entity->getEventSeries()->event_instances->referencedEntities();
 
+      // Allow other modules to react prior to deleting a specific instance
+      // after a date configuration change.
+      \Drupal::moduleHandler()->invokeAll('recurring_events_pre_delete_instance', [$entity]);
+
       // Loop through all instances on the series and remove the reference to
       // this instance.
       if (!empty($series_instances)) {
@@ -153,10 +157,6 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
           }
         }
       }
-
-      // Allow other modules to react prior to deleting a specific instance
-      // after a date configuration change.
-      \Drupal::moduleHandler()->invokeAll('recurring_events_pre_delete_instance', [$entity]);
 
       $entity->delete();
 
