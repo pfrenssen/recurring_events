@@ -5,6 +5,7 @@
  * Install and update functionalit for the recurring_events_views module.
  */
 
+use Drupal\Core\Serialization\Yaml;
 use Drupal\views\Views;
 
 /**
