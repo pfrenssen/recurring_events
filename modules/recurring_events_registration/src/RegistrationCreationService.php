@@ -752,12 +752,19 @@ class RegistrationCreationService {
       if ($registration_id === $ignored_registrant_id) {
         continue;
       }
-      // Compare the event instance ID and email address.
-      if (($this->eventInstance->id() == $registration_record->get('eventinstance_id')->target_id)
-        && ($this->cleanEmailAddress($email) == $this->cleanEmailAddress($registration_record->get('email')->value))) {
-        // Remember the existing registration ID and stop looking.
-        $existing_registration_id = $registration_id;
-        break;
+      if ($this->cleanEmailAddress($email) == $this->cleanEmailAddress($registration_record->get('email')->value)) {
+        if ($this->getRegistrationType() === 'instance') {
+          // Compare the event instance ID and email address.
+          if (($this->eventInstance->id() == $registration_record->get('eventinstance_id')->target_id)) {
+            // Remember the existing registration ID and stop looking.
+            $existing_registration_id = $registration_id;
+            break;
+          }
+        }
+        else {
+          $existing_registration_id = $registration_id;
+          break;
+        }
       }
     }
     return $existing_registration_id;
