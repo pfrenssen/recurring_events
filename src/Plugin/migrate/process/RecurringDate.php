@@ -142,7 +142,7 @@ class RecurringDate extends ProcessPluginBase {
     // Take the timezone from the first element, if provided.
     $timezone = empty($first[$timezone_key]) ? $default_timezone : $first[$timezone_key];
     $source_timezone = new \DateTimeZone($timezone);
-    date_default_timezone_set($timezone);
+    $storage_timezone = new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE);
 
     // Check whether the date data is non-associative.
     if (!isset($first[$value_key])) {
@@ -151,11 +151,9 @@ class RecurringDate extends ProcessPluginBase {
     }
 
     // Get values for the first event in the series.
-    $start_event = new DrupalDateTime($first[$value_key], DateTimeItemInterface::STORAGE_TIMEZONE);
-    $start_event->setTimezone($source_timezone);
+    $start_event = new DrupalDateTime($first[$value_key], $source_timezone);
     $end_key = (!empty($first[$end_value_key])) ? $end_value_key : $value_key;
-    $end_event = new DrupalDateTime($first[$end_key], DateTimeItemInterface::STORAGE_TIMEZONE);
-    $end_event->setTimezone($source_timezone);
+    $end_event = new DrupalDateTime($first[$end_key], $source_timezone);
     if (!$duration = $end_event->getTimestamp() - $start_event->getTimestamp()) {
       $duration = self::DEFAULT_DURATION;
       $end_event->add(new \DateInterval('PT' . $duration . 'S'));
@@ -172,13 +170,16 @@ class RecurringDate extends ProcessPluginBase {
 
     if (empty($rrule['UNTIL'])) {
       // Get values for the last event in the series.
-      $end_series = new DrupalDateTime($last[$value_key], DateTimeItemInterface::STORAGE_TIMEZONE);
+      $end_series = new DrupalDateTime($last[$value_key], $source_timezone);
     }
     else {
       // Use the UNTIL value as the last event in the series.
-      $end_series = new DrupalDateTime($rrule['UNTIL'], DateTimeItemInterface::STORAGE_TIMEZONE);
+      $end_series = new DrupalDateTime($rrule['UNTIL'], $source_timezone);
     }
-    $end_series->setTimezone($source_timezone);
+    // Adjust the timezone before storing values into the database.\
+    $start_event->setTimezone($storage_timezone);
+    $end_event->setTimezone($storage_timezone);
+    $end_series->setTimezone($storage_timezone);
 
     // Set the recurring date field data.
     $recurrence_config = [];
@@ -220,8 +221,8 @@ class RecurringDate extends ProcessPluginBase {
           $date_start = new DrupalDateTime($date[$value_key], $source_timezone);
           $date_end = new DrupalDateTime($date[$end_value_key], $source_timezone);
           $recurrence_config[] = [
-            'value' => $date_start->format(RRuleHelper::DATETIME_FORMAT),
-            'end_value' => $date_end->format(RRuleHelper::DATETIME_FORMAT),
+            'value' => $date_start->setTimezone($storage_timezone)->format(RRuleHelper::DATETIME_FORMAT),
+            'end_value' => $date_end->setTimezone($storage_timezone)->format(RRuleHelper::DATETIME_FORMAT),
           ];
         }
     }
