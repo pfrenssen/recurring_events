@@ -181,7 +181,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     $form['display']['use_admin_theme'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Use the administration theme when managing registrations'),
-      '#description' => t('Control which roles can "View the administration theme" on the <a href=":permissions">Permissions page</a>.', [
+      '#description' => $this->t('Control which roles can "View the administration theme" on the <a href=":permissions">Permissions page</a>.', [
         ':permissions' => Url::fromRoute('user.admin_permissions')->toString(),
       ]),
       '#default_value' => $config->get('use_admin_theme'),
