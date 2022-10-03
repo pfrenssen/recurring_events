@@ -59,6 +59,14 @@ function recurring_events_entity_operation(EntityInterface $entity) {
     ];
   }
 
+  if ($entity->getEntityTypeId() == 'eventseries') {
+    $operations['add_instance'] = [
+      'title' => t('Add Instance'),
+      'weight' => 50,
+      'url' => $entity->toUrl('add-instance-form'),
+    ];
+  }
+
   return $operations;
 }
 
