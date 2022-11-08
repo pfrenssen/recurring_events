@@ -439,10 +439,15 @@ class EventCreationService {
   /**
    * Create the event instances from the form state.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
+   *
+   * @return \Drupal\recurring_events\Entity\EventInstance[]
+   *   An array of event instances created for the series.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function createInstances(EventSeries $event) {
+  public function createInstances(EventSeries $event): array {
     $form_data = $this->convertEntityConfigToArray($event);
     $event_instances = [];
 
@@ -494,6 +499,8 @@ class EventCreationService {
     $this->messenger->addMessage($this->translation->translate('A total of %items event instances were created as part of this event series.', [
       '%items' => count($event_instances),
     ]));
+
+    return $event_instances;
   }
 
   /**
