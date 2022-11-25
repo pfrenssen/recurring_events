@@ -314,6 +314,10 @@ function recurring_events_registration_send_notification($key, RegistrantInterfa
   $config = \Drupal::config('recurring_events_registration.registrant.config');
   $send_email = $config->get('email_notifications');
   $send_email_key = $config->get('notifications' . '.' . $key . '.enabled');
+
+  // Modify $send_email if necessary.
+  \Drupal::moduleHandler()->alter('recurring_events_registration_send_notification', $send_email, $registrant);
+
   if ($send_email && $send_email_key) {
     $params = [
       'registrant' => $registrant,
