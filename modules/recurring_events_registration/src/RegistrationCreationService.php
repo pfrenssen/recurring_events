@@ -690,7 +690,7 @@ class RegistrationCreationService {
       return;
     }
 
-    if ($this->retrieveAvailability() > 0) {
+    if ($this->hasAvailability()) {
       $first_waitlist = $this->retrieveFirstWaitlistParty();
       if (!empty($first_waitlist)) {
         $first_waitlist->setWaitlist('0');
