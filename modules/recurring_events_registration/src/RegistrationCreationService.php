@@ -279,6 +279,22 @@ class RegistrationCreationService {
   }
 
   /**
+   * Checks if event instance has any availability.
+   *
+   * @return bool
+   *   Whether registration spaces exist.
+   */
+  public function hasAvailability() {
+    $availability = $this->retrieveAvailability();
+
+    if ($availability == -1 || $availability > 0) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Get registration availability.
    *
    * @return int
