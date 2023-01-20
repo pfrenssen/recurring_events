@@ -190,7 +190,7 @@ class RegistrantForm extends ContentEntityForm {
     $editing = !$entity->isNew();
 
     if (empty($event_instance)) {
-      throw new NotFoundHttpException();
+      return;
     }
 
     // Use the registration creation service to grab relevant data.

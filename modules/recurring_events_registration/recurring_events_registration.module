@@ -476,7 +476,7 @@ function recurring_events_registration_form_alter(array &$form, FormStateInterfa
   if ($form_object instanceof RegistrantForm) {
     /** @var \Drupal\recurring_events_registration\Entity\RegistrantInterface $entity */
     $entity = $form_object->getEntity();
-    if (!empty($entity) && $entity instanceof RegistrantInterface && $entity->getEntityTypeId() === 'registrant') {
+    if (!empty($entity) && $entity instanceof RegistrantInterface && $entity->getEntityTypeId() === 'registrant' && !empty($form['actions'])) {
       foreach ($form['actions']['submit']['#submit'] as $key => $submit) {
         if (is_array($submit) && $submit[0] === 'Drupal\content_moderation\EntityTypeInfo') {
           unset($form['actions']['submit']['#submit'][$key]);
