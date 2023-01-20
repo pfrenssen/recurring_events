@@ -215,6 +215,15 @@ eventinstance.settings:
   requirements:
     _permission: 'administer eventinstance entity'
 
+# Orphaned content cleanup.
+recurring_events.orphaned_instances:
+  path: '/admin/structure/events/orphaned-instances'
+  defaults:
+    _form: '\Drupal\recurring_events\Form\OrphanedEventInstanceForm'
+    _title: 'Orphaned Event Instances'
+  requirements:
+    _permission: 'administer orphaned events entities'
+
 # Event Series admin table list route.
 entity.eventseries.admin_collection:
   path: '/admin/content/events/series'
