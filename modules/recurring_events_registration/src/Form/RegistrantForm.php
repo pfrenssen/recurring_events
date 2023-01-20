@@ -20,6 +20,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\content_moderation\ModerationInformation;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\recurring_events_registration\NotificationService;
 
 /**
@@ -546,7 +547,27 @@ class RegistrantForm extends ContentEntityForm {
       $this->messenger->addMessage(new FormattableMarkup($this->notificationService->parseTokenizedString($message), []));
     }
 
-    $form_state->setRedirectUrl(Url::fromRoute('<current>'));
+    $redirect_choice = $this->config('recurring_events_registration.registrant.config')->get('insert_redirect_choice');
+    switch ($redirect_choice) {
+
+      case 'instance':
+        $form_state->setRedirect('entity.eventinstance.canonical', ['eventinstance' => $event_instance->id()]);
+        break;
+
+      case 'series':
+        $form_state->setRedirect('entity.eventseries.canonical', ['eventseries' => $event_series->id()]);
+        break;
+
+      case 'other':
+        $url = $this->config('recurring_events_registration.registrant.config')->get('insert_redirect_other');
+        $response = new TrustedRedirectResponse(Url::fromUri($url)->toString());
+        $form_state->setResponse($response);
+        break;
+
+      default:
+        $form_state->setRedirectUrl(Url::fromRoute('<current>'));
+        break;
+    }
 
     // @todo Remove when https://www.drupal.org/node/3173241 drops.
     if ($this->moderationInformation) {
