@@ -555,18 +555,24 @@ class RegistrationCreationService {
    */
   public function registrationIsOpen() {
     $registration = FALSE;
-    if ($this->hasRegistration()) {
-      $now = new DrupalDateTime();
 
-      $reg_open_close_dates = $this->registrationOpeningClosingTime();
-
-      if (!empty($reg_open_close_dates)) {
-        $registration = (
-          $now->getTimestamp() >= $reg_open_close_dates['reg_open']->getTimestamp()
-          && $now->getTimestamp() < $reg_open_close_dates['reg_close']->getTimestamp()
-        );
-      }
+    if (!$this->hasRegistration()) {
+      return $registration;
     }
+
+    $now = new DrupalDateTime();
+
+    $reg_open_close_dates = $this->registrationOpeningClosingTime();
+
+    if (empty($reg_open_close_dates) || empty($reg_open_close_dates['reg_open']) || empty($reg_open_close_dates['reg_close'])) {
+      return $registration;
+    }
+
+    $registration = (
+      $now->getTimestamp() >= $reg_open_close_dates['reg_open']->getTimestamp()
+      && $now->getTimestamp() < $reg_open_close_dates['reg_close']->getTimestamp()
+    );
+
     return $registration;
   }
 
@@ -617,6 +623,9 @@ class RegistrationCreationService {
           // The two registration types are 'series' or 'instance'.
           switch ($reg_type) {
             case 'series':
+              $reg_start = NULL;
+              $reg_end = NULL;
+
               $reg_date_range = $this->getRegistrationDateRange();
 
               if (!empty($reg_date_range)) {
