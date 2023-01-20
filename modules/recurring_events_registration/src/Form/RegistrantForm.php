@@ -525,6 +525,7 @@ class RegistrantForm extends ContentEntityForm {
       $tags = [];
       switch ($this->creationService->getRegistrationType()) {
         case 'series':
+          $tags[] = 'eventinstance:' . $event_instance->id();
           $tags[] = 'eventseries:' . $event_series->id();
           break;
 
