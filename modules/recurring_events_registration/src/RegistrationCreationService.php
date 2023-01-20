@@ -11,7 +11,7 @@ use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Extension\ModuleHandler;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Utility\Token;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -72,7 +72,7 @@ class RegistrationCreationService {
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandler
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -96,12 +96,12 @@ class RegistrationCreationService {
    *   The messenger service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Extension\ModuleHandler $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
    */
-  public function __construct(TranslationInterface $translation, Connection $database, LoggerChannelFactoryInterface $logger, Messenger $messenger, EntityTypeManagerInterface $entity_type_manager, ModuleHandler $module_handler, Token $token) {
+  public function __construct(TranslationInterface $translation, Connection $database, LoggerChannelFactoryInterface $logger, Messenger $messenger, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, Token $token) {
     $this->translation = $translation;
     $this->database = $database;
     $this->loggerFactory = $logger->get('recurring_events_registration');
