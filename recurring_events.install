@@ -444,7 +444,8 @@ function recurring_events_update_8010() {
   ];
 
   foreach ($configs as $config) {
-    $path = drupal_get_path('module', 'recurring_events') . '/config/install';
+    $path_resolver = \Drupal::service('extension.path.resolver');
+    $path = $path_resolver->getPath('module', 'recurring_events') . '/config/install';
     $source = new FileStorage($path);
     /** @var \Drupal\Core\Config\StorageInterface $active_storage */
     $active_storage = \Drupal::service('config.storage');
