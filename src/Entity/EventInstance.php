@@ -368,7 +368,8 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
     $fields['eventseries_id'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Event Series ID'))
       ->setDescription(t('The ID of the event series entity.'))
-      ->setSetting('target_type', 'eventseries');
+      ->setSetting('target_type', 'eventseries')
+      ->setTranslatable(TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
@@ -410,7 +411,11 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
    *   The event series.
    */
   public function getEventSeries() {
-    return $this->get('eventseries_id')->entity;
+    $entity = $this->get('eventseries_id')->entity;
+    if ($entity->hasTranslation($this->language()->getId())) {
+      return $entity->getTranslation($this->language()->getId());
+    }
+    return $entity;
   }
 
 }
