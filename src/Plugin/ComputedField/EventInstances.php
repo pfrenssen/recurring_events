@@ -20,7 +20,6 @@ class EventInstances extends EntityReferenceFieldItemList {
     if (!empty($entity->id())) {
       $instances = \Drupal::entityTypeManager()->getStorage('eventinstance')->loadByProperties([
         'eventseries_id' => $entity->id(),
-        'langcode' => $this->getLangcode(),
       ]);
 
       // Sort by instance start date and reindex by field item delta, as
@@ -30,7 +29,7 @@ class EventInstances extends EntityReferenceFieldItemList {
       });
 
       foreach ($instances as $key => $instance) {
-        $this->list[$key] = $this->createItem($key, $instance);
+        $this->list[$key] = $this->createItem($key, $instance->getTranslation($this->getLangcode()));
       }
     }
   }

@@ -533,7 +533,12 @@ class EventCreationService {
       $entity = $storage->create($data);
     }
     else {
+      // Grab the untranslated event series.
       $original = $event->getUntranslated();
+      // Find the corresponding default language event instance that matches
+      // the date and time of the version we wish to translate, so that we are
+      // mapping the translations from default language to translated language
+      // appropriately.
       $entity_ids = $storage->getQuery()
         ->condition('date__value', $data['date']['value'])
         ->condition('date__end_value', $data['date']['end_value'])
@@ -544,8 +549,12 @@ class EventCreationService {
         ->execute();
 
       if (!empty($entity_ids)) {
+        // Load the default language version of the event instance.
         $entity = $storage->load(reset($entity_ids));
-        $entity->addTranslation($event->language()->getId(), $data);
+        // Only add a translation if we do not already have one.
+        if (!$entity->hasTranslation($event->language()->getId())) {
+          $entity->addTranslation($event->language()->getId(), $data);
+        }
       }
     }
 

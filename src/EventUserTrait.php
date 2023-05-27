@@ -80,4 +80,15 @@ trait EventUserTrait {
   public static function getDefaultEntityOwner() {
     return \Drupal::currentUser()->id();
   }
+
+  /**
+   * Backwards compatibility for getCurrentUserId().
+   *
+   * @return mixed
+   *   A default value for the uid field.
+   */
+  public static function getCurrentUserId() {
+    return static::getDefaultEntityOwner();
+  }
+
 }
