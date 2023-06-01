@@ -14,7 +14,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
  * @QueueWorker(
  *   id = "recurring_events_registration_email_notifications_queue_worker",
  *   title = @Translation("Email Notifications Queue Worker"),
- *   cron = {"time" = 6}
+ *   cron = {"time" = 30}
  * )
  */
 class EmailNotificationsQueueWorker extends QueueWorkerBase implements ContainerFactoryPluginInterface {
