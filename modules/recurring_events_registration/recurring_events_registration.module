@@ -143,15 +143,25 @@ function template_preprocess_registrant(array &$variables) {
  * Implements hook_mail().
  */
 function recurring_events_registration_mail($key, &$message, $params) {
+  // Only if a value for 'subject', 'body' or 'from' has not been received in
+  // the `$params`, then use the notification service which is able to get
+  // those values from the `$key` and the `$registrant`.
+  // Some pieces of code can call the `mail()` function with already proccessed
+  // values for 'subject', 'body' and 'from', meaning that it is not necessary
+  // that those values are calculated here by the notification service.
+  // @see \Drupal\recurring_events_registration\Plugin\QueueWorker\EmailNotificationsQueueWorker
   if ((empty($params['subject']) || empty($params['body']) || empty($params['from']))
     && !empty($params['registrant'])
     && $params['registrant'] instanceof Registrant) {
-    /** @var \Drupal\recurring_events_registration\NotificationService */
+    /** @var \Drupal\recurring_events_registration\NotificationService $service */
     $service = \Drupal::service('recurring_events_registration.notification_service');
     $service->setKey($key)->setEntity($params['registrant']);
   }
 
-
+  // If other pieces of code that have called the `mail()` function have
+  // already defined those params, give them precedence. Else, let the
+  // notification service to calculate those values.
+  // Set the `$message['from']`.
   if (!empty($params['from'])) {
     $message['from'] = $params['from'];  
   }
@@ -159,6 +169,7 @@ function recurring_events_registration_mail($key, &$message, $params) {
     $message['from'] = $service->getFrom();
   }
 
+  // Set the `$message['subject']`.
   if (!empty($params['subject'])) {
     $message['subject'] = $params['subject'];  
   }
@@ -166,21 +177,13 @@ function recurring_events_registration_mail($key, &$message, $params) {
     $message['subject'] = $service->getSubject();
   }
 
+  // Set the `$message['body']`.
   if (!empty($params['body'])) {
     $message['body'][] = $params['body'];  
   }
   elseif (isset($service)) {
     $message['body'][] = $service->getMessage();
   }
-
-  // echo 'params::' . PHP_EOL;
-  // print_r($params);
-  // echo 'message::' . PHP_EOL;
-  // print_r($message);
-
-  // $message['from'] = $params['from'] ?? isset($service) ? $service->getFrom() : '';
-  // $message['subject'] = $params['subject'] ?? isset($service) ? $service->getSubject() : '';
-  // $message['body'][] = $params['body'] ?? isset($service) ? $service->getMessage() : '';
 }
 
 /**
@@ -339,7 +342,7 @@ function recurring_events_registration_recurring_events_pre_delete_instances(Eve
  *
  * @param string $key
  *   The mail key used to determine the message and subject.
- * @param \Drupal\recurring_events_registration\Entity\RegistrantInterface|bool $registrant
+ * @param \Drupal\recurring_events_registration\Entity\RegistrantInterface $registrant
  *   The registrant this email relates to.
  */
 function recurring_events_registration_send_notification($key, RegistrantInterface $registrant) {
