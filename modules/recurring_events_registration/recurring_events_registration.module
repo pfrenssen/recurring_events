@@ -143,26 +143,44 @@ function template_preprocess_registrant(array &$variables) {
  * Implements hook_mail().
  */
 function recurring_events_registration_mail($key, &$message, $params) {
-  /** @var \Drupal\recurring_events_registration\NotificationService */
-  $service = \Drupal::service('recurring_events_registration.notification_service');
-  $service->setKey($key)->setEntity($params['registrant']);
+  if ((empty($params['subject']) || empty($params['body']) || empty($params['from']))
+    && !empty($params['registrant'])
+    && $params['registrant'] instanceof Registrant) {
+    /** @var \Drupal\recurring_events_registration\NotificationService */
+    $service = \Drupal::service('recurring_events_registration.notification_service');
+    $service->setKey($key)->setEntity($params['registrant']);
+  }
 
-  if ($service->isEnabled()) {
-    if (!empty($params['subject'])) {
-      $service->setSubject($params['subject']);
-    }
-    if (!empty($params['body'])) {
-      $service->setMessage($params['body']);
-    }
-    if (!empty($params['from'])) {
-      $service->setFrom($params['from']);
-    }
 
+  if (!empty($params['from'])) {
+    $message['from'] = $params['from'];  
+  }
+  elseif (isset($service)) {
     $message['from'] = $service->getFrom();
+  }
+
+  if (!empty($params['subject'])) {
+    $message['subject'] = $params['subject'];  
+  }
+  elseif (isset($service)) {
     $message['subject'] = $service->getSubject();
+  }
+
+  if (!empty($params['body'])) {
+    $message['body'][] = $params['body'];  
+  }
+  elseif (isset($service)) {
     $message['body'][] = $service->getMessage();
   }
-  return FALSE;
+
+  // echo 'params::' . PHP_EOL;
+  // print_r($params);
+  // echo 'message::' . PHP_EOL;
+  // print_r($message);
+
+  // $message['from'] = $params['from'] ?? isset($service) ? $service->getFrom() : '';
+  // $message['subject'] = $params['subject'] ?? isset($service) ? $service->getSubject() : '';
+  // $message['body'][] = $params['body'] ?? isset($service) ? $service->getMessage() : '';
 }
 
 /**
@@ -218,7 +236,8 @@ function recurring_events_registration_recurring_events_save_pre_instances_delet
 
   // Send an email to all registrants.
   foreach ($registrants as $registrant) {
-    recurring_events_registration_send_notification($key, $registrant);
+    // Add each notification to be sent to the queue.
+    \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
     $registrant->delete();
   }
 }
@@ -250,7 +269,8 @@ function recurring_events_registration_entity_update(EntityInterface $entity) {
 
       // Send an email to all registrants.
       foreach ($registrants as $registrant) {
-        recurring_events_registration_send_notification($key, $registrant);
+        // Add each notification to be sent to the queue.
+        \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
       }
     }
   }
@@ -274,7 +294,8 @@ function recurring_events_registration_recurring_events_pre_delete_instance(Even
   foreach ($registrants as $registrant) {
     // Only send email notifications if this event instance is in the future.
     if ($registration_creation_service->eventInstanceIsInFuture()) {
-      recurring_events_registration_send_notification($key, $registrant);
+      // Add each notification to be sent to the queue.
+      \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
     }
     $registrant->delete();
   }
@@ -296,7 +317,8 @@ function recurring_events_registration_recurring_events_pre_delete_instances(Eve
 
     // Send an email to the future registrants.
     foreach ($future_registrants as $registrant) {
-      recurring_events_registration_send_notification($key, $registrant);
+      // Add each notification to be sent to the queue.
+      \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
     }
   }
 
@@ -317,7 +339,7 @@ function recurring_events_registration_recurring_events_pre_delete_instances(Eve
  *
  * @param string $key
  *   The mail key used to determine the message and subject.
- * @param \Drupal\recurring_events_registration\Entity\RegistrantInterface $registrant
+ * @param \Drupal\recurring_events_registration\Entity\RegistrantInterface|bool $registrant
  *   The registrant this email relates to.
  */
 function recurring_events_registration_send_notification($key, RegistrantInterface $registrant) {
