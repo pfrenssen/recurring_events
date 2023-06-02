@@ -497,8 +497,7 @@ class NotificationService {
       // Allow modules to add data to the `$params`. They can get the data from
       // `$registrant`. Those `$params` are used later as the
       // `$message['params']` in mail hooks.
-      $this->moduleHandler->alter('recurring_events_registration_message_params_alter', $params, $registrant);
-
+      $this->moduleHandler->alter('recurring_events_registration_message_params', $params, $registrant);
       $item->params = $params;
 
       // Add the item to the queue.
