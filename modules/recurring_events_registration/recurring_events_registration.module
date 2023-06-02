@@ -163,7 +163,7 @@ function recurring_events_registration_mail($key, &$message, $params) {
   // notification service to calculate those values.
   // Set the `$message['from']`.
   if (!empty($params['from'])) {
-    $message['from'] = $params['from'];  
+    $message['from'] = $params['from'];
   }
   elseif (isset($service)) {
     $message['from'] = $service->getFrom();
@@ -171,7 +171,7 @@ function recurring_events_registration_mail($key, &$message, $params) {
 
   // Set the `$message['subject']`.
   if (!empty($params['subject'])) {
-    $message['subject'] = $params['subject'];  
+    $message['subject'] = $params['subject'];
   }
   elseif (isset($service)) {
     $message['subject'] = $service->getSubject();
@@ -179,7 +179,7 @@ function recurring_events_registration_mail($key, &$message, $params) {
 
   // Set the `$message['body']`.
   if (!empty($params['body'])) {
-    $message['body'][] = $params['body'];  
+    $message['body'][] = $params['body'];
   }
   elseif (isset($service)) {
     $message['body'][] = $service->getMessage();
