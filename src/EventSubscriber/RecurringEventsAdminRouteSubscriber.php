@@ -69,7 +69,7 @@ class RecurringEventsAdminRouteSubscriber extends RouteSubscriberBase {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() : array {
+  public static function getSubscribedEvents(): array {
     $events = parent::getSubscribedEvents();
     $events[ConfigEvents::SAVE][] = ['onConfigSave', 0];
     return $events;
