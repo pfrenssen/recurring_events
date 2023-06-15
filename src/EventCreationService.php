@@ -707,13 +707,13 @@ class EventCreationService {
       if ($event->hasField('moderation_state') && $instance->hasField('moderation_state')) {
         $series_query = $this->entityTypeManager->getStorage('workflow')->getQuery()->accessCheck(FALSE);
         $series_query->condition('type_settings.entity_types.eventseries.*', $event->bundle());
-        $series_workflows = $series_query->execute();
+        $series_workflows = $series_query->accessCheck(FALSE)->execute();
         $series_workflows = array_keys($series_workflows);
         $series_workflow = reset($series_workflows);
 
         $instance_query = $this->entityTypeManager->getStorage('workflow')->getQuery()->accessCheck(FALSE);
         $instance_query->condition('type_settings.entity_types.eventinstance.*', $instance->bundle());
-        $instance_workflows = $instance_query->execute();
+        $instance_workflows = $instance_query->accessCheck(FALSE)->execute();
         $instance_workflows = array_keys($instance_workflows);
         $instance_workflow = reset($instance_workflows);
 
