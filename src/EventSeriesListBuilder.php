@@ -149,7 +149,7 @@ class EventSeriesListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   protected function getEntityIds() {
-    $query = $this->getStorage()->getQuery()
+    $query = $this->getStorage()->getQuery()->accessCheck(TRUE)
       ->sort('changed', 'DESC');
 
     // Only add the pager if a limit is specified.

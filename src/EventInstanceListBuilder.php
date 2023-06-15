@@ -142,7 +142,7 @@ class EventInstanceListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   protected function getEntityIds() {
-    $query = $this->getStorage()->getQuery()
+    $query = $this->getStorage()->getQuery()->accessCheck(TRUE)
       ->sort('date__value', 'ASC');
 
     // Only add the pager if a limit is specified.

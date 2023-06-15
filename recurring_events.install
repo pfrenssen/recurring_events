@@ -4,7 +4,7 @@
  * @file
  * Installation and update functionality for the recurring_events module.
  */
-
+use Drupal\views\Views;
 use Drupal\Core\Config\Entity\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -604,7 +604,7 @@ function recurring_events_update_8013() {
 
   $config_factory = \Drupal::configFactory();
 
-  if (!$views = \Drupal\views\Views::getAllViews()) {
+  if (!$views = Views::getAllViews()) {
     return [];
   }
 
