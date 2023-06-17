@@ -381,7 +381,7 @@ function recurring_events_eventseries_type_delete(EntityInterface $entity) {
     ->condition($and_destination)
     ->condition($and_source);
   $query->condition($or);
-  $inherited_field_ids = $query->execute();
+  $inherited_field_ids = $query->accessCheck(FALSE)->execute();
 
   if (!empty($inherited_field_ids)) {
     $inherited_fields = \Drupal::entityTypeManager()->getStorage('field_inheritance')->loadMultiple($inherited_field_ids);
@@ -403,7 +403,7 @@ function recurring_events_eventseries_type_delete(EntityInterface $entity) {
       ->condition($and_destination)
       ->condition($and_source);
     $query->condition($or);
-    $inherited_field_ids = $query->execute();
+    $inherited_field_ids = $query->accessCheck(FALSE)->execute();
 
     if (!empty($inherited_field_ids)) {
       $inherited_fields = \Drupal::entityTypeManager()->getStorage('field_inheritance')->loadMultiple($inherited_field_ids);
@@ -428,7 +428,7 @@ function recurring_events_eventseries_type_delete(EntityInterface $entity) {
         ->condition($and_destination)
         ->condition($and_source);
       $query->condition($or);
-      $inherited_field_ids = $query->execute();
+      $inherited_field_ids = $query->accessCheck(FALSE)->execute();
 
       if (!empty($inherited_field_ids)) {
         $inherited_fields = \Drupal::entityTypeManager()->getStorage('field_inheritance')->loadMultiple($inherited_field_ids);
