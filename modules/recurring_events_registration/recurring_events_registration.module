@@ -247,6 +247,7 @@ function recurring_events_registration_recurring_events_save_pre_instances_delet
       \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
     }
     else {
+      // If the queue is not enabled, send this notification immediately.
       recurring_events_registration_send_notification($key, $registrant);
     }
     $registrant->delete();
@@ -288,6 +289,7 @@ function recurring_events_registration_entity_update(EntityInterface $entity) {
           \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
         }
         else {
+          // If the queue is not enabled, send this notification immediately.
           recurring_events_registration_send_notification($key, $registrant);
         }
       }
@@ -321,6 +323,7 @@ function recurring_events_registration_recurring_events_pre_delete_instance(Even
         \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
       }
       else {
+        // If the queue is not enabled, send this notification immediately.
         recurring_events_registration_send_notification($key, $registrant);
       }
     }
@@ -352,6 +355,7 @@ function recurring_events_registration_recurring_events_pre_delete_instances(Eve
         \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
       }
       else {
+        // If the queue is not enabled, send this notification immediately.
         recurring_events_registration_send_notification($key, $registrant);
       }
     }
