@@ -140,6 +140,8 @@ function recurring_events_reminders_cron() {
     ->accessCheck(FALSE)
     ->execute();
 
+    print_r(array_keys($event_instances));
+
   if (!empty($event_instances)) {
     $instances = \Drupal::entityTypeManager()->getStorage('eventinstance')->loadMultiple($event_instances);
 
@@ -156,15 +158,23 @@ function recurring_events_reminders_cron() {
       $registrants = $registration_creation_service->retrieveRegisteredParties();
 
       if (empty($registrants)) {
-        return;
+        continue;
       }
 
       $key = 'registration_reminder';
 
+      $config = \Drupal::config('recurring_events_registration.registrant.config');
+      $queue_is_enabled = $config->get('email_notifications_queue');
+
       // Send an email to all registrants.
       foreach ($registrants as $registrant) {
-        // Add each notification to be sent to the queue.
-        \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
+        if ($queue_is_enabled) {
+          // Add each notification to be sent to the queue.
+          \Drupal::service('recurring_events_registration.notification_service')->addEmailNotificationToQueue($key, $registrant);
+        }
+        else {
+          recurring_events_registration_send_notification($key, $registrant);
+        }
       }
     }
   }
