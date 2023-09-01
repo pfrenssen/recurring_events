@@ -524,6 +524,7 @@ class EventCreationService {
         'end_value' => $end_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
       ],
       'type' => $event->getType(),
+      'uid' => $event->getOwnerId(),
     ];
 
     $this->moduleHandler->alter('recurring_events_event_instance', $data);
