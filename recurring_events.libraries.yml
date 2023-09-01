@@ -5,6 +5,7 @@ recurring_events.create_form:
   dependencies:
     - core/drupal
     - core/jquery
+    - core/once
 
 recurring_events.date_form:
   version: 1.x
@@ -13,3 +14,4 @@ recurring_events.date_form:
   dependencies:
     - core/drupal
     - core/jquery
+    - core/once
