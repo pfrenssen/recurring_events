@@ -686,3 +686,10 @@ function recurring_events_update_8015() {
   $config->set('enabled_fields', 'consecutive_recurring_date,daily_recurring_date,weekly_recurring_date,monthly_recurring_date,yearly_recurring_date,custom');
   $config->save(TRUE);
 }
+
+/**
+ * Set the default event instance plugin creator.
+ */
+function recurring_events_update_91001() {
+  recurring_events_update_8014();
+}
