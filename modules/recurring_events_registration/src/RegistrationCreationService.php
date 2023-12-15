@@ -265,6 +265,8 @@ class RegistrationCreationService {
         break;
     }
 
+    $query->accessCheck(TRUE);
+
     $result = $query->count()->execute();
 
     return $result;
