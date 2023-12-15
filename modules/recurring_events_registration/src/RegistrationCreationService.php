@@ -881,19 +881,24 @@ class RegistrationCreationService {
    *   An array of roles that are allowed to register for this event.
    */
   public function registrationPermittedRoles() {
+    $permitted_roles_string = $this->eventSeries->event_registration->permitted_roles;
+    $permitted_roles = [];
+
+    if (empty($permitted_roles_string)) {
+      return $permitted_roles;
+    }
+
     // Remove extra spaces from the list of roles.
-    $permitted_roles_string = str_replace(' ', '', $this->eventSeries->event_registration->permitted_roles);
+    $permitted_roles_string = str_replace(' ', '', $permitted_roles_string);
 
     // Convert the string into an array of roles.
-    $permitted_roles = [];
-    if (!empty($permitted_roles_string)) {
-      if (strpos($permitted_roles_string, ',')) {
-        $permitted_roles = explode(',', $permitted_roles_string);
-      }
-      else {
-        $permitted_roles[] = $permitted_roles_string;
-      }
+    if (strpos($permitted_roles_string, ',')) {
+      $permitted_roles = explode(',', $permitted_roles_string);
     }
+    else {
+      $permitted_roles[] = $permitted_roles_string;
+    }
+
     return $permitted_roles;
   }
 
