@@ -294,9 +294,6 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
         'type' => 'text_textarea',
         'weight' => -4,
       ])
-      ->setDisplayOptions('view', [
-        'type' => 'hidden',
-      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['date'] = BaseFieldDefinition::create('daterange')
