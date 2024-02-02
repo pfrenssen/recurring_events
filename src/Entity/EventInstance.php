@@ -360,7 +360,7 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
   /**
    * Get event series.
    *
-   * @return Drupal\recurring_events\EventInterface
+   * @return \Drupal\recurring_events\EventInterface
    *   The event series.
    */
   public function getEventSeries() {
