@@ -2,7 +2,7 @@
  * @file
  * Javascript functionality for the recurring events create form.
  */
-
+/* eslint-disable */
 (function ($, once) {
   'use strict';
 
