@@ -2,15 +2,15 @@
 
 namespace Drupal\recurring_events_registration;
 
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\Queue\QueueFactory;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\recurring_events_registration\Entity\RegistrantInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Queue\QueueFactory;
 
 /**
  * Provides a service with helper functions to facilitate notifications.
@@ -460,7 +460,7 @@ class NotificationService {
   public function addEmailNotificationToQueue($key, RegistrantInterface $registrant) {
     $config = $this->configFactory->get('recurring_events_registration.registrant.config');
     $send_email = $config->get('email_notifications');
-    $send_email_key = $config->get('notifications' . '.' . $key . '.enabled');
+    $send_email_key = $config->get('notifications.' . $key . '.enabled');
 
     // Modify $send_email if necessary.
     if ($registrant instanceof RegistrantInterface) {

@@ -2,26 +2,25 @@
 
 namespace Drupal\recurring_events_registration\Form;
 
-use Drupal\Core\Entity\ContentEntityForm;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Messenger\Messenger;
-use Drupal\recurring_events_registration\RegistrationCreationService;
-use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\Entity\EntityFieldManager;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use Drupal\content_moderation\ModerationInformation;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\content_moderation\ModerationInformation;
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\EntityFieldManager;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Url;
 use Drupal\recurring_events_registration\NotificationService;
+use Drupal\recurring_events_registration\RegistrationCreationService;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Form controller for Registrant edit forms.
@@ -341,12 +340,12 @@ class RegistrantForm extends ContentEntityForm {
     if (!$role_permitted) {
       $user_roles = $this->currentUser->getRoles();
       if (in_array('administrator', $user_roles)) {
-        $role_permitted = true;
+        $role_permitted = TRUE;
       }
       else {
-        foreach($user_roles as $user_role) {
+        foreach ($user_roles as $user_role) {
           if (in_array($user_role, $permitted_roles)) {
-            $role_permitted = true;
+            $role_permitted = TRUE;
             break;
           }
         }
@@ -354,7 +353,7 @@ class RegistrantForm extends ContentEntityForm {
     }
     if (!$role_permitted) {
       $this->messenger->addMessage('You are not allowed to register for events in this series.', $this->messenger::TYPE_WARNING);
-      $form['#disabled'] = true;
+      $form['#disabled'] = TRUE;
     }
     return $form;
   }

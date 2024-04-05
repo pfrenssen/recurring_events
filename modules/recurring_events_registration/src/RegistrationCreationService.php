@@ -2,17 +2,17 @@
 
 namespace Drupal\recurring_events_registration;
 
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\recurring_events\Entity\EventInstance;
-use Drupal\recurring_events\Entity\EventSeries;
-use Drupal\Core\Messenger\Messenger;
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Messenger\Messenger;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\Token;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+use Drupal\recurring_events\Entity\EventInstance;
+use Drupal\recurring_events\Entity\EventSeries;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

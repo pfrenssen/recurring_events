@@ -2,16 +2,16 @@
 
 namespace Drupal\recurring_events\Plugin\views\filter;
 
-use \Drupal\Core\Database\Query\Condition;
-use \Drupal\Core\Entity\EntityFieldManagerInterface;
-use \Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use \Drupal\Core\Form\FormStateInterface;
-use \Drupal\Core\Session\AccountInterface;
-use \Drupal\field\Entity\FieldConfig;
-use \Drupal\taxonomy\Plugin\views\filter\TaxonomyIndexTid;
-use \Drupal\taxonomy\TermStorageInterface;
-use \Drupal\taxonomy\VocabularyStorageInterface;
-use \Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Database\Query\Condition;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\taxonomy\Plugin\views\filter\TaxonomyIndexTid;
+use Drupal\taxonomy\TermStorageInterface;
+use Drupal\taxonomy\VocabularyStorageInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Filter handler for taxonomy terms with depth.
@@ -35,7 +35,7 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
@@ -73,7 +73,7 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user = NULL,EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, EntityFieldManagerInterface $entity_field_manager = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user = NULL, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, EntityFieldManagerInterface $entity_field_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $vocabulary_storage, $term_storage, $current_user);
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityFieldManager = $entity_field_manager;
@@ -149,6 +149,9 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
     ];
   }
 
+  /**
+   * Build the query for the filter.
+   */
   public function query() {
 
     // Get the DB table and reference column name from the reference field name.
@@ -172,7 +175,7 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
 
     // The normal use of ensureMyTable() here breaks Views.
     // So instead we trick the filter into using the alias of the base table.
-    //   See https://www.drupal.org/node/271833.
+    // @see https://www.drupal.org/node/271833.
     // If a relationship is set, we must use the alias it provides.
     if (!empty($this->relationship)) {
       $this->tableAlias = $this->relationship;

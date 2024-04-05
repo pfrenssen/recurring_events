@@ -2,14 +2,14 @@
 
 namespace Drupal\recurring_events\Plugin\views\argument;
 
-use \Drupal\Core\Database\Query\Condition;
-use \Drupal\Core\Entity\EntityFieldManagerInterface;
-use \Drupal\Core\Entity\EntityStorageInterface;
-use \Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use \Drupal\Core\Form\FormStateInterface;
-use \Drupal\field\Entity\FieldConfig;
-use \Drupal\taxonomy\Plugin\views\argument\IndexTidDepth;
-use \Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Database\Query\Condition;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\taxonomy\Plugin\views\argument\IndexTidDepth;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Argument handler for event series with taxonomy terms with depth.
@@ -37,7 +37,7 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
@@ -56,6 +56,8 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
   protected $entityTypeLabel = 'Event Series';
 
   /**
+   * Construct an instance of the plugin.
+   *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
@@ -91,18 +93,15 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
 
   /**
    * Extend options.
-   *
-   * @return array
    */
-  protected function defineOptions() {
+  protected function defineOptions(): array {
     $options = parent::defineOptions();
     $options['reference_field'] = ['default' => FALSE];
     return $options;
   }
 
-
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($this->entityType));
@@ -131,7 +130,7 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function query($group_by = FALSE) {
     // Get the DB table and reference column name from the reference field name.
@@ -183,7 +182,7 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function title() {
     $term = $this->termStorage->load($this->argument);
@@ -193,4 +192,5 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
     }
     return $this->t('No name');
   }
+
 }

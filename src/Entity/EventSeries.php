@@ -2,14 +2,13 @@
 
 namespace Drupal\recurring_events\Entity;
 
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EditorialContentEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\recurring_events\EventInterface;
 use Drupal\recurring_events\EventUserTrait;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the Event Series entity.
