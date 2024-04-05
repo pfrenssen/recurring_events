@@ -77,7 +77,7 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
 
     $properties['day_occurrence'] = DataDefinition::create('string')
       ->setLabel(t('Day Occurrence'))
-      ->setDescription(t('Which occurence of the day(s) of the week should event take place'));
+      ->setDescription(t('Which occurrence of the day(s) of the week should event take place'));
 
     $properties['day_of_month'] = DataDefinition::create('string')
       ->setLabel(t('Day of Month'))

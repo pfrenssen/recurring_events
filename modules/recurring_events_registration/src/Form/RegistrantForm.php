@@ -147,7 +147,7 @@ class RegistrantForm extends ContentEntityForm {
    * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
    *   The cache tags invalidator.
    * @param \Drupal\recurring_events_registration\NotificationService $notification_service
-   *   The registation notification service.
+   *   The registration notification service.
    * @param \Drupal\content_moderation\ModerationInformation $moderation_information
    *   The moderation information service.
    */

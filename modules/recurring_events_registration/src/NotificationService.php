@@ -263,7 +263,7 @@ class NotificationService {
       $this->messenger->addError($this->translation->translate('No key defined for @module notifications.', [
         '@module' => 'recurring_events_registration',
       ]));
-      $this->loggerFactory->error('No key defined @module notifications. Call @function before proceding.', [
+      $this->loggerFactory->error('No key defined @module notifications. Call @function before proceeding.', [
         '@module' => 'recurring_events_registration',
         '@function' => 'NotificationService::setKey()',
       ]);
@@ -283,7 +283,7 @@ class NotificationService {
       $this->messenger->addError($this->translation->translate('No config name defined for @module notifications.', [
         '@module' => 'recurring_events_registration',
       ]));
-      $this->loggerFactory->error('No config name defined for @module notifications. Call @function before proceding.', [
+      $this->loggerFactory->error('No config name defined for @module notifications. Call @function before proceeding.', [
         '@module' => 'recurring_events_registration',
         '@function' => 'NotificationService::setConfigName()',
       ]);
@@ -494,7 +494,7 @@ class NotificationService {
         'body' => $message,
         'from' => $from,
       ];
-      // Allow modules to add data to the `$params`. Developers can get data 
+      // Allow modules to add data to the `$params`. Developers can get data
       // from `$registrant`. Those `$params` can be used later as the
       // `$params` in `hook_mail()` and `$message['params']` in
       // `hook_mail_alter()`.

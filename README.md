@@ -202,7 +202,7 @@ modules can be written to modify, or enhance the core functionality
 of `recurring_events` by making use of these hooks.
 
 The `recurring_events` module also has a number of Field Inheritance plugins
-written to handle core fields, and custom plugins can be creared providing they
+written to handle core fields, and custom plugins can be created providing they
 implement the `FieldInheritance` annotation and extend
 the `FieldInheritancePluginBase` class. The core plugins are defined
 in `src/Plugin/FieldInheritance`.

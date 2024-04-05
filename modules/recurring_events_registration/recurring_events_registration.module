@@ -129,7 +129,7 @@ function template_preprocess_registrant(array &$variables) {
   // Set the registrant object to be accessible in the template.
   $variables['registrant'] = $variables['elements']['#registrant'];
 
-  // Set a class on the registrant to differentiate between viewmodes.
+  // Set a class on the registrant to differentiate between view modes.
   $variables['view_mode'] = $variables['elements']['#view_mode'];
   $variables['attributes']['class'][] = 'registrant-' . $variables['view_mode'];
 
@@ -146,7 +146,7 @@ function recurring_events_registration_mail($key, &$message, $params) {
   // Only if a value for 'subject', 'body' or 'from' has not been received in
   // the `$params`, then use the notification service which is able to get
   // those values from the `$key` and the `$registrant`.
-  // Some pieces of code can call the `mail()` function with already proccessed
+  // Some pieces of code can call the `mail()` function with already processed
   // values for 'subject', 'body' and 'from', meaning that it is not necessary
   // that those values are calculated here by the notification service.
   // @see \Drupal\recurring_events_registration\Plugin\QueueWorker\EmailNotificationsQueueWorker

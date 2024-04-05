@@ -12,7 +12,7 @@ use Drupal\Core\Url;
 /**
  * Implements hook_ENTITY_TYPE_insert().
  */
-function group_recurring_events_series_eventseries_type_insert(EventSeriesTypeInterface $eventserices_type) {
+function group_recurring_events_series_eventseries_type_insert(EventSeriesTypeInterface $eventseries_type) {
   if (\Drupal::isConfigSyncing()) {
     return;
   }

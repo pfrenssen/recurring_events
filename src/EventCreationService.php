@@ -270,7 +270,7 @@ class EventCreationService {
 
   /**
    * Normalize an array for equality checks, without having to worry about order
-   * or casing discrepencies.
+   * or casing discrepancies.
    *
    * @param array $input
    *   The array to clean and sort.

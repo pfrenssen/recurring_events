@@ -88,7 +88,7 @@ class EventSeriesTypeDeleteForm extends EntityConfirmFormBase {
     $this->entity->delete();
 
     $this->messenger->addMessage(
-      $this->t('Succesfully deleted @type: @label.',
+      $this->t('Successfully deleted @type: @label.',
         [
           '@type' => $this->entity->bundle(),
           '@label' => $this->entity->label(),

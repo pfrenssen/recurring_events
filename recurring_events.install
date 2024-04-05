@@ -279,7 +279,7 @@ function recurring_events_update_8005() {
 }
 
 /**
- * Install the new type basefields for series and instances.
+ * Install the new type base fields for series and instances.
  */
 function recurring_events_update_8006() {
   $series_type = BaseFieldDefinition::create('entity_reference')

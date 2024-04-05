@@ -9,7 +9,7 @@ use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 
 /**
- * A computed field that provides the availabilty count of an Event Instance.
+ * A computed field that provides the availability count of an Event Instance.
  */
 class AvailabilityCount extends FieldItemList {
 
