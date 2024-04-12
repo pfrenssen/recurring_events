@@ -2,6 +2,7 @@
 
 namespace Drupal\recurring_events\Plugin\views\argument;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -42,6 +43,13 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
   protected $entityFieldManager;
 
   /**
+   * The database service.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * The entity type.
    *
    * @var \string
@@ -70,11 +78,14 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
    *   The entity type bundle service.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Database\Connection
+   *   The database service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $term_storage, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $term_storage, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager, Connection $database) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $term_storage);
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityFieldManager = $entity_field_manager;
+    $this->database = $database;
   }
 
   /**
@@ -87,7 +98,8 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
       $plugin_definition,
       $container->get('entity_type.manager')->getStorage('taxonomy_term'),
       $container->get('entity_type.bundle.info'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('database')
     );
   }
 
@@ -154,7 +166,7 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
     }
 
     // Now build the subqueries.
-    $subquery = \Drupal::database()->select($ref_field_table, 'es');
+    $subquery = $this->database->select($ref_field_table, 'es');
     $subquery->addField('es', 'entity_id');
     $where = new Condition('OR');
     $where->condition('es.' . $ref_field_name, $tids, $operator);

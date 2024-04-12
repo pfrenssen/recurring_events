@@ -2,6 +2,7 @@
 
 namespace Drupal\recurring_events\Plugin\views\filter;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -40,6 +41,13 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
   protected $entityFieldManager;
 
   /**
+   * The database service.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * The entity type.
    *
    * @var \string
@@ -72,11 +80,14 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
    *   The entity type bundle service.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
+   * @param \Drupal\Core\Database\Connection
+   *   The database service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user = NULL, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, EntityFieldManagerInterface $entity_field_manager = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user = NULL, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, EntityFieldManagerInterface $entity_field_manager = NULL, Connection $database) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $vocabulary_storage, $term_storage, $current_user);
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityFieldManager = $entity_field_manager;
+    $this->database = $database;
   }
 
   /**
@@ -91,7 +102,8 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
       $container->get('entity_type.manager')->getStorage('taxonomy_term'),
       $container->get('current_user'),
       $container->get('entity_type.bundle.info'),
-      $container->get('entity_field.manager')
+      $container->get('entity_field.manager'),
+      $container->get('database')
     );
   }
 
@@ -186,7 +198,7 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
     }
 
     // Now build the subqueries.
-    $subquery = \Drupal::database()->select($ref_table_name, 'tn');
+    $subquery = $this->database->select($ref_table_name, 'tn');
     $subquery->addField('tn', 'entity_id');
     $where = new Condition('OR');
     $where->condition('tn.' . $ref_field_name, $this->value, $operator);
