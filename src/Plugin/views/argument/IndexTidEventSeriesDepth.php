@@ -78,7 +78,7 @@ class IndexTidEventSeriesDepth extends IndexTidDepth {
    *   The entity type bundle service.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Database\Connection
+   * @param \Drupal\Core\Database\Connection $database
    *   The database service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $term_storage, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager, Connection $database) {

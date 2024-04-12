@@ -80,7 +80,7 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
    *   The entity type bundle service.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Database\Connection
+   * @param \Drupal\Core\Database\Connection $database
    *   The database service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user = NULL, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, EntityFieldManagerInterface $entity_field_manager = NULL, Connection $database) {
