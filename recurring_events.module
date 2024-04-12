@@ -5,22 +5,22 @@
  * Contains recurring_events.module.
  */
 
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Render\Element;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\recurring_events\EventInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Link;
-use Drupal\Core\Entity\EntityForm;
-use Drupal\Component\Utility\Html;
 use Drupal\recurring_events\Plugin\ComputedField\EventInstances;
 
 /**

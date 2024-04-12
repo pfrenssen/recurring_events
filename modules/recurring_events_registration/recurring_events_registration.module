@@ -5,21 +5,21 @@
  * Contains recurring_events_registration.module.
  */
 
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Render\Element;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
-use Drupal\recurring_events\Entity\EventSeries;
-use Drupal\recurring_events\Entity\EventInstance;
-use Drupal\Core\Url;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+use Drupal\recurring_events\Entity\EventInstance;
+use Drupal\recurring_events\Entity\EventSeries;
+use Drupal\recurring_events_registration\Entity\Registrant;
 use Drupal\recurring_events_registration\Entity\RegistrantInterface;
 use Drupal\recurring_events_registration\Form\RegistrantForm;
-use Drupal\recurring_events_registration\Entity\Registrant;
 use Drupal\recurring_events_registration\Plugin\ComputedField\AvailabilityCount;
 use Drupal\recurring_events_registration\Plugin\ComputedField\RegistrationCount;
 use Drupal\recurring_events_registration\Plugin\ComputedField\WaitlistCount;
@@ -384,7 +384,7 @@ function recurring_events_registration_recurring_events_pre_delete_instances(Eve
 function recurring_events_registration_send_notification($key, RegistrantInterface $registrant) {
   $config = \Drupal::config('recurring_events_registration.registrant.config');
   $send_email = $config->get('email_notifications');
-  $send_email_key = $config->get('notifications' . '.' . $key . '.enabled');
+  $send_email_key = $config->get('notifications.' . $key . '.enabled');
 
   // Modify $send_email if necessary.
   \Drupal::moduleHandler()->alter('recurring_events_registration_send_notification', $send_email, $registrant);

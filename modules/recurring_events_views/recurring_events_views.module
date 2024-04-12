@@ -5,10 +5,10 @@
  * Contains recurring_events_views.module.
  */
 
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\views\ViewExecutable;
-use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**

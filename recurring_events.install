@@ -4,12 +4,13 @@
  * @file
  * Installation and update functionality for the recurring_events module.
  */
-use Drupal\views\Views;
+
 use Drupal\Core\Config\Entity\ConfigEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\views\Views;
 
 /**
  * Set up the config to allow field inheritance for event instances.
@@ -481,7 +482,7 @@ function recurring_events_update_8011() {
     'tables' => [
       'eventseries_field_data',
       'eventseries_field_revision',
-      ],
+    ],
     'fields' => [
       'daily_recurring_date__value',
       'daily_recurring_date__end_value',
@@ -718,7 +719,7 @@ function recurring_events_update_91002() {
   foreach ([
     'daily_recurring_date',
     'weekly_recurring_date',
-    'monthly_recurring_date'
+    'monthly_recurring_date',
   ] as $field_name) {
     $field_definitions = \Drupal::service('entity_field.manager')
       ->getFieldDefinitions('eventseries', 'eventseries');
