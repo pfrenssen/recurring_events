@@ -162,7 +162,7 @@ class DailyRecurringDateWidget extends DateRangeDefaultWidget {
       if (!empty($item['time']) && $item['time'] instanceof DrupalDateTime) {
         $item['time'] = $item['time']->format('h:i A');
       }
-      if (!empty($item['end_time']['time'])) {
+      if (isset($item['end_time']['time'])) {
         if ($item['end_time']['time'] instanceof DrupalDateTime) {
           $item['end_time'] = $item['end_time']['time']->format('h:i A');
         }
