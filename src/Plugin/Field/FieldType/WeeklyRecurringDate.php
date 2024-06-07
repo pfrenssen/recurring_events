@@ -224,7 +224,7 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
 
     // If the start date is not the weekday we are seeking, jump to the next
     // instance of that weekday.
-    if ($start->format('l') != ucwords($weekday)) {
+    if ($start->getPhpDateTime()->format('l') != ucwords($weekday)) {
       $start->modify('next ' . $weekday);
     }
 
