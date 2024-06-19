@@ -9,6 +9,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Mail\MailManager;
 use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Url;
+use Drupal\recurring_events_registration\Enum\RegistrationType;
 use Drupal\recurring_events_registration\NotificationService;
 use Drupal\recurring_events_registration\RegistrationCreationService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -140,7 +141,7 @@ class ContactForm extends FormBase {
         '%registered' => count($registered),
         '%waitlisted' => count($waitlisted),
         '%name' => $this->eventInstance->title->value,
-        '@type' => $this->creationService->getRegistrationType() === 'series' ? $this->t('series') : $this->t('event'),
+        '@type' => $this->creationService->getRegistrationType() === RegistrationType::SERIES->value ? $this->t('series') : $this->t('event'),
       ]),
     ];
 

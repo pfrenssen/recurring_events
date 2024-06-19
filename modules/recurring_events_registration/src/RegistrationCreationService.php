@@ -13,6 +13,7 @@ use Drupal\Core\Utility\Token;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\recurring_events\Entity\EventSeries;
+use Drupal\recurring_events_registration\Enum\RegistrationType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -200,13 +201,13 @@ class RegistrationCreationService {
     }
 
     switch ($this->getRegistrationType()) {
-      case 'series':
+      case RegistrationType::SERIES->value:
         if (!empty($this->eventSeries->id())) {
           $properties['eventseries_id'] = $this->eventSeries->id();
         }
         break;
 
-      case 'instance':
+      default:
         if (!empty($this->eventInstance->id())) {
           $properties['eventinstance_id'] = $this->eventInstance->id();
         }
@@ -252,13 +253,13 @@ class RegistrationCreationService {
     }
 
     switch ($this->getRegistrationType()) {
-      case 'series':
+      case RegistrationType::SERIES->value:
         if (!empty($this->eventSeries->id())) {
           $query->condition('eventseries_id', $this->eventSeries->id());
         }
         break;
 
-      case 'instance':
+      default:
         if (!empty($this->eventInstance->id())) {
           $query->condition('eventinstance_id', $this->eventInstance->id());
         }
@@ -466,15 +467,13 @@ class RegistrationCreationService {
    *
    * @return string
    *   The type of registration: series, or instance.
+   *   Starting from Recurring Events 3.x this will return an instance of the
+   *   RegistrationType enum.
    */
-  public function getRegistrationType() {
-    $type = FALSE;
-
-    if (!empty($this->eventSeries->event_registration->registration_type)) {
-      $type = $this->eventSeries->event_registration->registration_type;
-    }
-
-    return $type;
+  #[\ReturnTypeWillChange]
+  public function getRegistrationType(): string {
+    $type = RegistrationType::tryFrom($this->eventSeries->event_registration->registration_type) ?? RegistrationType::defaultValue();
+    return $type->value;
   }
 
   /**
@@ -654,15 +653,10 @@ class RegistrationCreationService {
           // For series, the event registration should close when the first
           // event in that series begins. For instance registration the event
           // registration should close when that instance begins.
-          switch ($reg_type) {
-            case 'series':
-              $event_date = $this->eventSeries->getSeriesStart();
-              break;
-
-            case 'instance':
-              $event_date = $this->eventInstance->date->start_date;
-              break;
-          }
+          $event_date = match ($reg_type) {
+            RegistrationType::SERIES->value => $this->eventSeries->getSeriesStart(),
+            default => $this->eventInstance->date->start_date,
+          };
 
           $event_date->setTimezone($timezone);
 
@@ -760,16 +754,10 @@ class RegistrationCreationService {
 
         $key = 'promotion_notification';
         $reg_type = $this->getRegistrationType();
-        $future_event = FALSE;
-        switch ($reg_type) {
-          case 'series':
-            $future_event = $this->eventSeriesHasFutureInstances();
-            break;
-
-          case 'instance':
-            $future_event = $this->eventInstanceIsInFuture();
-            break;
-        }
+        $future_event = match ($reg_type) {
+          RegistrationType::SERIES->value => $this->eventSeriesHasFutureInstances(),
+          default => $this->eventInstanceIsInFuture(),
+        };
         if ($future_event) {
           recurring_events_registration_send_notification($key, $first_waitlist);
         }
@@ -831,7 +819,7 @@ class RegistrationCreationService {
         continue;
       }
       if ($this->cleanEmailAddress($email) == $this->cleanEmailAddress($registration_record->get('email')->value)) {
-        if ($this->getRegistrationType() === 'instance') {
+        if ($this->getRegistrationType() === RegistrationType::INSTANCE->value) {
           // Compare the event instance ID and email address.
           if (($this->eventInstance->id() == $registration_record->get('eventinstance_id')->target_id)) {
             // Remember the existing registration ID and stop looking.
