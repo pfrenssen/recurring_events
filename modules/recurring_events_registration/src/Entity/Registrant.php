@@ -386,4 +386,17 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
     return $uri_route_parameters;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTagsToInvalidate() {
+    // Also invalidate the cache tags for the event instance and series (in case
+    // the registration is for a series). This ensures the counters are updated.
+    return array_merge(
+      parent::getCacheTagsToInvalidate(),
+      $this->getEventInstance()->getCacheTagsToInvalidate(),
+      $this->getRegistrationType() === 'series' ? $this->getEventSeries()->getCacheTagsToInvalidate() : [],
+    );
+  }
+
 }
