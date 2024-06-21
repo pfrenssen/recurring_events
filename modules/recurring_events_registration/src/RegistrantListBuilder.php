@@ -163,7 +163,7 @@ class RegistrantListBuilder extends EntityListBuilder {
       case 'entity.registrant.instance_listing':
         $event_instance = $params['eventinstance'];
         $this->creationService->setEventInstance($event_instance);
-        if ($this->creationService->getRegistrationType() === RegistrationType::SERIES->value) {
+        if ($this->creationService->getRegistrationType() === RegistrationType::SERIES) {
           $query->condition('eventseries_id', $event_instance->getEventSeries()->id());
         }
         else {

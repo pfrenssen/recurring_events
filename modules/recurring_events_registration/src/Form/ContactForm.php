@@ -141,7 +141,7 @@ class ContactForm extends FormBase {
         '%registered' => count($registered),
         '%waitlisted' => count($waitlisted),
         '%name' => $this->eventInstance->title->value,
-        '@type' => $this->creationService->getRegistrationType() === RegistrationType::SERIES->value ? $this->t('series') : $this->t('event'),
+        '@type' => $this->creationService->getRegistrationType() === RegistrationType::SERIES ? $this->t('series') : $this->t('event'),
       ]),
     ];
 

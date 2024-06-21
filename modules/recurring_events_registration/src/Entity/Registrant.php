@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\recurring_events\Entity\EventSeries;
+use Drupal\recurring_events_registration\Enum\RegistrationType;
 use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFieldItemList;
 use Drupal\user\UserInterface;
 
@@ -338,14 +339,14 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   /**
    * Set the registration type.
    *
-   * @param string $type
+   * @param \Drupal\recurring_events_registration\Enum\RegistrationType $type
    *   The type of registration, series or instance.
    *
    * @return \Drupal\recurring_events_registration\Entity\RegistrantInterface
    *   The registrant entity.
    */
-  public function setRegistrationType($type) {
-    $this->set('type', $type);
+  public function setRegistrationType(RegistrationType $type) {
+    $this->set('type', $type->value);
     return $this;
   }
 

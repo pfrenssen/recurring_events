@@ -201,7 +201,7 @@ class RegistrationCreationService {
     }
 
     switch ($this->getRegistrationType()) {
-      case RegistrationType::SERIES->value:
+      case RegistrationType::SERIES:
         if (!empty($this->eventSeries->id())) {
           $properties['eventseries_id'] = $this->eventSeries->id();
         }
@@ -253,7 +253,7 @@ class RegistrationCreationService {
     }
 
     switch ($this->getRegistrationType()) {
-      case RegistrationType::SERIES->value:
+      case RegistrationType::SERIES:
         if (!empty($this->eventSeries->id())) {
           $query->condition('eventseries_id', $this->eventSeries->id());
         }
@@ -465,15 +465,11 @@ class RegistrationCreationService {
   /**
    * Get registration type.
    *
-   * @return string
+   * @return \Drupal\recurring_events_registration\Enum\RegistrationType
    *   The type of registration: series, or instance.
-   *   Starting from Recurring Events 3.x this will return an instance of the
-   *   RegistrationType enum.
    */
-  #[\ReturnTypeWillChange]
-  public function getRegistrationType(): string {
-    $type = RegistrationType::tryFrom($this->eventSeries->event_registration->registration_type) ?? RegistrationType::defaultValue();
-    return $type->value;
+  public function getRegistrationType(): RegistrationType {
+    return RegistrationType::tryFrom($this->eventSeries->event_registration->registration_type) ?? RegistrationType::defaultValue();
   }
 
   /**
@@ -654,7 +650,7 @@ class RegistrationCreationService {
           // event in that series begins. For instance registration the event
           // registration should close when that instance begins.
           $event_date = match ($reg_type) {
-            RegistrationType::SERIES->value => $this->eventSeries->getSeriesStart(),
+            RegistrationType::SERIES => $this->eventSeries->getSeriesStart(),
             default => $this->eventInstance->date->start_date,
           };
 
@@ -669,7 +665,7 @@ class RegistrationCreationService {
         case 'scheduled':
           // The two registration types are 'series' or 'instance'.
           switch ($reg_type) {
-            case 'series':
+            case RegistrationType::SERIES:
               $reg_start = NULL;
               $reg_end = NULL;
 
@@ -755,7 +751,7 @@ class RegistrationCreationService {
         $key = 'promotion_notification';
         $reg_type = $this->getRegistrationType();
         $future_event = match ($reg_type) {
-          RegistrationType::SERIES->value => $this->eventSeriesHasFutureInstances(),
+          RegistrationType::SERIES => $this->eventSeriesHasFutureInstances(),
           default => $this->eventInstanceIsInFuture(),
         };
         if ($future_event) {
@@ -819,7 +815,7 @@ class RegistrationCreationService {
         continue;
       }
       if ($this->cleanEmailAddress($email) == $this->cleanEmailAddress($registration_record->get('email')->value)) {
-        if ($this->getRegistrationType() === RegistrationType::INSTANCE->value) {
+        if ($this->getRegistrationType() === RegistrationType::INSTANCE) {
           // Compare the event instance ID and email address.
           if (($this->eventInstance->id() == $registration_record->get('eventinstance_id')->target_id)) {
             // Remember the existing registration ID and stop looking.
