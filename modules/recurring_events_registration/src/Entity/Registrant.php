@@ -329,11 +329,11 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   /**
    * Get registration type.
    *
-   * @return string
+   * @return \Drupal\recurring_events_registration\Enum\RegistrationType
    *   The type of registration, series or instance.
    */
-  public function getRegistrationType() {
-    return $this->get('type')->value;
+  public function getRegistrationType(): RegistrationType {
+    return RegistrationType::tryFrom($this->get('type')->value) ?? RegistrationType::defaultValue();
   }
 
   /**
@@ -396,7 +396,7 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
     return array_merge(
       parent::getCacheTagsToInvalidate(),
       $this->getEventInstance()->getCacheTagsToInvalidate(),
-      $this->getRegistrationType() === 'series' ? $this->getEventSeries()->getCacheTagsToInvalidate() : [],
+      $this->getRegistrationType() === RegistrationType::SERIES ? $this->getEventSeries()->getCacheTagsToInvalidate() : [],
     );
   }
 
