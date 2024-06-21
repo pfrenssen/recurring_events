@@ -467,12 +467,6 @@ class EventCreationService {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function createInstances(EventSeries $event): array {
-    // Log a warning if instances have already been populated on the series.
-    if ($event->event_instances->count() > 0) {
-      $this->loggerChannel->warning('Could not create instances for event series %id, instances are already populated.', ['%id' => $event->id()]);
-      return [];
-    }
-
     $form_data = $this->convertEntityConfigToArray($event);
     $event_instances = [];
 
