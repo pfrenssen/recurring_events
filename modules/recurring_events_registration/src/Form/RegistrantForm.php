@@ -5,7 +5,6 @@ namespace Drupal\recurring_events_registration\Form;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\content_moderation\ModerationInformation;
-use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityFieldManager;
@@ -80,13 +79,6 @@ class RegistrantForm extends ContentEntityForm {
   protected $entityTypeManager;
 
   /**
-   * The cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
-   */
-  protected $cacheTagsInvalidator;
-
-  /**
    * The registration notification service.
    *
    * @var \Drupal\recurring_events_registration\NotificationService
@@ -115,7 +107,6 @@ class RegistrantForm extends ContentEntityForm {
       $container->get('entity_field.manager'),
       $container->get('current_route_match'),
       $container->get('entity_type.manager'),
-      $container->get('cache_tags.invalidator'),
       $container->get('recurring_events_registration.notification_service'),
       $container->has('content_moderation.moderation_information') ? $container->get('content_moderation.moderation_information') : NULL
     );
@@ -144,8 +135,6 @@ class RegistrantForm extends ContentEntityForm {
    *   The route match service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
-   *   The cache tags invalidator.
    * @param \Drupal\recurring_events_registration\NotificationService $notification_service
    *   The registration notification service.
    * @param \Drupal\content_moderation\ModerationInformation $moderation_information
@@ -162,7 +151,6 @@ class RegistrantForm extends ContentEntityForm {
     EntityFieldManager $field_manager,
     RouteMatchInterface $route_match,
     EntityTypeManagerInterface $entity_type_manager,
-    CacheTagsInvalidatorInterface $cache_tags_invalidator,
     NotificationService $notification_service,
     ModerationInformation $moderation_information = NULL) {
     $this->messenger = $messenger;
@@ -172,7 +160,6 @@ class RegistrantForm extends ContentEntityForm {
     $this->fieldManager = $field_manager;
     $this->routeMatch = $route_match;
     $this->entityTypeManager = $entity_type_manager;
-    $this->cacheTagsInvalidator = $cache_tags_invalidator;
     $this->notificationService = $notification_service;
     $this->moderationInformation = $moderation_information;
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
@@ -523,21 +510,6 @@ class RegistrantForm extends ContentEntityForm {
       }
 
       $this->messenger->addMessage(new FormattableMarkup($this->notificationService->parseTokenizedString($message), []));
-
-      // Invalidate tags to ensure that views count fields are updated.
-      $tags = [];
-      switch ($this->creationService->getRegistrationType()) {
-        case 'series':
-          $tags[] = 'eventinstance:' . $event_instance->id();
-          $tags[] = 'eventseries:' . $event_series->id();
-          break;
-
-        case 'instance':
-        default:
-          $tags[] = 'eventinstance:' . $event_instance->id();
-          break;
-      }
-      $this->cacheTagsInvalidator->invalidateTags($tags);
     }
     else {
       if ($this->entity->isNew()) {
