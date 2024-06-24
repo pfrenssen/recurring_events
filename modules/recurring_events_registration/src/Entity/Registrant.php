@@ -333,7 +333,7 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
    *   The type of registration, series or instance.
    */
   public function getRegistrationType(): RegistrationType {
-    return RegistrationType::tryFrom($this->get('type')->value) ?? RegistrationType::defaultValue();
+    return RegistrationType::tryFrom($this->get('type')->value ?? '') ?? RegistrationType::defaultValue();
   }
 
   /**

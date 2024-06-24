@@ -469,7 +469,7 @@ class RegistrationCreationService {
    *   The type of registration: series, or instance.
    */
   public function getRegistrationType(): RegistrationType {
-    return RegistrationType::tryFrom($this->eventSeries->event_registration->registration_type) ?? RegistrationType::defaultValue();
+    return RegistrationType::tryFrom($this->eventSeries->event_registration->registration_type ?? '') ?? RegistrationType::defaultValue();
   }
 
   /**
