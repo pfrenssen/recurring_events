@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\recurring_events_registration\Kernel;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\recurring_events\Entity\EventInstance;
@@ -26,6 +26,11 @@ class RegistrantControllerTest extends KernelTestBase {
    * The registrant controller. This is the system under test.
    */
   protected RegistrantController $registrantController;
+
+  /**
+   * The configuration factory.
+   */
+  protected ConfigFactoryInterface $configFactory;
 
   /**
    * {@inheritdoc}
@@ -55,7 +60,8 @@ class RegistrantControllerTest extends KernelTestBase {
 
     $this->installConfig(['field_inheritance', 'recurring_events_registration', 'system']);
 
-    $this->registrantController = RegistrantController::create(\Drupal::getContainer());
+    $this->registrantController = RegistrantController::create($this->container);
+    $this->configFactory = $this->container->get('config.factory');
   }
 
   /**
@@ -88,7 +94,7 @@ class RegistrantControllerTest extends KernelTestBase {
 
     // Change the configuration of the registrant title and check that it is
     // honored.
-    $config = \Drupal::configFactory()->getEditable('recurring_events_registration.registrant.config');
+    $config = $this->configFactory->getEditable('recurring_events_registration.registrant.config');
     $config->set('title', '[registrant:field_last_name:value] ([registrant:email])');
     $config->save();
 
