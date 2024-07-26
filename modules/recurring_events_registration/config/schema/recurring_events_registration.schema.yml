@@ -6,10 +6,10 @@ recurring_events_registration.registrant.config:
       type: boolean
       label: 'Whether to display the remaining capacity for an event during registration'
     insert_redirect_choice:
-      type: radios
+      type: string
       label: 'Choose where registrant form redirects'
     insert_redirect_other:
-      type: url
+      type: string
       label: 'Type custom URL here'
     use_admin_theme:
       type: boolean
@@ -29,6 +29,24 @@ recurring_events_registration.registrant.config:
     email_notifications_queue:
       type: boolean
       label: 'Whether to use the email notifications queue'
+    successfully_registered:
+      type: string
+      label: 'The message to display when a registrant is successfully created'
+    successfully_registered_waitlist:
+      type: string
+      label: 'The message to display when a registrant is successfully added to the waitlist'
+    successfully_updated:
+      type: string
+      label: 'The message to display when a registrant is successfully updated'
+    successfully_updated_waitlist:
+      type: string
+      label: 'The message to display when a registrant on the waitlist is successfully updated'
+    already_registered:
+      type: string
+      label: 'The message to display when a user is already registered for an event'
+    registration_closed:
+      type: string
+      label: 'The message to display when registration is closed for an event'
     notifications:
       type: sequence
       sequence:
