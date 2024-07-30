@@ -115,9 +115,9 @@ class RegistrantListBuilder extends EntityListBuilder {
     $row['id'] = $entity->id();
     $row['series'] = $series?->toLink($series->title->value) ?? '';
     $timezone = new \DateTimeZone(date_default_timezone_get());
-    $date = $instance->date->start_date;
+    $date = $instance?->date->start_date ?? '';
     $date->setTimezone($timezone);
-    $row['instance'] = $instance->toLink($date->format($this->config->get('recurring_events_registration.registrant.config')->get('date_format')));
+    $row['instance'] = $instance?->toLink($date->format($this->config->get('recurring_events_registration.registrant.config')->get('date_format'))) ?? '';
     $row['type'] = $entity->getRegistrationType() == 'series' ? $this->t('Series') : $this->t('Instance');
     $row['email'] = $entity->get('email')->value;
     $row['waitlist'] = $entity->get('waitlist')->value ? $this->t('Yes') : $this->t('No');
