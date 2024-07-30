@@ -278,13 +278,10 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   }
 
   /**
-   * Get the event series.
-   *
-   * @return \Drupal\recurring_events\Entity\EventSeries
-   *   The event series entity.
+   * {@inheritdoc}
    */
-  public function getEventSeries() {
-    return $this->get('eventseries_id')->entity;
+  public function getEventSeries(): ?EventSeries {
+    return $this->get('eventseries_id')?->entity;
   }
 
   /**
@@ -302,13 +299,10 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   }
 
   /**
-   * Get the event.
-   *
-   * @return \Drupal\recurring_events\Entity\EventInstance
-   *   The eventinstance entity.
+   * {@inheritdoc}
    */
-  public function getEventInstance() {
-    return $this->get('eventinstance_id')->entity;
+  public function getEventInstance(): ?EventInstance {
+    return $this->get('eventinstance_id')?->entity;
   }
 
   /**
