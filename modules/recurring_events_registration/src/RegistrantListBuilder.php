@@ -113,7 +113,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     $instance = $entity->getEventInstance();
 
     $row['id'] = $entity->id();
-    $row['series'] = $series->toLink($series->title->value);
+    $row['series'] = $series?->toLink($series->title->value) ?? '';
     $timezone = new \DateTimeZone(date_default_timezone_get());
     $date = $instance->date->start_date;
     $date->setTimezone($timezone);
