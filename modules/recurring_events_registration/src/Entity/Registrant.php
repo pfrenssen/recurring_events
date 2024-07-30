@@ -388,8 +388,8 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
     // the registration is for a series). This ensures the counters are updated.
     return array_merge(
       parent::getCacheTagsToInvalidate(),
-      $this->getEventInstance()->getCacheTagsToInvalidate(),
-      $this->getRegistrationType() === 'series' ? $this->getEventSeries()->getCacheTagsToInvalidate() : [],
+      $this->getEventInstance()?->getCacheTagsToInvalidate() ?? [],
+      $this->getEventSeries()?->getCacheTagsToInvalidate() ?? [],
     );
   }
 
