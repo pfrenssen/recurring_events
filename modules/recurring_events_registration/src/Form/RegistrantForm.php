@@ -367,7 +367,7 @@ class RegistrantForm extends ContentEntityForm {
 
     $form_fields = $this->fieldManager->getFieldDefinitions('registrant', $this->entity->getBundle());
 
-    $availability = $event_instance->availability_count->getValue()[0]['value'];
+    $availability = $event_instance?->availability_count->getValue()[0]['value'] ?? 0;
     $waitlist = $this->creationService->hasWaitlist();
     $registration_open = $this->creationService->registrationIsOpen();
 
@@ -547,7 +547,7 @@ class RegistrantForm extends ContentEntityForm {
     if ($this->moderationInformation) {
       if ($this->moderationInformation->hasPendingRevision($entity) && $entity->hasLinkTemplate('latest-version')) {
         $form_state->setRedirect('entity.registrant.latest_version', [
-          'eventinstance' => $entity->getEventInstance()->id(),
+          'eventinstance' => $entity->getEventInstance()?->id() ?? 0,
           'registrant' => $entity->id(),
         ]);
       }

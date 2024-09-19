@@ -279,13 +279,10 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   }
 
   /**
-   * Get the event series.
-   *
-   * @return \Drupal\recurring_events\Entity\EventSeries
-   *   The event series entity.
+   * {@inheritdoc}
    */
-  public function getEventSeries() {
-    return $this->get('eventseries_id')->entity;
+  public function getEventSeries(): ?EventSeries {
+    return $this->get('eventseries_id')?->entity;
   }
 
   /**
@@ -303,13 +300,10 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   }
 
   /**
-   * Get the event.
-   *
-   * @return \Drupal\recurring_events\Entity\EventInstance
-   *   The eventinstance entity.
+   * {@inheritdoc}
    */
-  public function getEventInstance() {
-    return $this->get('eventinstance_id')->entity;
+  public function getEventInstance(): ?EventInstance {
+    return $this->get('eventinstance_id')?->entity;
   }
 
   /**
@@ -395,8 +389,8 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
     // the registration is for a series). This ensures the counters are updated.
     return array_merge(
       parent::getCacheTagsToInvalidate(),
-      $this->getEventInstance()->getCacheTagsToInvalidate(),
-      $this->getRegistrationType() === RegistrationType::SERIES ? $this->getEventSeries()->getCacheTagsToInvalidate() : [],
+      $this->getEventInstance()?->getCacheTagsToInvalidate() ?? [],
+      $this->getEventSeries()?->getCacheTagsToInvalidate() ?? [],
     );
   }
 
