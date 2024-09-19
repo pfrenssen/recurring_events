@@ -30,36 +30,37 @@ recurring_events_registration.registrant.config:
       type: boolean
       label: 'Whether to use the email notifications queue'
     successfully_registered:
-      type: string
+      type: label
       label: 'The message to display when a registrant is successfully created'
     successfully_registered_waitlist:
-      type: string
+      type: label
       label: 'The message to display when a registrant is successfully added to the waitlist'
     successfully_updated:
-      type: string
+      type: label
       label: 'The message to display when a registrant is successfully updated'
     successfully_updated_waitlist:
-      type: string
-      label: 'The message to display when a registrant on the waitlist is successfully updated'
+      type: label
+      label: 'The message to display when a waitlist registrant is successfully updated'
     already_registered:
-      type: string
+      type: label
       label: 'The message to display when a user is already registered for an event'
     registration_closed:
-      type: string
-      label: 'The message to display when registration is closed for an event'
+      type: label
+      label: 'The message to display when registration is closed'
     notifications:
       type: sequence
       sequence:
         type: mapping
+        label: 'Email notification'
         mapping:
           enabled:
             type: boolean
             label: 'Whether to enable these notifications'
           subject:
-            type: string
+            type: label
             label: 'The email subject for these notifications'
           body:
-            type: string
+            type: text
             label: 'The email body for these notifications'
 field.widget.settings.event_registration:
   type: mapping
