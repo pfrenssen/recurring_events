@@ -452,7 +452,11 @@ class EventCreationService {
   }
 
   /**
-   * Create the event instances from the form state.
+   * Creates the event instances from the form state.
+   *
+   * This is intended to be called on newly created event series entities. When
+   * an existing event series entity needs to have the instances recreated, make
+   * sure to clear the existing instances first using ::clearEventInstances().
    *
    * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
@@ -485,11 +489,11 @@ class EventCreationService {
           if (!empty($events_to_create)) {
             foreach ($events_to_create as $custom_event) {
               $instance = $this->createEventInstance($event, $custom_event['start_date'], $custom_event['end_date']);
-              $this->configureDefaultInheritances($instance, $event->id());
               if ($instance) {
+                $this->configureDefaultInheritances($instance, $event->id());
                 $instance->save();
+                $event_instances[] = $instance;
               }
-              $event_instances[] = $instance;
             }
           }
         }
@@ -506,11 +510,11 @@ class EventCreationService {
         if (!empty($events_to_create)) {
           foreach ($events_to_create as $event_to_create) {
             $instance = $this->createEventInstance($event, $event_to_create['start_date'], $event_to_create['end_date']);
-            $this->configureDefaultInheritances($instance, $event->id());
             if ($instance) {
               $instance->save();
+              $this->configureDefaultInheritances($instance, $event->id());
+              $event_instances[] = $instance;
             }
-            $event_instances[] = $instance;
           }
         }
       }
