@@ -7,6 +7,7 @@
 
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\recurring_events_registration\Model\RegistrantTypeNotificationSetting;
 
 /**
  * Update registrant to be revisionable.
@@ -89,4 +90,20 @@ function recurring_events_registration_post_update_make_registrant_revisionable(
   $definition_update_manager->updateFieldableEntityType($entity_type, $field_storage_definitions, $sandbox);
 
   return t('Registrants have been converted to be revisionable.');
+}
+
+/**
+ * Add per-registrant type notification settings.
+ */
+function recurring_events_registration_post_update_add_notifications_to_registrant_types(&$sandbox) {
+  $registrant_types = \Drupal::entityTypeManager()
+    ->getStorage('registrant_type')
+    ->loadMultiple();
+
+  foreach ($registrant_types as $registrant_type) {
+    // Resave the entity to ensure the notification settings are saved.
+    $registrant_type
+      ->setNotificationSettings($registrant_type->getNotificationSettings())
+      ->save();
+  }
 }
