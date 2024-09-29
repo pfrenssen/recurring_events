@@ -7,7 +7,6 @@
 
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\recurring_events_registration\Model\RegistrantTypeNotificationSetting;
 
 /**
  * Update registrant to be revisionable.
