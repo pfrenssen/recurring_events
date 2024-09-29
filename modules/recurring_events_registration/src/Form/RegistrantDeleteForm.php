@@ -106,7 +106,7 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
         '#prefix' => '<p class=registration-register-intro">',
         '#markup' => $this->t('You are cancelling your registration for %email for %event. Once you do this, there may no longer be any spaces left for this event and you may not be able to register again.', [
           '%email' => $entity->email->value,
-          '%event' => $entity->getEventSeries()->title->value,
+          '%event' => $entity->getEventSeries()?->title->value ?? '',
         ]),
         '#suffix' => '</p>',
       ],
