@@ -115,7 +115,7 @@ class RegistrantController extends ControllerBase implements ContainerInjectionI
    *   The page title.
    */
   public function getTitle(RegistrantInterface $registrant) {
-    return $registrant->field_first_name->value . ' ' . $registrant->field_last_name->value;
+    return $registrant->label();
   }
 
 }
