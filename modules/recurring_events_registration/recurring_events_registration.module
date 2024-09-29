@@ -432,15 +432,18 @@ function recurring_events_registration_send_notification($key, RegistrantInterfa
  */
 function recurring_events_registration_entity_operation(EntityInterface $entity) {
   $operations = [];
-  if ($entity->getEntityTypeId() == 'registrant') {
-    $operations['resend'] = [
-      'title' => t('Resend Mail'),
-      'weight' => 50,
-      'url' => Url::fromRoute('entity.registrant.resend_form', [
-        'eventinstance' => $entity->getEventInstance()->id(),
-        'registrant' => $entity->id(),
-      ]),
-    ];
+  if ($entity instanceof RegistrantInterface) {
+    $instance = $entity->getEventInstance();
+    if ($instance) {
+      $operations['resend'] = [
+        'title' => t('Resend Mail'),
+        'weight' => 50,
+        'url' => Url::fromRoute('entity.registrant.resend_form', [
+          'eventinstance' => $instance->id(),
+          'registrant' => $entity->id(),
+        ]),
+      ];
+    }
   }
 
   return $operations;
