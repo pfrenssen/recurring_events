@@ -68,9 +68,10 @@ class NotificationTest extends KernelTestBase {
     ]);
     $registrant_type->setNotificationSettings([
       'registration_notification' => new RegistrantTypeNotificationSetting([
+        'overridden' => TRUE,
         'enabled' => TRUE,
         'subject' => 'Your group has been registered',
-        'body' => 'Thank you [] for registering your group for the event.',
+        'body' => 'Thank you [registrant:email] for registering your group for the event.',
       ]),
     ]);
     $registrant_type->save();
@@ -80,10 +81,19 @@ class NotificationTest extends KernelTestBase {
       'bundle' => 'group',
       'eventseries_id' => $event_series->id(),
       'type' => 'series',
+      'email' => 'kris@example.com',
       'field_first_name' => 'Kris',
       'status' => TRUE,
     ]);
     $registrant->save();
+
+    $mails = $this->getMails();
+    $this->assertEquals(1, count($mails));
+    $mail = reset($mails);
+
+    $this->assertMail('to', 'kris@example.com', 'The email was sent to the correct recipient.');
+    $this->assertMail('subject', 'Your group has been registered', 'The email has the correct subject.');
+    $this->assertMail('body', 'Thank you kris@example.com for registering your group for the event.' . PHP_EOL, 'The email has the correct body.');
   }
 
 }
