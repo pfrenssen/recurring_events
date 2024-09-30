@@ -23,6 +23,7 @@ class RegistrantTest extends KernelTestBase {
   protected static $modules = [
     'datetime',
     'datetime_range',
+    'field',
     'field_inheritance',
     'options',
     'recurring_events',
@@ -42,7 +43,7 @@ class RegistrantTest extends KernelTestBase {
     $this->installEntitySchema('registrant');
     $this->installEntitySchema('user');
 
-    $this->installConfig(['field_inheritance', 'recurring_events']);
+    $this->installConfig(['field_inheritance', 'recurring_events', 'recurring_events_registration']);
   }
 
   /**
