@@ -149,7 +149,7 @@ class NotificationTest extends KernelTestBase {
    * It should be possible for a registrant type to override the default
    * notification settings.
    */
-  public function _testRegistrationNotificationConfiguration(): void {
+  public function testRegistrationNotificationConfiguration(): void {
     $config = $this->config('recurring_events_registration.registrant.config');
     $send_email = $config->get('email_notifications');
     $this->assertTrue($send_email, 'By default email notifications are enabled.');
