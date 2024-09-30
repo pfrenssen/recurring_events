@@ -382,9 +382,12 @@ function recurring_events_registration_recurring_events_pre_delete_instances(Eve
  *   The registrant this email relates to.
  */
 function recurring_events_registration_send_notification($key, RegistrantInterface $registrant) {
+  /** @var \Drupal\recurring_events_registration\NotificationService $notification_service */
+  $notification_service = \Drupal::service('recurring_events_registration.notification_service')->setKey($key)->setEntity($registrant);
+
   $config = \Drupal::config('recurring_events_registration.registrant.config');
   $send_email = $config->get('email_notifications');
-  $send_email_key = $config->get('notifications.' . $key . '.enabled');
+  $send_email_key = $notification_service->isEnabled();
 
   // Modify $send_email if necessary.
   \Drupal::moduleHandler()->alter('recurring_events_registration_send_notification', $send_email, $registrant);
