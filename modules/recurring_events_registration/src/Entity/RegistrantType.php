@@ -94,7 +94,7 @@ class RegistrantType extends ConfigEntityBundleBase implements RegistrantTypeInt
     \Drupal::moduleHandler()->alter('recurring_events_registration_notification_types', $notification_types);
 
     $notification_settings = [];
-    foreach ($notification_types as $type => $notification) {
+    foreach (array_keys($notification_types) as $type) {
       $notification_settings[$type] = new RegistrantTypeNotificationSetting($this->notifications[$type] ?? []);
     }
 

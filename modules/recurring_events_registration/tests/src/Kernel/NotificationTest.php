@@ -196,7 +196,7 @@ class NotificationTest extends KernelTestBase {
   }
 
   /**
-   * Tests the `registration_notification` notification.
+   * Checks that a notification is sent out when a registrant is created.
    */
   public function testRegistrationNotification(): void {
     // Create a registrant type 'group' which overrides the registration
@@ -233,7 +233,7 @@ class NotificationTest extends KernelTestBase {
     // Clear out the mail queue.
     $this->container->get('state')->set('system.test_mail_collector', []);
 
-    // Change the group registrant type to no longer send out the notification.
+    // Configure the group registrant type to no longer send out a notification.
     $registrant_type->setNotificationSettings([
       'registration_notification' => new RegistrantTypeNotificationSetting([
         'overridden' => TRUE,

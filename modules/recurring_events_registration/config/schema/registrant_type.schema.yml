@@ -21,13 +21,13 @@ recurring_events_registration.registrant_type.*:
         mapping:
           overridden:
             type: boolean
-            label: 'Whether the notification settings are overridden for this registrant type.'
+            label: 'Whether the notification settings are overridden for this registrant type'
           enabled:
             type: boolean
-            label: 'Whether the notification is enabled.'
+            label: 'Whether the notification is enabled'
           subject:
             type: string
-            label: 'The subject of the notification.'
+            label: 'The subject of the notification'
           body:
             type: string
-            label: 'The body of the notification.'
+            label: 'The body of the notification'
