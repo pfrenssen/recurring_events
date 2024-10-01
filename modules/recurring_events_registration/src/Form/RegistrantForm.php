@@ -17,6 +17,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
+use Drupal\recurring_events_registration\Enum\RegistrationType;
 use Drupal\recurring_events_registration\NotificationService;
 use Drupal\recurring_events_registration\RegistrationCreationService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -214,7 +215,7 @@ class RegistrantForm extends ContentEntityForm {
         '#type' => 'markup',
         '#prefix' => '<p class="registration-message">',
         '#markup' => $this->t('Unfortunately, there are no spaces left for this @type. However, we can add you to the waitlist. If a space becomes available, the first registrant on the waitlist will be automatically registered.', [
-          '@type' => $reg_type === 'series' ? 'series' : 'event',
+          '@type' => $reg_type === RegistrationType::SERIES ? 'series' : 'event',
         ]),
         '#suffix' => '</p>',
       ],
@@ -237,7 +238,7 @@ class RegistrantForm extends ContentEntityForm {
         '#type' => 'markup',
         '#prefix' => '<p class="registration-message">',
         '#markup' => $this->t('Unfortunately, this @type is at capacity and there are no spaces available.', [
-          '@type' => $reg_type === 'series' ? 'series' : 'event',
+          '@type' => $reg_type === RegistrationType::SERIES ? 'series' : 'event',
         ]),
         '#suffix' => '</p>',
       ],
@@ -260,7 +261,7 @@ class RegistrantForm extends ContentEntityForm {
         '#type' => 'markup',
         '#prefix' => '<p class="registration-message">',
         '#markup' => $this->t('Unfortunately, registration for this @type is closed.', [
-          '@type' => $reg_type === 'series' ? 'series' : 'event',
+          '@type' => $reg_type === RegistrationType::SERIES ? 'series' : 'event',
         ]),
         '#suffix' => '</p>',
       ],

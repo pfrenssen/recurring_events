@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\recurring_events_registration\Enum\RegistrationType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -118,7 +119,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     $date = $instance?->date->start_date ?? '';
     $date->setTimezone($timezone);
     $row['instance'] = $instance?->toLink($date->format($this->config->get('recurring_events_registration.registrant.config')->get('date_format'))) ?? '';
-    $row['type'] = $entity->getRegistrationType() == 'series' ? $this->t('Series') : $this->t('Instance');
+    $row['type'] = $entity->getRegistrationType()->getLabel();
     $row['email'] = $entity->get('email')->value;
     $row['waitlist'] = $entity->get('waitlist')->value ? $this->t('Yes') : $this->t('No');
     $row['status'] = $entity->get('status')->value ? $this->t('Complete') : $this->t('Pending');
@@ -162,7 +163,7 @@ class RegistrantListBuilder extends EntityListBuilder {
       case 'entity.registrant.instance_listing':
         $event_instance = $params['eventinstance'];
         $this->creationService->setEventInstance($event_instance);
-        if ($this->creationService->getRegistrationType() === 'series') {
+        if ($this->creationService->getRegistrationType() === RegistrationType::SERIES) {
           $query->condition('eventseries_id', $event_instance->getEventSeries()->id());
         }
         else {

@@ -1,7 +1,8 @@
 name: 'Recurring Events iCalendar'
 type: module
 description: 'Provides the ability to export recurring events as iCalendar files'
-core_version_requirement: ^9.3 || ^10
+core_version_requirement: ^10.3 || ^11
+php: 8.3
 package: 'Recurring Events'
 configure: entity.event_ical_mapping.collection
 dependencies:

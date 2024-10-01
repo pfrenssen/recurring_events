@@ -68,11 +68,7 @@ class EventSeriesRegistrationType extends FieldPluginBase {
   public function render(ResultRow $values) {
     $series = $values->_entity;
     $this->registrationCreationService->setEventSeries($series);
-    $registration_type = $this->registrationCreationService->getRegistrationType();
-    if (empty($registration_type)) {
-      return $this->t('N/A');
-    }
-    return $registration_type;
+    return $this->registrationCreationService->getRegistrationType()->value;
   }
 
 }

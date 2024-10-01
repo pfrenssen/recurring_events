@@ -8,6 +8,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\recurring_events_registration\Entity\Registrant;
+use Drupal\recurring_events_registration\Enum\RegistrationType;
 
 /**
  * Tests the Registrant entity.
@@ -66,7 +67,7 @@ class RegistrantTest extends KernelTestBase {
 
       // Reference an event series if the test requires it.
       if ($referenceEventSeries) {
-        $registrant->setRegistrationType('series');
+        $registrant->setRegistrationType(RegistrationType::SERIES);
         $registrant->setEventSeries($eventSeries);
 
         $expected[] = 'eventseries:' . $eventSeries->id();
@@ -81,7 +82,7 @@ class RegistrantTest extends KernelTestBase {
         ]);
         $eventInstance->save();
 
-        $registrant->setRegistrationType('instance');
+        $registrant->setRegistrationType(RegistrationType::INSTANCE);
         $registrant->setEventInstance($eventInstance);
 
         $expected[] = 'eventinstance:' . $eventInstance->id();

@@ -11,6 +11,7 @@
     "source": "http://cgit.drupalcode.org/recurring_events"
   },
   "require": {
+    "php": "^8.3",
     "drupal/field_inheritance": "^2"
   },
   "require-dev": {
