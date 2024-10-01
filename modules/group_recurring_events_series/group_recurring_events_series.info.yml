@@ -2,8 +2,8 @@ name: 'Group recurring events'
 description: 'Enables Group functionality for the Recurring events module'
 package: 'Group'
 type: 'module'
-core_version_requirement: ^10.3 || ^11
-php: 8.3
+core_version_requirement: ^10.2 || ^11
+php: 8.2
 dependencies:
   - 'recurring_events:recurring_events'
   - 'group:group'
