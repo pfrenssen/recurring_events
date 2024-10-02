@@ -233,7 +233,7 @@ class RegistrationCreationService {
    * @return int
    *   The count of registrants.
    */
-  public function retrieveRegisteredPartiesCount($include_nonwaitlisted = TRUE, $include_waitlisted = TRUE, $uid = FALSE) {
+  public function retrieveRegisteredPartiesCount($include_nonwaitlisted = TRUE, $include_waitlisted = TRUE, $uid = FALSE): int {
     $query = $this->storage->getQuery();
 
     if ($include_nonwaitlisted && !$include_waitlisted) {
@@ -267,9 +267,19 @@ class RegistrationCreationService {
 
     $query->accessCheck(TRUE);
 
-    $result = $query->count()->execute();
+    $registrant_ids = $query->execute();
 
-    return $result;
+    if (empty($registrant_ids)) {
+      return 0;
+    }
+
+    // Add up all the seats from the registrants.
+    $query = $this->database->select('registrant', 'r');
+    $query->condition('r.id', $registrant_ids, 'IN');
+    $query->addField('r', 'seats');
+
+    $seats = $query->execute()->fetchCol();
+    return array_sum($seats);
   }
 
   /**

@@ -235,10 +235,19 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
 
     $fields['seats'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Seats'))
-      ->setDescription(t('The number of seats that are reserved.'))
+      ->setDescription(t('The number of seats to reserve.'))
       ->setDefaultValue(1)
       ->setSetting('unsigned', TRUE)
-      ->setRequired(TRUE);
+      ->setRequired(TRUE)
+      ->setDisplayOptions('form', [
+        'weight' => 6,
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'weight' => 10,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['waitlist'] = BaseFieldDefinition::create('boolean')
       ->setRevisionable(TRUE)
