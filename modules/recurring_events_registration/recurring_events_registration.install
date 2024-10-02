@@ -642,7 +642,9 @@ function recurring_events_registration_update_8013() {
         $revision_key => $value->{$revision_key},
       ];
       foreach ($reg_fields as $field) {
-        $values_to_restore[$field] = rtrim($value->{$field}, 's');
+        if (!empty($value->{$field})) {
+          $values_to_restore[$field] = rtrim($value->{$field}, 's');
+        }
       }
       $values_to_restore['event_registration__max_seats'] = 1;
       $database->update($table_name)
