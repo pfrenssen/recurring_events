@@ -69,6 +69,7 @@ function recurring_events_registration_entity_base_field_info_alter(&$fields, En
       ]);
 
     $fields['max_seats'] = BaseFieldDefinition::create('integer')
+      ->setName('max_seats')
       ->setLabel(t('Max seats'))
       ->setDescription('The maximum number of seats than can be registered per registrant.')
       ->setDisplayConfigurable('form', TRUE)

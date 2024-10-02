@@ -548,6 +548,7 @@ function recurring_events_registration_update_8012(): void {
   $storage_definitions = [
     'registrant' => [
       'seats' => BaseFieldDefinition::create('integer')
+        ->setName('seats')
         ->setLabel(t('Seats'))
         ->setDescription(t('The number of seats the registrant is reserving.'))
         ->setDefaultValue(1)
@@ -557,6 +558,7 @@ function recurring_events_registration_update_8012(): void {
     ],
     'eventseries' => [
       'max_seats' => BaseFieldDefinition::create('integer')
+        ->setName('max_seats')
         ->setLabel(t('Max seats'))
         ->setDescription('The maximum number of seats than can be registered per registrant.')
         ->setDisplayConfigurable('form', TRUE)
