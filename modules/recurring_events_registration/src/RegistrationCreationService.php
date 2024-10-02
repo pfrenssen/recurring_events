@@ -765,6 +765,12 @@ class RegistrationCreationService {
     if ($this->hasAvailability()) {
       $first_waitlist = $this->retrieveFirstWaitlistParty();
       if (!empty($first_waitlist)) {
+        $availability = $this->retrieveAvailability();
+        $requested_seats = (int) $first_waitlist->get('seats')->value;
+        if ($requested_seats > $availability) {
+          return;
+        }
+
         $first_waitlist->setWaitlist('0');
         $first_waitlist->save();
 
