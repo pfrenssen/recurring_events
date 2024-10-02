@@ -50,4 +50,23 @@ interface RegistrantInterface extends ContentEntityInterface, EntityChangedInter
    */
   public function getEventSeries(): ?EventSeries;
 
+  /**
+   * Returns the number of seats the registrant has reserved.
+   *
+   * @return int
+   *   The number of seats the registrant has reserved.
+   */
+  public function getSeats(): int;
+
+  /**
+   * Sets the number of seats the registrant has reserved.
+   *
+   * @param int $seats
+   *   The number of seats the registrant has reserved.
+   *
+   * @return RegistrantInterface
+   *   The Registrant entity, for chaining.
+   */
+  public function setSeats(int $seats): RegistrantInterface;
+
 }

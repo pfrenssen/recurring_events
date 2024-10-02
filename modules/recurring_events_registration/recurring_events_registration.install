@@ -14,23 +14,38 @@ use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFie
  * @see hook_install()
  */
 function recurring_events_registration_install() {
-  $storage_definition = BaseFieldDefinition::create('event_registration')
-    ->setName('event_registration')
-    ->setLabel(t('Event Registration'))
-    ->setDescription('The event registration configuration.')
-    ->setDisplayConfigurable('form', TRUE)
-    ->setDisplayConfigurable('view', TRUE)
-    ->setRevisionable(TRUE)
-    ->setTranslatable(FALSE)
-    ->setCardinality(1)
-    ->setRequired(FALSE)
-    ->setDisplayOptions('form', [
-      'type' => 'event_registration',
-      'weight' => 10,
-    ]);
+  $storage_definitions = [
+    'event_registration' => BaseFieldDefinition::create('event_registration')
+      ->setName('event_registration')
+      ->setLabel(t('Event Registration'))
+      ->setDescription('The event registration configuration.')
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setRevisionable(TRUE)
+      ->setTranslatable(FALSE)
+      ->setCardinality(1)
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'event_registration',
+        'weight' => 10,
+      ]),
+    'max_seats' => BaseFieldDefinition::create('integer')
+      ->setLabel(t('Max seats'))
+      ->setDescription('The maximum number of seats than can be registered per registrant.')
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setRevisionable(TRUE)
+      ->setTranslatable(FALSE)
+      ->setCardinality(1)
+      ->setRequired(FALSE)
+      ->setDefaultValue(1)
+      ->setDisplayOptions('form', ['weight' => 11]),
+  ];
 
-  \Drupal::entityDefinitionUpdateManager()
-    ->installFieldStorageDefinition('event_registration', 'eventseries', 'eventseries', $storage_definition);
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  foreach ($storage_definitions as $field_name => $storage_definition) {
+    $update_manager->installFieldStorageDefinition($field_name, 'eventseries', 'recurring_events_registration', $storage_definition);
+  }
 
   // When enabling registrations make sure we create all the registrant types
   // to match the existing series and instance types.
@@ -524,4 +539,42 @@ function recurring_events_registration_update_8011() {
   $config->set('insert_redirect_choice', 'current');
   $config->set('insert_redirect_other', '');
   $config->save();
+}
+
+/**
+ * Add fields to keep track of the number of seats a registrant is reserving.
+ */
+function recurring_events_registration_update_8012(): void {
+  $storage_definitions = [
+    'registrant' => [
+      'seats' => BaseFieldDefinition::create('integer')
+        ->setLabel(t('Seats'))
+        ->setDescription(t('The number of seats the registrant is reserving.'))
+        ->setDefaultValue(1)
+        ->setInitialValue(1)
+        ->setSetting('unsigned', TRUE)
+        ->setRequired(TRUE),
+    ],
+    'eventseries' => [
+      'max_seats' => BaseFieldDefinition::create('integer')
+        ->setLabel(t('Max seats'))
+        ->setDescription('The maximum number of seats than can be registered per registrant.')
+        ->setDisplayConfigurable('form', TRUE)
+        ->setDisplayConfigurable('view', TRUE)
+        ->setRevisionable(TRUE)
+        ->setTranslatable(FALSE)
+        ->setCardinality(1)
+        ->setRequired(FALSE)
+        ->setDefaultValue(1)
+        ->setInitialValue(1)
+        ->setDisplayOptions('form', ['weight' => 11]),
+    ],
+  ];
+
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+  foreach ($storage_definitions as $entity_type_id => $fields) {
+    foreach ($fields as $field_name => $storage_definition) {
+      $update_manager->installFieldStorageDefinition($field_name, $entity_type_id, 'recurring_events_registration', $storage_definition);
+    }
+  }
 }

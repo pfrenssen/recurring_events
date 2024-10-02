@@ -233,6 +233,13 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
       ->setDescription(t('The ID of the eventinstance entity.'))
       ->setSetting('target_type', 'eventinstance');
 
+    $fields['seats'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Seats'))
+      ->setDescription(t('The number of seats that are reserved.'))
+      ->setDefaultValue(1)
+      ->setSetting('unsigned', TRUE)
+      ->setRequired(TRUE);
+
     $fields['waitlist'] = BaseFieldDefinition::create('boolean')
       ->setRevisionable(TRUE)
       ->setLabel(t('Waitlist'))
@@ -340,6 +347,25 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
    */
   public function setRegistrationType($type) {
     $this->set('type', $type);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSeats(): int {
+    $seats = (int) $this->get('seats')->value;
+    return $seats > 0 ? $seats : 1;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSeats(int $seats): RegistrantInterface {
+    if ($seats < 1) {
+      throw new \InvalidArgumentException('The number of seats must be 1 or greater.');
+    }
+    $this->set('seats', $seats);
     return $this;
   }
 
