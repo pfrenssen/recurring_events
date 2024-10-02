@@ -67,19 +67,6 @@ function recurring_events_registration_entity_base_field_info_alter(&$fields, En
         'type' => 'event_registration',
         'weight' => 10,
       ]);
-
-    $fields['max_seats'] = BaseFieldDefinition::create('integer')
-      ->setName('max_seats')
-      ->setLabel(t('Max seats'))
-      ->setDescription('The maximum number of seats than can be registered per registrant.')
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setTranslatable(FALSE)
-      ->setCardinality(1)
-      ->setRequired(FALSE)
-      ->setDefaultValue(1)
-      ->setDisplayOptions('form', ['weight' => 11]);
   }
 
   if ($entity_type->id() === 'eventinstance') {

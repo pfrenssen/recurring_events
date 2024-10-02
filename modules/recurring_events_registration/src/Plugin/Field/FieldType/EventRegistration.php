@@ -46,6 +46,11 @@ class EventRegistration extends DateRangeItem {
       'unsigned' => TRUE,
     ];
 
+    $schema['columns']['max_seats'] = [
+      'type' => 'int',
+      'unsigned' => TRUE,
+    ];
+
     $schema['columns']['waitlist'] = [
       'type' => 'int',
       'default' => 0,
@@ -111,6 +116,7 @@ class EventRegistration extends DateRangeItem {
     $registration_type = $this->get('registration_type')->getValue();
     $registration_dates = $this->get('registration_dates')->getValue();
     $capacity = $this->get('capacity')->getValue();
+    $max_seats = $this->get('max_seats')->getValue();
     $waitlist = $this->get('waitlist')->getValue();
     $instance_schedule_open = $this->get('instance_schedule_open')->getValue();
     $instance_schedule_open_amount = $this->get('instance_schedule_open_amount')->getValue();
@@ -127,7 +133,7 @@ class EventRegistration extends DateRangeItem {
       && empty($instance_schedule_open_units) && empty($instance_schedule_close)
       && empty($instance_schedule_close_amount) && empty($instance_schedule_close_units)
       && empty($instance_schedule_close_type) && empty($unique_email_address)
-      && empty($permitted_roles);
+      && empty($permitted_roles) && empty($max_seats);
   }
 
   /**
@@ -156,6 +162,10 @@ class EventRegistration extends DateRangeItem {
     $properties['capacity'] = DataDefinition::create('integer')
       ->setLabel(t('Capacity'))
       ->setDescription(t('Enter the number of registrants that can attend the event.'));
+
+    $properties['max_seats'] = DataDefinition::create('integer')
+      ->setLabel(t('Max Seats'))
+      ->setDescription(t('Enter the maximum number of attendees allowed per registration.'));
 
     $properties['waitlist'] = DataDefinition::create('boolean')
       ->setLabel(t('Waitlist'))
