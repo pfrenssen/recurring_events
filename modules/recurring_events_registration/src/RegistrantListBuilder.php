@@ -97,6 +97,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     $header['type'] = $this->t('Type');
     $header['email'] = $this->t('Email');
     $header['waitlist'] = $this->t('Waitlist');
+    $header['seats'] = $this->t('Seats');
     $header['status'] = $this->t('Status');
     foreach ($this->getCustomFields() as $machine_name => $field) {
       $header[$machine_name] = $field;
@@ -121,6 +122,7 @@ class RegistrantListBuilder extends EntityListBuilder {
     $row['type'] = $entity->getRegistrationType() == 'series' ? $this->t('Series') : $this->t('Instance');
     $row['email'] = $entity->get('email')->value;
     $row['waitlist'] = $entity->get('waitlist')->value ? $this->t('Yes') : $this->t('No');
+    $row['seats'] = $entity->getSeats();
     $row['status'] = $entity->get('status')->value ? $this->t('Complete') : $this->t('Pending');
     foreach ($this->getCustomFields($entity->bundle()) as $machine_name => $field) {
       $row[$machine_name] = $entity->get($machine_name)->value;
