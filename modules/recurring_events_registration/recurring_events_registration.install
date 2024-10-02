@@ -562,7 +562,9 @@ function recurring_events_registration_update_8012(): void {
  * Update the event_registration field type to add the max_seats field.
  */
 function recurring_events_registration_update_8013() {
+  $database = \Drupal::database();
   $entity_type_manager = \Drupal::entityTypeManager();
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
 
   $storage = $entity_type_manager->getStorage('eventseries');
   $bundle_definition = $entity_type_manager->getDefinition('eventseries');
@@ -572,9 +574,6 @@ function recurring_events_registration_update_8013() {
 
   $table_name = $storage->getDataTable() ?: $storage->getBaseTable();
   $revision_table_name = $storage->getRevisionDataTable() ?: $storage->getRevisionTable();
-
-  $database = \Drupal::database();
-  $definition_manager = \Drupal::entityDefinitionUpdateManager();
 
   // We need to grab all the current data for registration settings for an event
   // before we remove the registration field, before re-adding it with our new
@@ -631,8 +630,7 @@ function recurring_events_registration_update_8013() {
       'weight' => 10,
     ]);
 
-  \Drupal::entityDefinitionUpdateManager()
-    ->installFieldStorageDefinition('event_registration', 'eventseries', 'eventseries', $storage_definition);
+  $definition_manager->installFieldStorageDefinition('event_registration', 'eventseries', 'recurring_events_registration', $storage_definition);
 
   // Restore previously stored values.
   if (!empty($registration_values)) {
@@ -643,7 +641,7 @@ function recurring_events_registration_update_8013() {
       ];
       foreach ($reg_fields as $field) {
         if (!empty($value->{$field})) {
-          $values_to_restore[$field] = rtrim($value->{$field}, 's');
+          $values_to_restore[$field] = $value->{$field};
         }
       }
       $values_to_restore['event_registration__max_seats'] = 1;
@@ -652,6 +650,8 @@ function recurring_events_registration_update_8013() {
         ->condition($id_key, $value->{$id_key})
         ->execute();
 
+      // @todo This only restores the most recent revision, all data regarding
+      //   event registrations from prior revisions should also be restored.
       $database->update($revision_table_name)
         ->fields($values_to_restore)
         ->condition($id_key, $value->{$id_key})
