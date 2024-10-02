@@ -16,6 +16,7 @@ use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\Core\Url;
 use Drupal\recurring_events_registration\NotificationService;
 use Drupal\recurring_events_registration\RegistrationCreationService;
@@ -85,6 +86,13 @@ class RegistrantForm extends ContentEntityForm {
   protected $notificationService;
 
   /**
+   * The private tempstore factory.
+   *
+   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
+   */
+  protected $tempStoreFactory;
+
+  /**
    * The moderation information service.
    *
    * @var \Drupal\content_moderation\ModerationInformation
@@ -107,6 +115,7 @@ class RegistrantForm extends ContentEntityForm {
       $container->get('current_route_match'),
       $container->get('entity_type.manager'),
       $container->get('recurring_events_registration.notification_service'),
+      $container->get('recurring_events_registration.tempstore.private'),
       $container->has('content_moderation.moderation_information') ? $container->get('content_moderation.moderation_information') : NULL
     );
   }
@@ -136,6 +145,8 @@ class RegistrantForm extends ContentEntityForm {
    *   The entity type manager service.
    * @param \Drupal\recurring_events_registration\NotificationService $notification_service
    *   The registration notification service.
+   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store
+   *   The private tempstore factory.
    * @param \Drupal\content_moderation\ModerationInformation $moderation_information
    *   The moderation information service.
    */
@@ -151,6 +162,7 @@ class RegistrantForm extends ContentEntityForm {
     RouteMatchInterface $route_match,
     EntityTypeManagerInterface $entity_type_manager,
     NotificationService $notification_service,
+    PrivateTempStoreFactory $temp_store,
     ModerationInformation $moderation_information = NULL) {
     $this->messenger = $messenger;
     $this->creationService = $creation_service;
@@ -161,6 +173,7 @@ class RegistrantForm extends ContentEntityForm {
     $this->entityTypeManager = $entity_type_manager;
     $this->notificationService = $notification_service;
     $this->moderationInformation = $moderation_information;
+    $this->tempStoreFactory = $temp_store;
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
   }
 
@@ -184,6 +197,8 @@ class RegistrantForm extends ContentEntityForm {
     // Use the registration creation service to grab relevant data.
     $this->creationService->setEventInstance($event_instance);
     $availability = $event_instance->availability_count->getValue()[0]['value'];
+
+    $waitlist = $this->creationService->hasWaitlist();
     $is_waitlisted = $entity->getWaitlist() != 0;
 
     // If the registrant is being edited, add the current number of seats to the
@@ -194,15 +209,25 @@ class RegistrantForm extends ContentEntityForm {
       $availability += $entity->getSeats();
     }
 
+    // Since the availability might change between the time the form was loaded
+    // and the time it was submitted, keep track of the original availability
+    // as was shown to the user, so we can show helpful messages if needed.
+    $form['#cache']['contexts'][] = 'session';
+    $temp_store = $this->tempStoreFactory->get('recurring_events_registration_form');
+    if (!$temp_store->get($event_instance->uuid())) {
+      $temp_store->set($event_instance->uuid(), $availability);
+    }
+
     // Determine the maximum number of seats that can be registered, taking into
     // account the configured maximum seats per registrant and the remaining
-    // availability.
+    // availability. Also, if we are out of space, but there is a waitlist, we
+    // can still register the maximum number of seats.
+    $out_of_space_with_waitlist = $availability === 0 && $waitlist;
     $max_seats = (int) $event_series->event_registration->max_seats;
-    if ($availability !== -1 && !$is_waitlisted) {
+    if ($availability !== -1 && !$out_of_space_with_waitlist && !$is_waitlisted) {
       $max_seats = min($max_seats, $availability);
     }
 
-    $waitlist = $this->creationService->hasWaitlist();
     $registration_open = $this->creationService->registrationIsOpen();
     $reg_type = $this->creationService->getRegistrationType();
 
@@ -346,7 +371,7 @@ class RegistrantForm extends ContentEntityForm {
 
     // Because the form gets modified depending on the number of registrations
     // we need to invalidate it when the list of registrants changes.
-    $form['#cache']['tags'] = ['registrant_list'];
+    $form['#cache']['tags'][] = 'registrant_list';
 
     $save_label = $this->t('Register');
     if ($editing) {
@@ -473,6 +498,7 @@ class RegistrantForm extends ContentEntityForm {
     $this->creationService->setEventInstance($event_instance);
     // Just to be sure we have a fresh copy of the event series.
     $this->creationService->setEventSeries($event_series);
+    $temp_store = $this->tempStoreFactory->get('recurring_events_registration_form');
 
     $availability = $event_instance->availability_count->getValue()[0]['value'];
     // If the registrant is being edited, add the current number of seats to the
@@ -491,11 +517,17 @@ class RegistrantForm extends ContentEntityForm {
     // Handle the automatic waitlist addition.
     if ($add_to_waitlist == 2) {
       $add_to_waitlist = 0;
-      if ($out_of_capacity && $waitlist) {
+      // If there was originally enough space the user will not expect to be put
+      // on the waitlist. In case someone else registered in the meantime and
+      // now there is no longer enough space, we need to inform the user.
+      $original_availability = $temp_store->get($event_instance->uuid());
+      $ran_out_of_space = !empty($original_availability) && $out_of_capacity && $requested_seats <= $original_availability;
+      if ($out_of_capacity && $waitlist && !$ran_out_of_space) {
         $add_to_waitlist = 1;
       }
       $form_state->setValue('add_to_waitlist', $add_to_waitlist);
     }
+    $temp_store->delete($event_instance->uuid());
 
     // Only perform the checks if the entity is new.
     if ($entity->isNew()) {
