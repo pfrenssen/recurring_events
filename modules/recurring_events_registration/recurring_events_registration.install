@@ -14,38 +14,23 @@ use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFie
  * @see hook_install()
  */
 function recurring_events_registration_install() {
-  $storage_definitions = [
-    'event_registration' => BaseFieldDefinition::create('event_registration')
-      ->setName('event_registration')
-      ->setLabel(t('Event Registration'))
-      ->setDescription('The event registration configuration.')
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setTranslatable(FALSE)
-      ->setCardinality(1)
-      ->setRequired(FALSE)
-      ->setDisplayOptions('form', [
-        'type' => 'event_registration',
-        'weight' => 10,
-      ]),
-    'max_seats' => BaseFieldDefinition::create('integer')
-      ->setLabel(t('Max seats'))
-      ->setDescription('The maximum number of seats than can be registered per registrant.')
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE)
-      ->setRevisionable(TRUE)
-      ->setTranslatable(FALSE)
-      ->setCardinality(1)
-      ->setRequired(FALSE)
-      ->setDefaultValue(1)
-      ->setDisplayOptions('form', ['weight' => 11]),
-  ];
+  $storage_definition = BaseFieldDefinition::create('event_registration')
+    ->setName('event_registration')
+    ->setLabel(t('Event Registration'))
+    ->setDescription('The event registration configuration.')
+    ->setDisplayConfigurable('form', TRUE)
+    ->setDisplayConfigurable('view', TRUE)
+    ->setRevisionable(TRUE)
+    ->setTranslatable(FALSE)
+    ->setCardinality(1)
+    ->setRequired(FALSE)
+    ->setDisplayOptions('form', [
+      'type' => 'event_registration',
+      'weight' => 10,
+    ]);
 
-  $update_manager = \Drupal::entityDefinitionUpdateManager();
-  foreach ($storage_definitions as $field_name => $storage_definition) {
-    $update_manager->installFieldStorageDefinition($field_name, 'eventseries', 'recurring_events_registration', $storage_definition);
-  }
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('event_registration', 'eventseries', 'eventseries', $storage_definition);
 
   // When enabling registrations make sure we create all the registrant types
   // to match the existing series and instance types.
@@ -650,8 +635,13 @@ function recurring_events_registration_update_8013() {
         ->condition($id_key, $value->{$id_key})
         ->execute();
 
-      // @todo This only restores the most recent revision, all data regarding
-      //   event registrations from prior revisions should also be restored.
+      // @todo This only restores the most recent revision, the historic data
+      //   related to event registrations from prior revisions is not preserved.
+      //   Previous update hooks also follow this pattern. Was it perhaps done
+      //   deliberately? I assume the historic registration settings are not
+      //   super valuable, and trying to load and restore a very large number of
+      //   revisions could cause OOM problems, potentially leaving the site in a
+      //   broken state.
       $database->update($revision_table_name)
         ->fields($values_to_restore)
         ->condition($id_key, $value->{$id_key})
