@@ -233,9 +233,9 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
       ->setDescription(t('The ID of the eventinstance entity.'))
       ->setSetting('target_type', 'eventinstance');
 
-    $fields['seats'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Seats'))
-      ->setDescription(t('The number of seats to reserve.'))
+    $fields['places'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Places'))
+      ->setDescription(t('The number of places to reserve.'))
       ->setDefaultValue(1)
       ->setSetting('unsigned', TRUE)
       ->setRequired(TRUE)
@@ -362,19 +362,19 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   /**
    * {@inheritdoc}
    */
-  public function getSeats(): int {
-    $seats = (int) $this->get('seats')->value;
-    return $seats > 0 ? $seats : 1;
+  public function getPlaces(): int {
+    $places = (int) $this->get('places')->value;
+    return $places > 0 ? $places : 1;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setSeats(int $seats): RegistrantInterface {
-    if ($seats < 1) {
-      throw new \InvalidArgumentException('The number of seats must be 1 or greater.');
+  public function setPlaces(int $places): RegistrantInterface {
+    if ($places < 1) {
+      throw new \InvalidArgumentException('The number of places must be 1 or greater.');
     }
-    $this->set('seats', $seats);
+    $this->set('places', $places);
     return $this;
   }
 

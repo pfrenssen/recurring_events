@@ -45,7 +45,7 @@ content:
     third_party_settings: {  }
     type: string_textfield
     region: content
-  seats:
+  places:
     type: number
     weight: 4
     region: content

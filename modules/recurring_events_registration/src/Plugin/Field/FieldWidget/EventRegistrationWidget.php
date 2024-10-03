@@ -309,12 +309,12 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       ],
     ];
 
-    $element['max_seats'] = [
+    $element['max_places'] = [
       '#type' => 'number',
-      '#title' => $this->t('Maximum Seats Per Registration'),
+      '#title' => $this->t('Maximum Places Per Registration'),
       '#description' => $this->t('The maximum number of attendees allowed per registration.'),
       '#weight' => 7,
-      '#default_value' => $items[$delta]->max_seats ?: 1,
+      '#default_value' => $items[$delta]->max_places ?: 1,
       '#min' => 1,
       '#required' => TRUE,
       '#states' => [
@@ -322,7 +322,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
           ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
         ],
       ],
-      '#element_validate' => [[static::class, 'validateMaxSeats']],
+      '#element_validate' => [[static::class, 'validateMaxPlaces']],
     ];
 
     $enable_waitlist = $this->getSetting('show_enable_waitlist');
@@ -360,7 +360,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       $item['instance_schedule_close_units'] = $item['instance_registration']['close_registration']['instance_schedule_close_units'];
       $item['instance_schedule_close_type'] = $item['instance_registration']['close_registration']['instance_schedule_close_type'];
       $item['capacity'] = (int) $item['capacity'];
-      $item['max_seats'] = (int) $item['max_seats'];
+      $item['max_places'] = (int) $item['max_places'];
       $selected_roles = array_filter($item['permitted_roles'], function ($i) {
         return $i !== 0;
       });
@@ -392,8 +392,8 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
         $item['capacity'] = 0;
       }
 
-      if (empty($item['max_seats'])) {
-        $item['max_seats'] = 1;
+      if (empty($item['max_places'])) {
+        $item['max_places'] = 1;
       }
 
       if (empty($item['waitlist'])) {
@@ -493,9 +493,9 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
   }
 
   /**
-   * Validate callback for the maximum seats per registration.
+   * Validate callback for the maximum places per registration.
    *
-   * The maximum seats per registration must be less than or equal to the
+   * The maximum places per registration must be less than or equal to the
    * capacity.
    *
    * @param array $element
@@ -506,13 +506,13 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
    * @param array $complete_form
    *   The complete form structure.
    */
-  public static function validateMaxSeats(array $element, FormStateInterface $form_state, array &$complete_form) {
+  public static function validateMaxPlaces(array $element, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue('event_registration');
-    $max_seats = (int) $values[0]['max_seats'];
+    $max_places = (int) $values[0]['max_places'];
     $capacity = (int) $values[0]['capacity'];
 
-    if ($max_seats > $capacity) {
-      $form_state->setError($element, t('The maximum seats per registration cannot be greater than the total number of spaces available.'));
+    if ($max_places > $capacity) {
+      $form_state->setError($element, t('The maximum places per registration cannot be greater than the total number of spaces available.'));
     }
   }
 

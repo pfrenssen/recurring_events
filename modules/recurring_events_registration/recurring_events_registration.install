@@ -527,24 +527,24 @@ function recurring_events_registration_update_8011() {
 }
 
 /**
- * Add a field to keep track of the number of seats a registrant is reserving.
+ * Add a field to keep track of the number of places a registrant is reserving.
  */
 function recurring_events_registration_update_8012(): void {
   $storage_definition = BaseFieldDefinition::create('integer')
-    ->setName('seats')
-    ->setLabel(t('Seats'))
-    ->setDescription(t('The number of seats the registrant is reserving.'))
+    ->setName('places')
+    ->setLabel(t('Places'))
+    ->setDescription(t('The number of places the registrant is reserving.'))
     ->setDefaultValue(1)
     ->setInitialValue(1)
     ->setSetting('unsigned', TRUE)
     ->setRequired(TRUE);
 
   $update_manager = \Drupal::entityDefinitionUpdateManager();
-  $update_manager->installFieldStorageDefinition('seats', 'registrant', 'recurring_events_registration', $storage_definition);
+  $update_manager->installFieldStorageDefinition('places', 'registrant', 'recurring_events_registration', $storage_definition);
 }
 
 /**
- * Update the event_registration field type to add the max_seats field.
+ * Update the event_registration field type to add the max_places field.
  */
 function recurring_events_registration_update_8013() {
   $database = \Drupal::database();
@@ -562,7 +562,7 @@ function recurring_events_registration_update_8013() {
 
   // We need to grab all the current data for registration settings for an event
   // before we remove the registration field, before re-adding it with our new
-  // max_seats field.
+  // max_places field.
   $reg_fields = [
     'event_registration__value',
     'event_registration__end_value',
@@ -629,7 +629,7 @@ function recurring_events_registration_update_8013() {
           $values_to_restore[$field] = $value->{$field};
         }
       }
-      $values_to_restore['event_registration__max_seats'] = 1;
+      $values_to_restore['event_registration__max_places'] = 1;
       $database->update($table_name)
         ->fields($values_to_restore)
         ->condition($id_key, $value->{$id_key})

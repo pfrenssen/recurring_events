@@ -201,12 +201,12 @@ class RegistrantForm extends ContentEntityForm {
     $waitlist = $this->creationService->hasWaitlist();
     $is_waitlisted = $entity->getWaitlist() != 0;
 
-    // If the registrant is being edited, add the current number of seats to the
+    // If the registrant is being edited, add the current number of places to the
     // availability. This is to ensure that the user can change the number of
-    // seats they are registering for as if they were registering for the first
+    // places they are registering for as if they were registering for the first
     // time.
     if ($editing && $availability !== -1 && !$is_waitlisted) {
-      $availability += $entity->getSeats();
+      $availability += $entity->getPlaces();
     }
 
     // Since the availability might change between the time the form was loaded
@@ -218,14 +218,14 @@ class RegistrantForm extends ContentEntityForm {
       $temp_store->set($event_instance->uuid(), $availability);
     }
 
-    // Determine the maximum number of seats that can be registered, taking into
-    // account the configured maximum seats per registrant and the remaining
+    // Determine the maximum number of places that can be registered, taking into
+    // account the configured maximum places per registrant and the remaining
     // availability. Also, if we are out of space, but there is a waitlist, we
-    // can still register the maximum number of seats.
+    // can still register the maximum number of places.
     $out_of_space_with_waitlist = $availability === 0 && $waitlist;
-    $max_seats = (int) $event_series->event_registration->max_seats;
+    $max_places = (int) $event_series->event_registration->max_places;
     if ($availability !== -1 && !$out_of_space_with_waitlist && !$is_waitlisted) {
-      $max_seats = min($max_seats, $availability);
+      $max_places = min($max_places, $availability);
     }
 
     $registration_open = $this->creationService->registrationIsOpen();
@@ -322,20 +322,20 @@ class RegistrantForm extends ContentEntityForm {
       ];
     }
 
-    // If only a single seat can be registered, it is pointless to show the
+    // If only a single place can be registered, it is pointless to show the
     // option.
-    if ($max_seats < 2) {
-      $form['seats']['#access'] = FALSE;
+    if ($max_places < 2) {
+      $form['places']['#access'] = FALSE;
     }
     else {
-      $form['seats']['widget'][0]['value']['#min'] = 1;
-      $form['seats']['widget'][0]['value']['#max'] = $max_seats;
-      // We are dynamically setting the maximum number of seats based on
+      $form['places']['widget'][0]['value']['#min'] = 1;
+      $form['places']['widget'][0]['value']['#max'] = $max_places;
+      // We are dynamically setting the maximum number of places based on
       // availability. However this might have changed in between the time the
       // form was loaded and the time it was submitted, since somebody might
-      // have snatched some seats while the user was filling out the form.
+      // have snatched some places while the user was filling out the form.
       // Replace the standard validation to avoid unhelpful errors in this case.
-      $form['seats']['widget'][0]['value']['#element_validate'] = [[$this, 'validateSeats']];
+      $form['places']['widget'][0]['value']['#element_validate'] = [[$this, 'validatePlaces']];
     }
 
     $form['add_to_waitlist'] = [
@@ -456,9 +456,9 @@ class RegistrantForm extends ContentEntityForm {
   }
 
   /**
-   * Form element validation handler for the number of seats.
+   * Form element validation handler for the number of places.
    */
-  public function validateSeats(&$element, FormStateInterface $form_state, &$complete_form) {
+  public function validatePlaces(&$element, FormStateInterface $form_state, &$complete_form) {
     $value = $element['#value'];
     if ($value === '') {
       return;
@@ -473,14 +473,14 @@ class RegistrantForm extends ContentEntityForm {
     }
 
     if ($value < 1) {
-      $form_state->setError($element, t('Please select at least one seat.'));
+      $form_state->setError($element, t('Please select at least one place.'));
       return;
     }
     $event_instance = $this->routeMatch->getParameter('eventinstance');
     $event_series = $event_instance->getEventSeries();
-    $max_seats = (int) $event_series->event_registration->max_seats;
-    if ($value > $max_seats) {
-      $form_state->setError($element, t('You cannot register more than @max_seats seats.', ['@max_seats' => $max_seats]));
+    $max_places = (int) $event_series->event_registration->max_places;
+    if ($value > $max_places) {
+      $form_state->setError($element, t('You cannot register more than @max_places places.', ['@max_places' => $max_places]));
     }
   }
 
@@ -501,16 +501,16 @@ class RegistrantForm extends ContentEntityForm {
     $temp_store = $this->tempStoreFactory->get('recurring_events_registration_form');
 
     $availability = $event_instance->availability_count->getValue()[0]['value'];
-    // If the registrant is being edited, add the current number of seats to the
+    // If the registrant is being edited, add the current number of places to the
     // availability. This is to ensure that the user can change the number of
-    // seats they are registering for as if they were registering for the first
+    // places they are registering for as if they were registering for the first
     // time.
     if (!$entity->isNew() && $availability !== -1 && $entity->getWaitlist() == 0) {
-      $availability += $entity->getSeats();
+      $availability += $entity->getPlaces();
     }
 
-    $requested_seats = (int) $form_state->getValue('seats')[0]['value'];
-    $out_of_capacity = $availability !== -1 && $requested_seats > $availability;
+    $requested_places = (int) $form_state->getValue('places')[0]['value'];
+    $out_of_capacity = $availability !== -1 && $requested_places > $availability;
 
     $waitlist = $this->creationService->hasWaitlist();
     $add_to_waitlist = $form_state->getValue('add_to_waitlist');
@@ -521,7 +521,7 @@ class RegistrantForm extends ContentEntityForm {
       // on the waitlist. In case someone else registered in the meantime and
       // now there is no longer enough space, we need to inform the user.
       $original_availability = $temp_store->get($event_instance->uuid());
-      $ran_out_of_space = !empty($original_availability) && $out_of_capacity && $requested_seats <= $original_availability;
+      $ran_out_of_space = !empty($original_availability) && $out_of_capacity && $requested_places <= $original_availability;
       if ($out_of_capacity && $waitlist && !$ran_out_of_space) {
         $add_to_waitlist = 1;
       }
@@ -555,7 +555,7 @@ class RegistrantForm extends ContentEntityForm {
       }
 
       if ($out_of_capacity && !$add_to_waitlist) {
-        $form_state->setError($form['seats'], $this->t('Unfortunately the event is now full and additional seats are no longer available.'));
+        $form_state->setError($form['places'], $this->t('Unfortunately the event is now full and additional places are no longer available.'));
       }
     }
 

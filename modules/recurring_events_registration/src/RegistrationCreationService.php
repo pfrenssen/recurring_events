@@ -273,13 +273,13 @@ class RegistrationCreationService {
       return 0;
     }
 
-    // Add up all the seats from the registrants.
+    // Add up all the places from the registrants.
     $query = $this->database->select('registrant', 'r');
     $query->condition('r.id', $registrant_ids, 'IN');
-    $query->addField('r', 'seats');
+    $query->addField('r', 'places');
 
-    $seats = $query->execute()->fetchCol();
-    return array_sum($seats);
+    $places = $query->execute()->fetchCol();
+    return array_sum($places);
   }
 
   /**
@@ -766,8 +766,8 @@ class RegistrationCreationService {
       $first_waitlist = $this->retrieveFirstWaitlistParty();
       if (!empty($first_waitlist)) {
         $availability = $this->retrieveAvailability();
-        $requested_seats = (int) $first_waitlist->get('seats')->value;
-        if ($requested_seats > $availability) {
+        $requested_places = (int) $first_waitlist->get('places')->value;
+        if ($requested_places > $availability) {
           return;
         }
 
