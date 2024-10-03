@@ -9,6 +9,11 @@ services:
     class: Drupal\recurring_events_registration\RegistrationCreationService
     arguments: ['@string_translation', '@database', '@logger.factory', '@messenger', '@entity_type.manager', '@module_handler', '@token']
     shared: false
+  recurring_events_registration.tempstore.private:
+    class: Drupal\Core\TempStore\PrivateTempStoreFactory
+    arguments: ['@keyvalue.expirable', '@lock', '@current_user', '@request_stack', '%recurring_events_registration.tempstore.expire%']
+    tags:
+      - { name: backend_overridable }
   recurring_events_registration.notification_service:
     class: Drupal\recurring_events_registration\NotificationService
     arguments: ['@string_translation', '@config.factory', '@logger.factory', '@messenger', '@token', '@module_handler', '@recurring_events_registration.creation_service', '@queue']
@@ -20,8 +25,3 @@ services:
     arguments: [ '@config.factory' ]
     tags:
       - { name: event_subscriber }
-  recurring_events_registration.tempstore.private:
-    class: Drupal\Core\TempStore\PrivateTempStoreFactory
-    arguments: ['@keyvalue.expirable', '@lock', '@current_user', '@request_stack', '%recurring_events_registration.tempstore.expire%']
-    tags:
-      - { name: backend_overridable }
