@@ -15,9 +15,10 @@ recurring_events_registration.registrant_type.*:
       type: string
     notifications:
       type: sequence
-      label: 'Notification settings'
+      label: 'Email notifications'
       sequence:
         type: mapping
+        label: 'Email notification'
         mapping:
           overridden:
             type: boolean
