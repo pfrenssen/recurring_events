@@ -26,8 +26,8 @@ recurring_events_registration.registrant_type.*:
             type: boolean
             label: 'Whether the notification is enabled'
           subject:
-            type: string
+            type: label
             label: 'The subject of the notification'
           body:
-            type: string
+            type: text
             label: 'The body of the notification'
