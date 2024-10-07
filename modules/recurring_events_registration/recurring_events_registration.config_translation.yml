@@ -1,0 +1,5 @@
+recurring_events_registration.registrant.config:
+  title: 'Recurring Events Registration configuration'
+  base_route_name: registrant.settings
+  names:
+    - recurring_events_registration.registrant.config
