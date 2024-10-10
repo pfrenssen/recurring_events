@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\recurring_events\Traits;
 
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\TestTools\Random;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+use Drupal\recurring_events\Entity\EventSeries;
 
 /**
  * Helper methods for creating event series entities.
@@ -39,8 +40,8 @@ trait EventSeriesCreationTrait {
     if ($values['recur_type'] === 'weekly_recurring_date') {
       $values += [
         'weekly_recurring_date' => [
-          'start_date' => new DrupalDateTime('2024-05-19T15:00:00'),
-          'end_date' => new DrupalDateTime('2024-06-09T15:00:00'),
+          'value' => (new DrupalDateTime('2024-05-19T00:00:00', 'UTC'))->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
+          'end_value' => (new DrupalDateTime('2024-06-09T23:59:59', 'UTC'))->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT),
           'time' => '03:00 pm',
           'duration' => '3600',
           'end_time' => '04:00 pm',
