@@ -202,10 +202,10 @@ class RegistrantForm extends ContentEntityForm {
     $waitlist = $this->creationService->hasWaitlist();
     $is_waitlisted = $entity->getWaitlist() != 0;
 
-    // If the registrant is being edited, add the current number of places to the
-    // availability. This is to ensure that the user can change the number of
-    // places they are registering for as if they were registering for the first
-    // time.
+    // If the registrant is being edited, add the current number of places to
+    // the availability. This is to ensure that the user can change the number
+    // of places they are registering for as if they were registering for the
+    // first time.
     if ($editing && $availability !== -1 && !$is_waitlisted) {
       $availability += $entity->getPlaces();
     }
@@ -219,10 +219,10 @@ class RegistrantForm extends ContentEntityForm {
       $temp_store->set($event_instance->uuid(), $availability);
     }
 
-    // Determine the maximum number of places that can be registered, taking into
-    // account the configured maximum places per registrant and the remaining
-    // availability. Also, if we are out of space, but there is a waitlist, we
-    // can still register the maximum number of places.
+    // Determine the maximum number of places that can be registered, taking
+    // into account the configured maximum places per registrant and the
+    // remaining availability. Also, if we are out of space, but there is a
+    // waitlist, we can still register the maximum number of places.
     $out_of_space_with_waitlist = $availability === 0 && $waitlist;
     $max_places = (int) $event_series->event_registration->max_places;
     if ($availability !== -1 && !$out_of_space_with_waitlist && !$is_waitlisted) {
@@ -502,10 +502,10 @@ class RegistrantForm extends ContentEntityForm {
     $temp_store = $this->tempStoreFactory->get('recurring_events_registration_form');
 
     $availability = $event_instance->availability_count->getValue()[0]['value'];
-    // If the registrant is being edited, add the current number of places to the
-    // availability. This is to ensure that the user can change the number of
-    // places they are registering for as if they were registering for the first
-    // time.
+    // If the registrant is being edited, add the current number of places to
+    // the availability. This is to ensure that the user can change the number
+    // of places they are registering for as if they were registering for the
+    // first time.
     if (!$entity->isNew() && $availability !== -1 && $entity->getWaitlist() == 0) {
       $availability += $entity->getPlaces();
     }
