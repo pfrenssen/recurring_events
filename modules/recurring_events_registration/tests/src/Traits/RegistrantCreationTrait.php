@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\recurring_events_registration\Traits;
 
-use Drupal\recurring_events_registration\Entity\Registrant;
 use Drupal\Tests\recurring_events\Traits\EventSeriesCreationTrait;
+use Drupal\recurring_events_registration\Entity\Registrant;
 
 /**
  * Helper methods for creating registrant entities.

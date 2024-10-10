@@ -6,12 +6,11 @@ namespace Drupal\Tests\recurring_events_registration\Kernel;
 
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\recurring_events_registration\Entity\Registrant;
+use Drupal\Tests\recurring_events\Traits\EventSeriesCreationTrait;
+use Drupal\Tests\recurring_events_registration\Traits\RegistrantCreationTrait;
 use Drupal\recurring_events_registration\Entity\RegistrantType;
 use Drupal\recurring_events_registration\Model\RegistrantTypeNotificationSetting;
 use Drupal\recurring_events_registration\NotificationService;
-use Drupal\Tests\recurring_events\Traits\EventSeriesCreationTrait;
-use Drupal\Tests\recurring_events_registration\Traits\RegistrantCreationTrait;
 
 /**
  * Tests the notifications sent during the event registration process.

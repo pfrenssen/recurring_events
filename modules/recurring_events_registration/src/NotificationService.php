@@ -307,7 +307,7 @@ class NotificationService {
   /**
    * Returns the value for the given key.
    *
-   * @param $name
+   * @param string $name
    *   The name of the value to retrieve.
    *
    * @return mixed
