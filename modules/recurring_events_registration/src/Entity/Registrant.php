@@ -303,7 +303,7 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   /**
    * Set the event series ID.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The event series entity.
    *
    * @return \Drupal\recurring_events_registration\Entity\RegistrantInterface
@@ -324,7 +324,7 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
   /**
    * Set the event ID.
    *
-   * @param Drupal\recurring_events\Entity\EventInstance $event
+   * @param \Drupal\recurring_events\Entity\EventInstance $event
    *   The eventinstance entity.
    *
    * @return \Drupal\recurring_events_registration\Entity\RegistrantInterface

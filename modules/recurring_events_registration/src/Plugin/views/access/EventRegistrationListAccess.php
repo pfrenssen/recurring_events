@@ -37,7 +37,7 @@ class EventRegistrationListAccess extends AccessPluginBase {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param Drupal\recurring_events_registration\AccessHandler $access_handler
+   * @param \Drupal\recurring_events_registration\AccessHandler $access_handler
    *   The access handler.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, AccessHandler $access_handler) {

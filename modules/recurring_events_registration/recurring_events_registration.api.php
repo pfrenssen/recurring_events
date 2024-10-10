@@ -17,7 +17,7 @@ use Drupal\recurring_events_registration\Entity\RegistrantInterface;
  * instance of Drupal\recurring_events_registration\Entity\Registrant for the
  * specified event, which can be retrieved from the registrant entity.
  *
- * @param Drupal\recurring_events_registration\Entity\Registrant $registrant
+ * @param \Drupal\recurring_events_registration\Entity\Registrant $registrant
  *   The default selected registrant.
  *
  * @return \Drupal\recurring_events_registration\Entity\Registrant
@@ -35,7 +35,7 @@ function hook_recurring_events_registration_first_waitlist_alter(Registrant $reg
  *
  * @param bool $send_email
  *   Whether the notification email is sent.
- * @param Drupal\recurring_events_registration\Entity\RegistrantInterface $registrant
+ * @param \Drupal\recurring_events_registration\Entity\RegistrantInterface $registrant
  *   The registrant entity.
  */
 function hook_recurring_events_registration_send_notification_alter(bool &$send_email, RegistrantInterface $registrant) {

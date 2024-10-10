@@ -197,9 +197,9 @@ class WeeklyRecurringDate extends DailyRecurringDate implements RecurringEventsF
    *
    * @param string $weekday
    *   The name of the day of the week.
-   * @param Drupal\Core\Datetime\DrupalDateTime $start_date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
    *   The start date.
-   * @param Drupal\Core\Datetime\DrupalDateTime $end_date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
    *   The end date.
    *
    * @return array

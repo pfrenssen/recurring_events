@@ -63,7 +63,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
     NotificationService $notification_service,
     RegistrationCreationService $creation_service,
     ModuleHandlerInterface $module_handler,
-    RouteBuilderInterface $route_builder
+    RouteBuilderInterface $route_builder,
   ) {
     $this->notificationService = $notification_service;
     $this->creationService = $creation_service;

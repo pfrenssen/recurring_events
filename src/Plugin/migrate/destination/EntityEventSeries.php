@@ -2,12 +2,12 @@
 
 namespace Drupal\recurring_events\Plugin\migrate\destination;
 
-use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
 use Drupal\migrate\Row;
 use Drupal\recurring_events\Entity\EventSeries;
-use Drupal\recurring_events\Plugin\migrate\process\RecurringDate;
 use Drupal\recurring_events\Plugin\migrate\process\RRuleHelper;
+use Drupal\recurring_events\Plugin\migrate\process\RecurringDate;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -85,7 +85,7 @@ class EntityEventSeries extends EntityContentBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition, $migration);
     $instance->moduleHandler = $container->get('module_handler');
     return $instance;

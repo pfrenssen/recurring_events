@@ -78,11 +78,11 @@ function hook_recurring_events_event_instance_alter(array &$event_instance = [])
 /**
  * Alter the active EventInstanceCreator plugin.
  *
- * @param Drupal\recurring_events\EventInstanceCreatorInterface $active_plugin
+ * @param \Drupal\recurring_events\EventInstanceCreatorInterface $active_plugin
  *   The active plugin to use.
- * @param Drupal\recurring_events\EventInstanceCreatorPluginManager $plugin_manager
+ * @param \Drupal\recurring_events\EventInstanceCreatorPluginManager $plugin_manager
  *   The plugin manager to discover plugins.
- * @param Drupal\recurring_events\Entity\EventSeries $series
+ * @param \Drupal\recurring_events\Entity\EventSeries $series
  *   The event series for which we need to create instances.
  */
 function hook_recurring_events_event_instance_creator_plugin_alter(EventInstanceCreatorInterface &$active_plugin, EventInstanceCreatorPluginManager $plugin_manager, EventSeries $series) {
@@ -181,7 +181,7 @@ function hook_recurring_events_save_pre_instances_deletion_alter(array &$instanc
  * and recreate them. This hook allows you to execute code prior to the deletion
  * of those instances.
  *
- * @param Drupal\recurring_events\Entity\EventSeries $event_series
+ * @param \Drupal\recurring_events\Entity\EventSeries $event_series
  *   The eventseries being altered.
  */
 function hook_recurring_events_save_pre_instances_deletion(EventSeries $event_series) {
@@ -195,7 +195,7 @@ function hook_recurring_events_save_pre_instances_deletion(EventSeries $event_se
  * and recreate them. This hook allows you to execute code after the deletion
  * of those instances.
  *
- * @param Drupal\recurring_events\Entity\EventSeries $event_series
+ * @param \Drupal\recurring_events\Entity\EventSeries $event_series
  *   The eventseries being altered.
  */
 function hook_recurring_events_save_post_instances_deletion(EventSeries $event_series) {
@@ -209,9 +209,9 @@ function hook_recurring_events_save_post_instances_deletion(EventSeries $event_s
  * and recreate them. This hook allows you to execute code prior to the deletion
  * of each instance.
  *
- * @param Drupal\recurring_events\Entity\EventSeries $event_series
+ * @param \Drupal\recurring_events\Entity\EventSeries $event_series
  *   The eventseries being altered.
- * @param Drupal\recurring_events\Entity\EventInstance $event_instance
+ * @param \Drupal\recurring_events\Entity\EventInstance $event_instance
  *   The event instance being deleted.
  */
 function hook_recurring_events_save_pre_instance_deletion(EventSeries $event_series, EventInstance $event_instance) {
@@ -225,9 +225,9 @@ function hook_recurring_events_save_pre_instance_deletion(EventSeries $event_ser
  * and recreate them. This hook allows you to execute code after the deletion
  * of each instance.
  *
- * @param Drupal\recurring_events\Entity\EventSeries $event_series
+ * @param \Drupal\recurring_events\Entity\EventSeries $event_series
  *   The eventseries being altered.
- * @param Drupal\recurring_events\Entity\EventInstance $event_instance
+ * @param \Drupal\recurring_events\Entity\EventInstance $event_instance
  *   The event instance being deleted.
  */
 function hook_recurring_events_save_post_instance_deletion(EventSeries $event_series, EventInstance $event_instance) {

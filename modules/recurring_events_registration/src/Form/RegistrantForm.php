@@ -4,7 +4,6 @@ namespace Drupal\recurring_events_registration\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\content_moderation\ModerationInformation;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityFieldManager;
@@ -18,6 +17,7 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\Core\Url;
+use Drupal\content_moderation\ModerationInformation;
 use Drupal\recurring_events_registration\NotificationService;
 use Drupal\recurring_events_registration\RegistrationCreationService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -147,7 +147,7 @@ class RegistrantForm extends ContentEntityForm {
    *   The registration notification service.
    * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store
    *   The private tempstore factory.
-   * @param \Drupal\content_moderation\ModerationInformation $moderation_information
+   * @param \Drupal\content_moderation\ModerationInformation|null $moderation_information
    *   The moderation information service.
    */
   public function __construct(
@@ -163,7 +163,8 @@ class RegistrantForm extends ContentEntityForm {
     EntityTypeManagerInterface $entity_type_manager,
     NotificationService $notification_service,
     PrivateTempStoreFactory $temp_store,
-    ModerationInformation $moderation_information = NULL) {
+    ?ModerationInformation $moderation_information = NULL,
+  ) {
     $this->messenger = $messenger;
     $this->creationService = $creation_service;
     $this->currentUser = $current_user;
