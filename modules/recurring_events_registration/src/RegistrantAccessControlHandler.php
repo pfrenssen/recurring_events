@@ -120,11 +120,11 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler implemen
   /**
    * Check if the user can edit or delete this registrant anonymously.
    *
-   * @param Drupal\Core\Entity\EntityInterface $registrant
+   * @param \Drupal\Core\Entity\EntityInterface $registrant
    *   The registrant to be edited.
    * @param string $operation
    *   The operation being attempted.
-   * @param Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The user attempting to gain access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

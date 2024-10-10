@@ -26,7 +26,7 @@ class AvailabilityCount extends FieldItemList {
   /**
    * {@inheritdoc}
    */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, TypedDataInterface $parent = NULL) {
+  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
     // @todo Look for a better way to inject this service.
     $this->requestStack = \Drupal::service('request_stack');

@@ -13,7 +13,7 @@ interface RecurringEventsFieldTypeInterface {
   /**
    * Converts an EventSeries entity's recurring configuration to an array.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
    *
    * @return array
@@ -24,7 +24,7 @@ interface RecurringEventsFieldTypeInterface {
   /**
    * Converts a form state object's recurring configuration to an array.
    *
-   * @param Drupal\Core\Form\FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of an updated event series entity.
    *
    * @return array

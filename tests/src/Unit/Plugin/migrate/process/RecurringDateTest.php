@@ -7,8 +7,8 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\recurring_events\Plugin\migrate\process\RecurringDate;
 use Drupal\Tests\migrate\Unit\process\MigrateProcessTestCase;
+use Drupal\recurring_events\Plugin\migrate\process\RecurringDate;
 use Prophecy\Argument;
 
 /**

@@ -290,9 +290,9 @@ class ConsecutiveRecurringDate extends DateRangeItem implements RecurringEventsF
   /**
    * Find all the daily date occurrences between two dates.
    *
-   * @param Drupal\Core\Datetime\DrupalDateTime $start_date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
    *   The start date.
-   * @param Drupal\Core\Datetime\DrupalDateTime $end_date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
    *   The end date.
    * @param bool $count_only
    *   Whether to only return a count.
@@ -342,7 +342,7 @@ class ConsecutiveRecurringDate extends DateRangeItem implements RecurringEventsF
   /**
    * Find all the time slots between two times of a specific day.
    *
-   * @param Drupal\Core\Datetime\DrupalDateTime $date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $date
    *   The date.
    * @param array $form_data
    *   The form data used to find the time slots.
