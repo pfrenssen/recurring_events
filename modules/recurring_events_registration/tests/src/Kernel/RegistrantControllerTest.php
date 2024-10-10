@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\recurring_events_registration\Kernel;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\recurring_events_registration\Controller\RegistrantController;
 use Drupal\recurring_events_registration\Entity\Registrant;

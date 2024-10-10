@@ -68,7 +68,7 @@ class RegistrantController extends ControllerBase implements ContainerInjectionI
   /**
    * Check if registration is enabled.
    *
-   * @param Drupal\recurring_events\Entity\EventInstance $eventinstance
+   * @param \Drupal\recurring_events\Entity\EventInstance $eventinstance
    *   The eventinstance entity.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -91,7 +91,7 @@ class RegistrantController extends ControllerBase implements ContainerInjectionI
   /**
    * Check if the user can contact the registrants.
    *
-   * @param Drupal\recurring_events\Entity\EventInstance $eventinstance
+   * @param \Drupal\recurring_events\Entity\EventInstance $eventinstance
    *   The eventinstance entity.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -108,7 +108,7 @@ class RegistrantController extends ControllerBase implements ContainerInjectionI
   /**
    * Return a dynamic page title for a Registrant.
    *
-   * @param Drupal\recurring_events_registration\Entity\RegistrantInterface $registrant
+   * @param \Drupal\recurring_events_registration\Entity\RegistrantInterface $registrant
    *   The entity for which to generate a page title.
    *
    * @return string

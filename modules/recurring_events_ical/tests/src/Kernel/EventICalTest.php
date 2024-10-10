@@ -3,8 +3,8 @@
 namespace Drupal\Tests\recurring_events_ical\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\recurring_events\Entity\EventSeries;
 
 /**

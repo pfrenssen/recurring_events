@@ -258,9 +258,9 @@ class DailyRecurringDate extends DateRangeItem implements RecurringEventsFieldTy
   /**
    * Find all the daily date occurrences between two dates.
    *
-   * @param Drupal\Core\Datetime\DrupalDateTime $start_date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
    *   The start date.
-   * @param Drupal\Core\Datetime\DrupalDateTime $end_date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
    *   The end date.
    *
    * @return array
