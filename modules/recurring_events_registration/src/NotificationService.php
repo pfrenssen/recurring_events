@@ -3,6 +3,7 @@
 namespace Drupal\recurring_events_registration;
 
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Messenger\Messenger;
@@ -123,6 +124,13 @@ class NotificationService {
   protected $queueFactory;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
    * Class constructor.
    *
    * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
@@ -141,8 +149,10 @@ class NotificationService {
    *   The registration creation service.
    * @param \Drupal\Core\Queue\QueueFactory $queue_factory
    *   The queue factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(TranslationInterface $translation, ConfigFactory $config_factory, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token, ModuleHandlerInterface $module_handler, RegistrationCreationService $creation_service, QueueFactory $queue_factory) {
+  public function __construct(TranslationInterface $translation, ConfigFactory $config_factory, LoggerChannelFactoryInterface $logger, Messenger $messenger, Token $token, ModuleHandlerInterface $module_handler, RegistrationCreationService $creation_service, QueueFactory $queue_factory, EntityTypeManagerInterface $entity_type_manager) {
     $this->translation = $translation;
     $this->configFactory = $config_factory;
     $this->loggerFactory = $logger->get('recurring_events_registration');
@@ -152,6 +162,7 @@ class NotificationService {
     $this->creationService = $creation_service;
     $this->configName = 'recurring_events_registration.registrant.config';
     $this->queueFactory = $queue_factory;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -166,7 +177,8 @@ class NotificationService {
       $container->get('token'),
       $container->get('module_handler'),
       $container->get('recurring_events_registration.creation_service'),
-      $container->get('queue')
+      $container->get('queue'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -293,6 +305,35 @@ class NotificationService {
   }
 
   /**
+   * Returns the value for the given key.
+   *
+   * @param string $name
+   *   The name of the value to retrieve.
+   *
+   * @return mixed
+   *   If the value is overridden in the registrant type, return the overridden
+   *   value. Otherwise, return the default value from the global configuration.
+   */
+  protected function getValue($name) {
+    // Check if the value is overridden in the registrant type.
+    if ($key = $this->getKey()) {
+      /** @var \Drupal\recurring_events_registration\Entity\RegistrantTypeInterface $registrant_type */
+      $registrant_type = $this->entityTypeManager->getStorage('registrant_type')->load($this->entity->bundle());
+      $notification_settings = $registrant_type->getNotificationSettings();
+      if ($notification_settings[$key]?->isOverridden()) {
+        $overridden_settings = $notification_settings[$key]->toArray();
+        if (array_key_exists($name, $overridden_settings)) {
+          return $overridden_settings[$name];
+        }
+      }
+    }
+
+    // If the value is not overridden, get the default value from the global
+    // configuration.
+    return $this->getConfigValue($name);
+  }
+
+  /**
    * Retrieve config value.
    *
    * @var string $name
@@ -347,7 +388,7 @@ class NotificationService {
       return TRUE;
     }
     if ($key) {
-      return (bool) $this->getConfigValue('enabled');
+      return (bool) $this->getValue('enabled');
     }
     return FALSE;
   }
@@ -364,7 +405,7 @@ class NotificationService {
   public function getSubject($parse_tokens = TRUE) {
     $key = $this->getKey();
     if ($key) {
-      $subject = $this->getConfigValue('subject');
+      $subject = $this->getValue('subject');
 
       if (empty($subject)) {
         $this->messenger->addError($this->translation->translate('No default subject configured for @key emails in @config_name.', [
@@ -394,7 +435,7 @@ class NotificationService {
   public function getMessage($parse_tokens = TRUE) {
     $key = $this->getKey();
     if ($key) {
-      $message = $this->getConfigValue('body');
+      $message = $this->getValue('body');
 
       if (empty($message)) {
         $this->messenger->addError($this->translation->translate('No default body configured for @key emails in @config_name.', [

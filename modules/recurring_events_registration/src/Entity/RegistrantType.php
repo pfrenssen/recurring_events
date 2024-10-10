@@ -3,6 +3,7 @@
 namespace Drupal\recurring_events_registration\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\recurring_events_registration\Model\RegistrantTypeNotificationSetting;
 
 /**
  * Defines the registrant type entity.
@@ -37,6 +38,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *     "label",
  *     "id",
  *     "description",
+ *     "notifications"
  *   }
  * )
  */
@@ -64,6 +66,13 @@ class RegistrantType extends ConfigEntityBundleBase implements RegistrantTypeInt
   protected $description;
 
   /**
+   * The notifications settings for this registrant type.
+   *
+   * @var array
+   */
+  protected array $notifications = [];
+
+  /**
    * {@inheritdoc}
    */
   public function id() {
@@ -75,6 +84,30 @@ class RegistrantType extends ConfigEntityBundleBase implements RegistrantTypeInt
    */
   public function getDescription() {
     return $this->description;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getNotificationSettings(): array {
+    $notification_types = [];
+    \Drupal::moduleHandler()->alter('recurring_events_registration_notification_types', $notification_types);
+
+    $notification_settings = [];
+    foreach (array_keys($notification_types) as $type) {
+      $notification_settings[$type] = new RegistrantTypeNotificationSetting($this->notifications[$type] ?? []);
+    }
+
+    return $notification_settings;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setNotificationSettings(array $notification_settings): RegistrantTypeInterface {
+    $this->notifications = array_map(fn (RegistrantTypeNotificationSetting $notification_setting) => $notification_setting->toArray(), $notification_settings);
+
+    return $this;
   }
 
 }

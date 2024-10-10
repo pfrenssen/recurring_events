@@ -13,3 +13,22 @@ recurring_events_registration.registrant_type.*:
       label: 'Description'
     uuid:
       type: string
+    notifications:
+      type: sequence
+      label: 'Email notifications'
+      sequence:
+        type: mapping
+        label: 'Email notification'
+        mapping:
+          overridden:
+            type: boolean
+            label: 'Whether the notification settings are overridden for this registrant type'
+          enabled:
+            type: boolean
+            label: 'Whether the notification is enabled'
+          subject:
+            type: label
+            label: 'The subject of the notification'
+          body:
+            type: text
+            label: 'The body of the notification'
