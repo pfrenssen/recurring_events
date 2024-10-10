@@ -130,7 +130,7 @@ class RegistrationCreationService {
   /**
    * Set the event entities.
    *
-   * @param Drupal\recurring_events\Entity\EventInstance $event_instance
+   * @param \Drupal\recurring_events\Entity\EventInstance $event_instance
    *   The event instance.
    */
   public function setEventInstance(EventInstance $event_instance) {
@@ -141,7 +141,7 @@ class RegistrationCreationService {
   /**
    * Set the event series, helpful to get a fresh copy of the entity.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event_series
+   * @param \Drupal\recurring_events\Entity\EventSeries $event_series
    *   The event series.
    */
   public function setEventSeries(EventSeries $event_series) {

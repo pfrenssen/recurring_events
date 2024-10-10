@@ -74,16 +74,16 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
    *   The vocabulary storage.
    * @param \Drupal\taxonomy\TermStorageInterface $term_storage
    *   The term storage.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param \Drupal\Core\Session\AccountInterface|null $current_user
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
    *   The entity field manager.
    * @param \Drupal\Core\Database\Connection $database
    *   The database service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user = NULL, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, EntityFieldManagerInterface $entity_field_manager = NULL, Connection $database) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, ?AccountInterface $current_user = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?EntityFieldManagerInterface $entity_field_manager = NULL, Connection $database) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $vocabulary_storage, $term_storage, $current_user);
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityFieldManager = $entity_field_manager;

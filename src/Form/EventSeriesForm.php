@@ -141,18 +141,31 @@ class EventSeriesForm extends ContentEntityForm {
    *   The field type plugin manager.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository interface.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle info interface.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time interface.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param \Drupal\Core\Session\AccountProxyInterface|null $current_user
    *   The current user.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface|null $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactory|null $config_factory
    *   The config factory.
    */
-  public function __construct(EventCreationService $creation_service, EntityStorageInterface $storage, Messenger $messenger, DateFormatter $date_formatter, EntityFieldManager $entity_field_manager, FieldTypePluginManager $field_type_plugin_manager, EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, AccountProxyInterface $current_user = NULL, ModuleHandlerInterface $module_handler = NULL, ConfigFactory $config_factory = NULL) {
+  public function __construct(
+    EventCreationService $creation_service,
+    EntityStorageInterface $storage,
+    Messenger $messenger,
+    DateFormatter $date_formatter,
+    EntityFieldManager $entity_field_manager,
+    FieldTypePluginManager $field_type_plugin_manager,
+    EntityRepositoryInterface $entity_repository,
+    ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL,
+    ?TimeInterface $time = NULL,
+    ?AccountProxyInterface $current_user = NULL,
+    ?ModuleHandlerInterface $module_handler = NULL,
+    ?ConfigFactory $config_factory = NULL,
+  ) {
     $this->creationService = $creation_service;
     $this->storage = $storage;
     $this->messenger = $messenger;

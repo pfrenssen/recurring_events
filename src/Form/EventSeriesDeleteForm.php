@@ -67,9 +67,9 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle info interface.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time interface.
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
@@ -78,7 +78,7 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
    * @param \Drupal\Core\Config\ConfigFactory $config
    *   The config factory service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer, ConfigFactory $config) {
+  public function __construct(EntityRepositoryInterface $entity_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer, ConfigFactory $config) {
     $this->messenger = $messenger;
     $this->renderer = $renderer;
     $this->config = $config;

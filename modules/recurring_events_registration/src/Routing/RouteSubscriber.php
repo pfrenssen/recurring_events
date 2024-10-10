@@ -24,9 +24,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    */
-  public function __construct(
-    ConfigFactoryInterface $configFactory
-  ) {
+  public function __construct(ConfigFactoryInterface $configFactory) {
     $this->configFactory = $configFactory;
   }
 
