@@ -144,9 +144,9 @@ class EventCreationService {
   /**
    * Check whether there have been form recurring configuration changes.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
-   * @param Drupal\Core\Form\FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of an updated event series entity.
    *
    * @return bool
@@ -163,9 +163,9 @@ class EventCreationService {
   /**
    * Check whether there have been original recurring configuration changes.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
-   * @param Drupal\recurring_events\Entity\EventSeries $original
+   * @param \Drupal\recurring_events\Entity\EventSeries $original
    *   The original stored event series entity.
    *
    * @return bool
@@ -182,7 +182,7 @@ class EventCreationService {
   /**
    * Converts an EventSeries entity's recurring configuration to an array.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
    *
    * @return array
@@ -211,7 +211,7 @@ class EventCreationService {
   /**
    * Converts a form state object's recurring configuration to an array.
    *
-   * @param Drupal\Core\Form\FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of an updated event series entity.
    *
    * @return array
@@ -298,17 +298,17 @@ class EventCreationService {
   /**
    * Build diff array between stored entity and form state.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
-   * @param Drupal\Core\Form\FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface|null $form_state
    *   (Optional) The form state of an updated event series entity.
-   * @param Drupal\recurring_events\Entity\EventSeries $edited
+   * @param \Drupal\recurring_events\Entity\EventSeries|null $edited
    *   (Optional) The edited event series entity.
    *
    * @return array
    *   An array of differences.
    */
-  public function buildDiffArray(EventSeries $event, FormStateInterface $form_state = NULL, EventSeries $edited = NULL) {
+  public function buildDiffArray(EventSeries $event, ?FormStateInterface $form_state = NULL, ?EventSeries $edited = NULL) {
     $diff = [];
 
     $entity_config = $this->convertEntityConfigToArray($event);
@@ -397,7 +397,7 @@ class EventCreationService {
   /**
    * Clear out existing event instances..
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The event series entity.
    */
   public function clearEventInstances(EventSeries $event) {
@@ -527,11 +527,11 @@ class EventCreationService {
   /**
    * Create an event instance from an event series.
    *
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The stored event series entity.
-   * @param Drupal\Core\Datetime\DrupalDateTime $start_date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
    *   The start date and time of the event.
-   * @param Drupal\Core\Datetime\DrupalDateTime $end_date
+   * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
    *   The end date and time of the event.
    *
    * @return \Drupal\recurring_events\Entity\EventInstance
@@ -590,12 +590,13 @@ class EventCreationService {
   /**
    * Configure the default field inheritances for event instances.
    *
-   * @param Drupal\recurring_events\Entity\EventInstance $instance
+   * @param \Drupal\recurring_events\Entity\EventInstance $instance
    *   The event instance.
-   * @param int $series_id
-   *   The event series entity ID.
+   * @param int|null $series_id
+   *   Optional event series entity ID. If omitted, the event series ID will be
+   *   taken from the instance.
    */
-  public function configureDefaultInheritances(EventInstance $instance, int $series_id = NULL) {
+  public function configureDefaultInheritances(EventInstance $instance, ?int $series_id = NULL) {
     if (is_null($series_id)) {
       $series_id = $instance->eventseries_id->target_id;
     }
@@ -636,9 +637,9 @@ class EventCreationService {
   /**
    * When adding a new field inheritance, add the default values for it.
    *
-   * @param Drupal\recurring_events\Entity\EventInstance $instance
+   * @param \Drupal\recurring_events\Entity\EventInstance $instance
    *   The event instance for which to configure default inheritance values.
-   * @param Drupal\field_inheritance\Entity\FieldInheritanceInterface $field_inheritance
+   * @param \Drupal\field_inheritance\Entity\FieldInheritanceInterface $field_inheritance
    *   The field inheritance being created or updated.
    */
   public function addNewDefaultInheritance(EventInstance $instance, FieldInheritanceInterface $field_inheritance) {
@@ -747,9 +748,9 @@ class EventCreationService {
   /**
    * Update instance status.
    *
-   * @param Drupal\recurring_events\Entity\EventInstance $instance
+   * @param \Drupal\recurring_events\Entity\EventInstance $instance
    *   The event instance for which to update the status.
-   * @param Drupal\recurring_events\Entity\EventSeries $event
+   * @param \Drupal\recurring_events\Entity\EventSeries $event
    *   The event series entity.
    */
   public function updateInstanceStatus(EventInstance $instance, EventSeries $event) {

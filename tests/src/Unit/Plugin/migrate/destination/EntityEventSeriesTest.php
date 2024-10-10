@@ -8,9 +8,9 @@ use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
+use Drupal\Tests\migrate\Unit\Plugin\migrate\destination\EntityTestBase;
 use Drupal\migrate\Row;
 use Drupal\recurring_events\Plugin\migrate\destination\EntityEventSeries;
-use Drupal\Tests\migrate\Unit\Plugin\migrate\destination\EntityTestBase;
 use Prophecy\Argument;
 
 /**

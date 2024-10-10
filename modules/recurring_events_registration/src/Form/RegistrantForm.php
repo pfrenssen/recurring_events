@@ -4,7 +4,6 @@ namespace Drupal\recurring_events_registration\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\content_moderation\ModerationInformation;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityFieldManager;
@@ -17,6 +16,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
+use Drupal\content_moderation\ModerationInformation;
 use Drupal\recurring_events_registration\Enum\RegistrationType;
 use Drupal\recurring_events_registration\NotificationService;
 use Drupal\recurring_events_registration\RegistrationCreationService;
@@ -137,7 +137,7 @@ class RegistrantForm extends ContentEntityForm {
    *   The entity type manager service.
    * @param \Drupal\recurring_events_registration\NotificationService $notification_service
    *   The registration notification service.
-   * @param \Drupal\content_moderation\ModerationInformation $moderation_information
+   * @param \Drupal\content_moderation\ModerationInformation|null $moderation_information
    *   The moderation information service.
    */
   public function __construct(
@@ -152,7 +152,8 @@ class RegistrantForm extends ContentEntityForm {
     RouteMatchInterface $route_match,
     EntityTypeManagerInterface $entity_type_manager,
     NotificationService $notification_service,
-    ModerationInformation $moderation_information = NULL) {
+    ?ModerationInformation $moderation_information = NULL,
+  ) {
     $this->messenger = $messenger;
     $this->creationService = $creation_service;
     $this->currentUser = $current_user;

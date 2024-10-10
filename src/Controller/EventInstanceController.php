@@ -63,7 +63,7 @@ class EventInstanceController extends ControllerBase implements ContainerInjecti
    *   The renderer service.
    * @param \Drupal\system\SystemManager $systemManager
    *   System manager service.
-   * @param Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager service.
    */
   public function __construct(DateFormatterInterface $date_formatter, RendererInterface $renderer, SystemManager $systemManager, LanguageManagerInterface $language_manager) {

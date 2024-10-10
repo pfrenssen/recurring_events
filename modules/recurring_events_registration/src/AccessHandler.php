@@ -50,7 +50,7 @@ class AccessHandler {
    *   The translation interface.
    * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
    *   The registration creation service.
-   * @param Drupal\Core\Routing\CurrentRouteMatch $route_match
+   * @param \Drupal\Core\Routing\CurrentRouteMatch $route_match
    *   The current route match.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
@@ -100,7 +100,7 @@ class AccessHandler {
   /**
    * Access control based on whether the account has the right permission.
    *
-   * @param Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The current route.
    *
    * @return bool

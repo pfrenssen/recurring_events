@@ -46,9 +46,9 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time service.
    * @param \Drupal\Core\Messenger\Messenger $messenger
    *   The messenger service.
@@ -57,7 +57,7 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
    * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
    *   The creation service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer, RegistrationCreationService $creation_service) {
+  public function __construct(EntityRepositoryInterface $entity_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer, RegistrationCreationService $creation_service) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->messenger = $messenger;
     $this->renderer = $renderer;
