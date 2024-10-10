@@ -303,10 +303,14 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       '#default_value' => $items[$delta]->capacity ?: '',
       '#min' => 0,
       '#states' => [
+        'required' => [
+          ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
+        ],
         'visible' => [
           ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
         ],
       ],
+      '#element_validate' => [[static::class, 'validateCapacity']],
     ];
 
     $element['max_places'] = [
@@ -522,10 +526,41 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       return;
     }
 
-    // The max_places field must be less than or equal to the capacity.
+    // The max_places field must be less than or equal to the capacity, unless
+    // capacity is 0 (which indicates an event that is waitlist-only).
     $capacity = (int) $values[0]['capacity'];
+    if ($capacity === 0) {
+      return;
+    }
     if ($max_places > $capacity) {
       $form_state->setError($element, t('The maximum places per registration cannot be greater than the total number of spaces available.'));
+    }
+  }
+
+  /**
+   * Validate callback for the capacity field.
+   *
+   * The capacity field is required if registration is enabled.
+   *
+   * @param array $element
+   *   An associative array containing the properties and children of the
+   *   generic form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *  The current state of the form.
+   * @param array $complete_form
+   *   The complete form structure.
+   */
+  public static function validateCapacity(array $element, FormStateInterface $form_state, array &$complete_form) {
+    // Skip validation if registration is not enabled.
+    $values = $form_state->getValue('event_registration');
+    if (empty($values[0]['registration'])) {
+      return;
+    }
+
+    // The capacity field is required.
+    $capacity = $values[0]['capacity'];
+    if (!isset($capacity) || !is_numeric($capacity)) {
+      $form_state->setError($element, t('Please choose how many spaces are available for this event.'));
     }
   }
 
