@@ -316,8 +316,10 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       '#weight' => 7,
       '#default_value' => $items[$delta]->max_places ?: 1,
       '#min' => 1,
-      '#required' => TRUE,
       '#states' => [
+        'required' => [
+          ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
+        ],
         'visible' => [
           ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
         ],
@@ -507,10 +509,21 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
    *   The complete form structure.
    */
   public static function validateMaxPlaces(array $element, FormStateInterface $form_state, array &$complete_form) {
+    // Skip validation if registration is not enabled.
     $values = $form_state->getValue('event_registration');
-    $max_places = (int) $values[0]['max_places'];
-    $capacity = (int) $values[0]['capacity'];
+    if (empty($values[0]['registration'])) {
+      return;
+    }
 
+    // The max_places field is required.
+    $max_places = (int) $values[0]['max_places'];
+    if (empty($max_places) || $max_places < 1) {
+      $form_state->setError($element, t('Please choose how many places can be reserved per registration.'));
+      return;
+    }
+
+    // The max_places field must be less than or equal to the capacity.
+    $capacity = (int) $values[0]['capacity'];
     if ($max_places > $capacity) {
       $form_state->setError($element, t('The maximum places per registration cannot be greater than the total number of spaces available.'));
     }
