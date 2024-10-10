@@ -86,9 +86,9 @@ function hook_recurring_events_event_instance_alter(array &$event_instance = [])
  *   The event series for which we need to create instances.
  */
 function hook_recurring_events_event_instance_creator_plugin_alter(EventInstanceCreatorInterface &$active_plugin, EventInstanceCreatorPluginManager $plugin_manager, EventSeries $series) {
-  // If this is series #1 then use some-other-id plugin instead.
-  if ($series->id() === 1) {
-    $active_plugin = $plugin_manager->createInstance('some-other-id', []);
+  // Prevent changes to event instances if the series is published.
+  if ($series->isPublished()) {
+    $active_plugin = $plugin_manager->createInstance('noop', []);
   }
 }
 
