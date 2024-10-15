@@ -14,3 +14,10 @@ services:
     arguments: [ '@config.factory' ]
     tags:
       - { name: event_subscriber }
+  cache_context.recurring_events_registration_is_open:
+    class: Drupal\recurring_events_registration\Cache\Context\RegistrationIsOpenCacheContext
+    arguments:
+      - '@entity_type.manager'
+      - '@recurring_events_registration.creation_service'
+    tags:
+      - { name: cache.context}
