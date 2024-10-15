@@ -683,7 +683,7 @@ class RegistrationCreationService {
               }
               break;
 
-            case 'instance':
+            case RegistrationType::INSTANCE:
               $event_start_date = $this->eventInstance->date->start_date;
               $event_end_date = $this->eventInstance->date->end_date;
 
