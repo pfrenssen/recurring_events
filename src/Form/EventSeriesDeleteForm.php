@@ -8,7 +8,6 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,13 +25,6 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
    * @var \Drupal\Core\Entity\ContentEntityInterface
    */
   public $untranslatedEvent;
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
 
   /**
    * The config factory service.
@@ -56,7 +48,6 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('messenger'),
       $container->get('renderer'),
       $container->get('config.factory')
     );
@@ -71,15 +62,12 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
    *   The entity type bundle info interface.
    * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time interface.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The renderer service.
    * @param \Drupal\Core\Config\ConfigFactory $config
    *   The config factory service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer, ConfigFactory $config) {
-    $this->messenger = $messenger;
+  public function __construct(EntityRepositoryInterface $entity_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, Renderer $renderer, ConfigFactory $config) {
     $this->renderer = $renderer;
     $this->config = $config;
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
@@ -178,7 +166,7 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
     if (!$entity->isDefaultTranslation()) {
       $this->untranslatedEvent->removeTranslation($entity->language()->getId());
       $this->untranslatedEvent->save();
-      $this->messenger->addMessage($this->t('@language translation of the @type %label has been deleted.', [
+      $this->messenger()->addMessage($this->t('@language translation of the @type %label has been deleted.', [
         '@language' => $entity->language()->getName(),
         '@type' => 'Event',
         '%label' => $this->untranslatedEvent->title->value,
@@ -195,7 +183,7 @@ class EventSeriesDeleteForm extends ContentEntityDeleteForm {
         ]
       );
 
-      $this->messenger->addMessage($this->t('The %title event series and all the instances have been deleted.', [
+      $this->messenger()->addMessage($this->t('The %title event series and all the instances have been deleted.', [
         '%title' => $this->entity->title->value,
       ]));
 

@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountProxyInterface;
@@ -28,13 +27,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @ingroup recurring_events_registration
  */
 class RegistrantForm extends ContentEntityForm {
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
 
   /**
    * The creation service.
@@ -100,7 +92,6 @@ class RegistrantForm extends ContentEntityForm {
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('messenger'),
       $container->get('recurring_events_registration.creation_service'),
       $container->get('current_user'),
       $container->get('config.factory'),
@@ -121,8 +112,6 @@ class RegistrantForm extends ContentEntityForm {
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
    * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
    *   The registrant creation service.
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
@@ -144,7 +133,6 @@ class RegistrantForm extends ContentEntityForm {
     EntityRepositoryInterface $entity_repository,
     EntityTypeBundleInfoInterface $entity_type_bundle_info,
     TimeInterface $time,
-    Messenger $messenger,
     RegistrationCreationService $creation_service,
     AccountProxyInterface $current_user,
     ConfigFactory $config,
@@ -154,7 +142,6 @@ class RegistrantForm extends ContentEntityForm {
     NotificationService $notification_service,
     ?ModerationInformation $moderation_information = NULL,
   ) {
-    $this->messenger = $messenger;
     $this->creationService = $creation_service;
     $this->currentUser = $current_user;
     $this->config = $config;
@@ -341,7 +328,7 @@ class RegistrantForm extends ContentEntityForm {
       }
     }
     if (!$role_permitted) {
-      $this->messenger->addMessage('You are not allowed to register for events in this series.', $this->messenger::TYPE_WARNING);
+      $this->messenger()->addWarning('You are not allowed to register for events in this series.');
       $form['#disabled'] = TRUE;
     }
     return $form;
@@ -510,7 +497,7 @@ class RegistrantForm extends ContentEntityForm {
           break;
       }
 
-      $this->messenger->addMessage(new FormattableMarkup($this->notificationService->parseTokenizedString($message), []));
+      $this->messenger()->addMessage(new FormattableMarkup($this->notificationService->parseTokenizedString($message), []));
     }
     else {
       if ($this->entity->isNew()) {
@@ -519,7 +506,7 @@ class RegistrantForm extends ContentEntityForm {
       else {
         $message = $this->t('Registrant successfully updated');
       }
-      $this->messenger->addMessage(new FormattableMarkup($this->notificationService->parseTokenizedString($message), []));
+      $this->messenger()->addMessage(new FormattableMarkup($this->notificationService->parseTokenizedString($message), []));
     }
 
     $redirect_choice = $this->config('recurring_events_registration.registrant.config')->get('insert_redirect_choice');

@@ -7,7 +7,6 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Url;
 use Drupal\recurring_events_registration\RegistrationCreationService;
@@ -19,13 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @ingroup recurring_events_registration
  */
 class RegistrantDeleteForm extends ContentEntityDeleteForm {
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
 
   /**
    * The renderer service.
@@ -50,16 +42,13 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time service.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
    * @param \Drupal\Core\Render\Renderer $renderer
    *   The renderer service.
    * @param \Drupal\recurring_events_registration\RegistrationCreationService $creation_service
    *   The creation service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, Messenger $messenger, Renderer $renderer, RegistrationCreationService $creation_service) {
+  public function __construct(EntityRepositoryInterface $entity_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, Renderer $renderer, RegistrationCreationService $creation_service) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
-    $this->messenger = $messenger;
     $this->renderer = $renderer;
     $this->creationService = $creation_service;
   }
@@ -72,7 +61,6 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('messenger'),
       $container->get('renderer'),
       $container->get('recurring_events_registration.creation_service')
     );
@@ -154,7 +142,7 @@ class RegistrantDeleteForm extends ContentEntityDeleteForm {
       $this->creationService->promoteFromWaitlist();
     }
 
-    $this->messenger->addMessage($this->getDeletionMessage());
+    $this->messenger()->addMessage($this->getDeletionMessage());
     $this->logDeletionMessage();
   }
 

@@ -6,7 +6,6 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\recurring_events\EventInterface;
@@ -43,26 +42,16 @@ class EventInstanceRevisionRevertForm extends ConfirmFormBase {
   protected $dateFormatter;
 
   /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
-
-  /**
    * Constructs a new EventInstanceRevisionRevertForm.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
    *   The eventinstance storage.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
    */
-  public function __construct(EntityStorageInterface $entity_storage, DateFormatterInterface $date_formatter, Messenger $messenger) {
+  public function __construct(EntityStorageInterface $entity_storage, DateFormatterInterface $date_formatter) {
     $this->eventSeriesStorage = $entity_storage;
     $this->dateFormatter = $date_formatter;
-    $this->messenger = $messenger;
   }
 
   /**
@@ -71,8 +60,7 @@ class EventInstanceRevisionRevertForm extends ConfirmFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity_type.manager')->getStorage('eventinstance'),
-      $container->get('date.formatter'),
-      $container->get('messenger')
+      $container->get('date.formatter')
     );
   }
 
@@ -137,7 +125,7 @@ class EventInstanceRevisionRevertForm extends ConfirmFormBase {
       '%title' => $this->revision->label(),
       '%revision' => $this->revision->getRevisionId(),
     ]);
-    $this->messenger->addMessage($this->t('eventinstance %title has been reverted to the revision from %revision-date.', [
+    $this->messenger()->addMessage($this->t('eventinstance %title has been reverted to the revision from %revision-date.', [
       '%title' => $this->revision->label(),
       '%revision-date' => $this->dateFormatter->format($original_revision_timestamp),
     ]));

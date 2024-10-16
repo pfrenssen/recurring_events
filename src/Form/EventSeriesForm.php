@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldTypePluginManager;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\recurring_events\EventCreationService;
 use Drupal\recurring_events\Plugin\Field\FieldWidget\ConsecutiveRecurringDateWidget;
@@ -47,13 +46,6 @@ class EventSeriesForm extends ContentEntityForm {
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $storage;
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
 
   /**
    * The date formatter service.
@@ -111,7 +103,6 @@ class EventSeriesForm extends ContentEntityForm {
     return new static(
       $container->get('recurring_events.event_creation_service'),
       $container->get('entity_type.manager')->getStorage('eventseries'),
-      $container->get('messenger'),
       $container->get('date.formatter'),
       $container->get('entity_field.manager'),
       $container->get('plugin.manager.field.field_type'),
@@ -131,8 +122,6 @@ class EventSeriesForm extends ContentEntityForm {
    *   The event creation service.
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The storage interface.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
    * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *   The date formatter service.
    * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
@@ -155,7 +144,6 @@ class EventSeriesForm extends ContentEntityForm {
   public function __construct(
     EventCreationService $creation_service,
     EntityStorageInterface $storage,
-    Messenger $messenger,
     DateFormatter $date_formatter,
     EntityFieldManager $entity_field_manager,
     FieldTypePluginManager $field_type_plugin_manager,
@@ -168,7 +156,6 @@ class EventSeriesForm extends ContentEntityForm {
   ) {
     $this->creationService = $creation_service;
     $this->storage = $storage;
-    $this->messenger = $messenger;
     $this->dateFormatter = $date_formatter;
     $this->entityFieldManager = $entity_field_manager;
     $this->fieldTypePluginManager = $field_type_plugin_manager;
@@ -390,12 +377,12 @@ class EventSeriesForm extends ContentEntityForm {
     }
 
     if ($entity->isDefaultTranslation()) {
-      $this->messenger->addStatus($this->t('Successfully saved the %name event series', [
+      $this->messenger()->addStatus($this->t('Successfully saved the %name event series', [
         '%name' => $entity->title->value,
       ]));
     }
     else {
-      $this->messenger->addStatus($this->t('@language translation of the @type %label has been saved.', [
+      $this->messenger()->addStatus($this->t('@language translation of the @type %label has been saved.', [
         '@language' => $entity->language()->getName(),
         '@type' => 'Event ',
         '%label' => $entity->getUntranslated()->title->value,
