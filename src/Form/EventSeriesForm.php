@@ -3,7 +3,7 @@
 namespace Drupal\recurring_events\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityFieldManager;
@@ -76,13 +76,6 @@ class EventSeriesForm extends ContentEntityForm {
   protected $currentUser;
 
   /**
-   * The time service.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected $time;
-
-  /**
    * The module handler service.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -111,7 +104,7 @@ class EventSeriesForm extends ContentEntityForm {
       $container->get('datetime.time'),
       $container->get('current_user'),
       $container->get('module_handler'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
     );
   }
 
@@ -121,7 +114,7 @@ class EventSeriesForm extends ContentEntityForm {
    * @param \Drupal\recurring_events\EventCreationService $creation_service
    *   The event creation service.
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The storage interface.
+   *   The entity storage handler.
    * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
    *   The date formatter service.
    * @param \Drupal\Core\Entity\EntityFieldManager $entity_field_manager
@@ -129,16 +122,16 @@ class EventSeriesForm extends ContentEntityForm {
    * @param \Drupal\Core\Field\FieldTypePluginManager $field_type_plugin_manager
    *   The field type plugin manager.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository interface.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
-   *   The entity type bundle info interface.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
-   *   The time interface.
-   * @param \Drupal\Core\Session\AccountProxyInterface|null $current_user
+   *   The entity repository service.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info service.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
+   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface|null $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Config\ConfigFactory|null $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
   public function __construct(
@@ -148,22 +141,22 @@ class EventSeriesForm extends ContentEntityForm {
     EntityFieldManager $entity_field_manager,
     FieldTypePluginManager $field_type_plugin_manager,
     EntityRepositoryInterface $entity_repository,
-    ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL,
-    ?TimeInterface $time = NULL,
-    ?AccountProxyInterface $current_user = NULL,
-    ?ModuleHandlerInterface $module_handler = NULL,
-    ?ConfigFactory $config_factory = NULL,
+    EntityTypeBundleInfoInterface $entity_type_bundle_info,
+    TimeInterface $time,
+    AccountProxyInterface $current_user,
+    ModuleHandlerInterface $module_handler,
+    ConfigFactoryInterface $config_factory,
   ) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
+
     $this->creationService = $creation_service;
     $this->storage = $storage;
     $this->dateFormatter = $date_formatter;
     $this->entityFieldManager = $entity_field_manager;
     $this->fieldTypePluginManager = $field_type_plugin_manager;
-    $this->time = $time;
     $this->currentUser = $current_user;
     $this->moduleHandler = $module_handler;
     $this->configFactory = $config_factory;
-    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
   }
 
   /**
