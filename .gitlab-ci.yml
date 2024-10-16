@@ -24,7 +24,8 @@ include:
 ################
 variables:
   _TARGET_PHP: $CORE_PHP_NEXT
-  OPT_IN_TEST_NEXT_MAJOR: '1'
+  # Keep testing on Drupal 10 until our dependencies are D11 ready.
+  CORE_STABLE: $CORE_PREVIOUS_STABLE
 
 phpcs:
   allow_failure: false

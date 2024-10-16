@@ -7,7 +7,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Mail\MailManager;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Url;
 use Drupal\recurring_events_registration\Enum\RegistrationType;
 use Drupal\recurring_events_registration\NotificationService;
@@ -43,13 +42,6 @@ class ContactForm extends FormBase {
   protected $notificationService;
 
   /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
-
-  /**
    * The mail manager service.
    *
    * @var \Drupal\Core\Mail\MailManager
@@ -79,18 +71,15 @@ class ContactForm extends FormBase {
    *   The registration creation service.
    * @param \Drupal\recurring_events_registration\NotificationService $notification_service
    *   The registration notification service.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
    * @param \Drupal\Core\Mail\MailManager $mail
    *   The mail manager service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager service.
    */
-  public function __construct(RequestStack $request, RegistrationCreationService $creation_service, NotificationService $notification_service, Messenger $messenger, MailManager $mail, LanguageManagerInterface $language_manager) {
+  public function __construct(RequestStack $request, RegistrationCreationService $creation_service, NotificationService $notification_service, MailManager $mail, LanguageManagerInterface $language_manager) {
     $this->request = $request;
     $this->creationService = $creation_service;
     $this->notificationService = $notification_service;
-    $this->messenger = $messenger;
     $this->mail = $mail;
     $this->languageManager = $language_manager;
 
@@ -114,7 +103,6 @@ class ContactForm extends FormBase {
       $container->get('request_stack'),
       $container->get('recurring_events_registration.creation_service'),
       $container->get('recurring_events_registration.notification_service'),
-      $container->get('messenger'),
       $container->get('plugin.manager.mail'),
       $container->get('language_manager')
     );
@@ -230,13 +218,13 @@ class ContactForm extends FormBase {
         }
       }
 
-      $this->messenger->addMessage($this->t('Successfully sent emails to %reg_count registrants and %wait_count waitlisted users.', [
+      $this->messenger()->addMessage($this->t('Successfully sent emails to %reg_count registrants and %wait_count waitlisted users.', [
         '%reg_count' => $reg_count,
         '%wait_count' => $wait_count,
       ]));
     }
     else {
-      $this->messenger->addMessage($this->t('No emails were sent as there were no registrants or waitlist users to contact.'));
+      $this->messenger()->addMessage($this->t('No emails were sent as there were no registrants or waitlist users to contact.'));
     }
   }
 

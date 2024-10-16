@@ -3,12 +3,11 @@
 namespace Drupal\recurring_events\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
-use Drupal\Core\Datetime\DateFormatter;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,13 +26,6 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
   public $untranslatedEventInstance;
 
   /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
-
-  /**
    * The date formatter service.
    *
    * @var \Drupal\Core\Datetime\DateFormatter
@@ -45,18 +37,21 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info interface.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time interface.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
-   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
+   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL, Messenger $messenger, DateFormatter $date_formatter) {
+  public function __construct(
+    EntityRepositoryInterface $entity_repository,
+    EntityTypeBundleInfoInterface $entity_type_bundle_info,
+    TimeInterface $time,
+    DateFormatterInterface $date_formatter,
+  ) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
-    $this->messenger = $messenger;
+
     $this->dateFormatter = $date_formatter;
   }
 
@@ -68,7 +63,6 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('messenger'),
       $container->get('date.formatter')
     );
   }
@@ -134,7 +128,7 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
     if (!$entity->isDefaultTranslation()) {
       $this->untranslatedEventInstance->removeTranslation($entity->language()->getId());
       $this->untranslatedEventInstance->save();
-      $this->message->addMessage($this->t('@language translation of the @type %label has been deleted.', [
+      $this->messenger()->addMessage($this->t('@language translation of the @type %label has been deleted.', [
         '@language' => $entity->language()->getName(),
         '@type' => 'Event',
         '%label' => $this->untranslatedEventInstance->getEventSeries()->title->value,
@@ -173,7 +167,7 @@ class EventInstanceDeleteForm extends ContentEntityDeleteForm {
         ]
       );
 
-      $this->messenger->addMessage($this->t('The %title event instance starting on %date has been deleted.', [
+      $this->messenger()->addMessage($this->t('The %title event instance starting on %date has been deleted.', [
         '%title' => $this->entity->getEventSeries()->title->value,
         '%date' => $this->dateFormatter->format($start_date->getTimestamp(), 'custom', 'Y-m-d h:i A'),
       ]));

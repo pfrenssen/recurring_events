@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Filter handler for taxonomy terms with depth.
  *
- * This handler is actually part of the node table and has some restrictions,
- * because it uses a subquery to find nodes with.
- *
  * @ingroup views_filter_handlers
  *
  * @ViewsFilter("taxonomy_index_tid_eventseries_depth")
@@ -50,19 +47,19 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
   /**
    * The entity type.
    *
-   * @var \string
+   * @var string
    */
   protected $entityType = 'eventseries';
 
   /**
    * The entity type label.
    *
-   * @var \string
+   * @var string
    */
   protected $entityTypeLabel = 'Event Series';
 
   /**
-   * Constructs a TaxonomyIndexTid object.
+   * Constructs a TaxonomyIndexTidEventSeriesDepth object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -74,17 +71,28 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
    *   The vocabulary storage.
    * @param \Drupal\taxonomy\TermStorageInterface $term_storage
    *   The term storage.
-   * @param \Drupal\Core\Session\AccountInterface|null $current_user
+   * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
+   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    * @param \Drupal\Core\Database\Connection $database
-   *   The database service.
+   *   The database connection.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, ?AccountInterface $current_user = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?EntityFieldManagerInterface $entity_field_manager = NULL, Connection $database) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    VocabularyStorageInterface $vocabulary_storage,
+    TermStorageInterface $term_storage,
+    AccountInterface $current_user,
+    EntityTypeBundleInfoInterface $entity_type_bundle_info,
+    EntityFieldManagerInterface $entity_field_manager,
+    Connection $database,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $vocabulary_storage, $term_storage, $current_user);
+
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityFieldManager = $entity_field_manager;
     $this->database = $database;
@@ -165,7 +173,6 @@ class TaxonomyIndexTidEventSeriesDepth extends TaxonomyIndexTid {
    * Build the query for the filter.
    */
   public function query() {
-
     // Get the DB table and reference column name from the reference field name.
     $ref_field_name = $this->options['reference_field'] . '_target_id';
     $ref_table_name = $this->entityType . '__' . $this->options['reference_field'];

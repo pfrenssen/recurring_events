@@ -4,40 +4,12 @@ namespace Drupal\recurring_events\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Builds the form to delete Excluded dates entities.
  */
 class ExcludedDatesDeleteForm extends EntityConfirmFormBase {
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
-
-  /**
-   * Construct an IncludedDatesDeleteForm.
-   *
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
-   */
-  public function __construct(Messenger $messenger) {
-    $this->messenger = $messenger;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('messenger')
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -66,7 +38,7 @@ class ExcludedDatesDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
 
-    $this->messenger->addMessage(
+    $this->messenger()->addMessage(
       $this->t('content @type: deleted @label.',
         [
           '@type' => $this->entity->bundle(),

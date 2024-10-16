@@ -7,7 +7,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Mail\MailManagerInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Url;
 use Drupal\recurring_events_registration\NotificationService;
@@ -43,13 +42,6 @@ class RegistrantResendForm extends FormBase {
    * @var \Drupal\recurring_events_registration\NotificationService
    */
   protected $notificationService;
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
 
   /**
    * The mail manager service.
@@ -95,8 +87,6 @@ class RegistrantResendForm extends FormBase {
    *   The registration creation service.
    * @param \Drupal\recurring_events_registration\NotificationService $notification_service
    *   The registration notification service.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
    * @param \Drupal\Core\Mail\MailManager $mail
    *   The mail manager service.
    * @param \Drupal\Core\Render\Renderer $renderer
@@ -104,11 +94,10 @@ class RegistrantResendForm extends FormBase {
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager service.
    */
-  public function __construct(RequestStack $request, RegistrationCreationService $creation_service, NotificationService $notification_service, Messenger $messenger, MailManagerInterface $mail, Renderer $renderer, LanguageManagerInterface $language_manager) {
+  public function __construct(RequestStack $request, RegistrationCreationService $creation_service, NotificationService $notification_service, MailManagerInterface $mail, Renderer $renderer, LanguageManagerInterface $language_manager) {
     $this->request = $request;
     $this->creationService = $creation_service;
     $this->notificationService = $notification_service;
-    $this->messenger = $messenger;
     $this->mail = $mail;
     $this->renderer = $renderer;
     $this->languageManager = $language_manager;
@@ -139,7 +128,6 @@ class RegistrantResendForm extends FormBase {
       $container->get('request_stack'),
       $container->get('recurring_events_registration.creation_service'),
       $container->get('recurring_events_registration.notification_service'),
-      $container->get('messenger'),
       $container->get('plugin.manager.mail'),
       $container->get('renderer'),
       $container->get('language_manager')
@@ -234,7 +222,7 @@ class RegistrantResendForm extends FormBase {
 
     $to = $this->registrant->email->value;
     $this->mail->mail('recurring_events_registration', 'custom', $to, $this->languageManager->getDefaultLanguage()->getId(), $params);
-    $this->messenger->addMessage($this->t('Registrant email successfully resent.'));
+    $this->messenger()->addMessage($this->t('Registrant email successfully resent.'));
   }
 
 }

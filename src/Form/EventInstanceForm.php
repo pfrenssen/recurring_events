@@ -7,7 +7,6 @@ use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\Messenger;
 use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -17,13 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @ingroup recurring_events
  */
 class EventInstanceForm extends ContentEntityForm {
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\Messenger
-   */
-  protected $messenger;
 
   /**
    * The current user.
@@ -47,7 +39,6 @@ class EventInstanceForm extends ContentEntityForm {
       $container->get('entity.repository'),
       $container->get('entity_type.bundle.info'),
       $container->get('datetime.time'),
-      $container->get('messenger'),
       $container->get('current_user')
     );
   }
@@ -61,13 +52,10 @@ class EventInstanceForm extends ContentEntityForm {
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Messenger\Messenger $messenger
-   *   The messenger service.
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    *   The current user.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, Messenger $messenger, AccountProxyInterface $current_user) {
-    $this->messenger = $messenger;
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, AccountProxyInterface $current_user) {
     $this->currentUser = $current_user;
     $this->time = $time;
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
@@ -144,7 +132,7 @@ class EventInstanceForm extends ContentEntityForm {
         '%label' => $entity->getUntranslated()->getEventSeries()->title->value,
       ]);
     }
-    $this->messenger->addMessage($message);
+    $this->messenger()->addMessage($message);
 
     $form_state->setRedirect('entity.eventinstance.canonical', ['eventinstance' => $entity->id()]);
   }
