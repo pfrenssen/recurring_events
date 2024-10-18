@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events_registration\Form;
 
 use Drupal\Component\Render\FormattableMarkup;

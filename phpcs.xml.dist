@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://www.drupal.org/docs/develop/git/using-gitlab-to-contribute-to-drupal/using-coder-and-php_codesniffer-in-gitlab-ci -->
+<ruleset name="recurring_events">
+  <description>PHP CodeSniffer configuration for the Recurring Events Drupal module.</description>
+
+  <rule ref="Drupal"/>
+
+  <arg name="extensions" value="php,inc,module,install,info,test,profile,theme,css,js"/>
+  <arg name="report-width" value="120"/>
+
+  <!-- Use 's' to print the full sniff name in the report. -->
+  <arg value="s"/>
+
+  <!-- Require strict types declaration in every PHP file. -->
+  <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes.DeclareStrictTypesMissing">
+    <severity>5</severity>
+  </rule>
+
+</ruleset>

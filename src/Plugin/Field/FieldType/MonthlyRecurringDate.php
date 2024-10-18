@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events\Plugin\Field\FieldType;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -240,7 +242,7 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
 
         case 'monthday':
           foreach ($form_data['day_of_month'] as $day_of_month) {
-            $days_of_month = static::findMonthDaysBetweenDates($day_of_month, $form_data['start_date'], $form_data['end_date']);
+            $days_of_month = static::findMonthDaysBetweenDates((int) $day_of_month, $form_data['start_date'], $form_data['end_date']);
             $dates = array_merge($dates, $days_of_month);
           }
           break;
@@ -301,7 +303,7 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
    * @return array
    *   An array of matching dates.
    */
-  public static function findMonthDaysBetweenDates($day_of_month, DrupalDateTime $start_date, DrupalDateTime $end_date) {
+  public static function findMonthDaysBetweenDates(int $day_of_month, DrupalDateTime $start_date, DrupalDateTime $end_date): array {
     $dates = [];
 
     // Clone the date as we do not want to make changes to the original object.
@@ -322,15 +324,15 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
 
     // If day of month is set to -1 that is the last day of the month, we need
     // to calculate how many days a month has.
-    if ($day_of_month === '-1') {
-      $day_to_check = $start->format('t');
+    if ($day_of_month === -1) {
+      $day_to_check = (int) $start->format('t');
     }
 
     // If the day of the month is after the start date.
-    if ($start->format('d') < $day_to_check) {
+    if ((int) $start->format('d') < $day_to_check) {
       $new_date = clone $start;
-      $curr_month = $new_date->format('m');
-      $curr_year = $new_date->format('Y');
+      $curr_month = (int) $new_date->format('m');
+      $curr_year = (int) $new_date->format('Y');
 
       // Check to see if that date is a valid date.
       if (!checkdate($curr_month, $day_to_check, $curr_year)) {
@@ -343,7 +345,7 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
       }
     }
     // If the day of the month is in the past.
-    elseif ($start->format('d') > $day_to_check) {
+    elseif ((int) $start->format('d') > $day_to_check) {
       // Find the next valid start date.
       $start = static::findNextMonthDay($day_of_month, $start);
     }
@@ -372,11 +374,11 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   The next occurrence of a specific day of the month.
    */
-  public static function findNextMonthDay($day_of_month, DrupalDateTime $date) {
+  public static function findNextMonthDay(int $day_of_month, DrupalDateTime $date): DrupalDateTime {
     $new_date = clone $date;
 
-    $curr_month = $new_date->format('m');
-    $curr_year = $new_date->format('Y');
+    $curr_month = (int) $new_date->format('m');
+    $curr_year = (int) $new_date->format('Y');
     $next_month = $curr_month;
     $next_year = $curr_year;
 
@@ -386,9 +388,9 @@ class MonthlyRecurringDate extends WeeklyRecurringDate implements RecurringEvent
 
       // If the desired day of the month is the last day, calculate what that
       // day is.
-      if ($day_of_month === '-1') {
-        $new_date->setDate($next_year, $next_month, '1');
-        $day_of_month = $new_date->format('t');
+      if ($day_of_month === -1) {
+        $new_date->setDate($next_year, $next_month, 1);
+        $day_of_month = (int) $new_date->format('t');
       }
     } while (checkdate($next_month, $day_of_month, $next_year) === FALSE);
 

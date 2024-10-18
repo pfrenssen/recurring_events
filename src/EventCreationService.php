@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events;
 
 use Drupal\Core\Database\Connection;
@@ -485,7 +487,7 @@ class EventCreationService {
           if (!empty($events_to_create)) {
             foreach ($events_to_create as $custom_event) {
               $instance = $this->createEventInstance($event, $custom_event['start_date'], $custom_event['end_date']);
-              $this->configureDefaultInheritances($instance, $event->id());
+              $this->configureDefaultInheritances($instance, (int) $event->id());
               if ($instance) {
                 $instance->save();
               }
@@ -506,7 +508,7 @@ class EventCreationService {
         if (!empty($events_to_create)) {
           foreach ($events_to_create as $event_to_create) {
             $instance = $this->createEventInstance($event, $event_to_create['start_date'], $event_to_create['end_date']);
-            $this->configureDefaultInheritances($instance, $event->id());
+            $this->configureDefaultInheritances($instance, (int) $event->id());
             if ($instance) {
               $instance->save();
             }

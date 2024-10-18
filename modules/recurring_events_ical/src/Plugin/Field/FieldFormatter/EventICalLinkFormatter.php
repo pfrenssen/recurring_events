@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events_ical\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Config\ConfigFactoryInterface;

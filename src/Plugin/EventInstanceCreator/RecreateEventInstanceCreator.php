@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events\Plugin\EventInstanceCreator;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;

@@ -5,6 +5,8 @@
  * Contains recurring_events_registration.module.
  */
 
+declare(strict_types=1);
+
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;

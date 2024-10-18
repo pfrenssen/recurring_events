@@ -5,6 +5,8 @@
  * Post update hooks for the recurring_events_registration module.
  */
 
+declare(strict_types=1);
+
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 

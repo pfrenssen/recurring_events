@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\recurring_events\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;

@@ -5,6 +5,8 @@
  * Contains recurring_events_views.module.
  */
 
+declare(strict_types=1);
+
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;

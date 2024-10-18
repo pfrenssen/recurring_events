@@ -5,6 +5,8 @@
  * Installation and update functionality for the recurring_events module.
  */
 
+declare(strict_types=1);
+
 use Drupal\Core\Config\Entity\ConfigEntityType;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Field\BaseFieldDefinition;

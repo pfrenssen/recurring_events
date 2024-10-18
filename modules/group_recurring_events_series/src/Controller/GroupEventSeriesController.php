@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\group_recurring_events_series\Controller;
 
 use Drupal\Core\Entity\EntityFormBuilderInterface;

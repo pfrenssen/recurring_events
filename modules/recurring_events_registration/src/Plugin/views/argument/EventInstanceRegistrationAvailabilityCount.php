@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events_registration\Plugin\views\argument;
 
 use Drupal\views\Plugin\views\argument\NumericArgument;

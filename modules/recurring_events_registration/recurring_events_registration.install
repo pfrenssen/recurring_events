@@ -5,6 +5,8 @@
  * Installation functionality for the recurring events registration module.
  */
 
+declare(strict_types=1);
+
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFieldItemList;
 
