@@ -15,7 +15,7 @@ class EventInstances extends EntityReferenceFieldItemList {
   use ComputedItemListTrait;
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
   protected function computeValue() {
     $entity = $this->getEntity();
@@ -31,7 +31,10 @@ class EventInstances extends EntityReferenceFieldItemList {
       });
 
       foreach ($instances as $key => $instance) {
-        $this->list[$key] = $this->createItem($key, $instance->getTranslation($this->getLangcode()));
+        // Return the instances in the current language if available.
+        $langcode = $this->getLangcode();
+        $translation = $instance->hasTranslation($langcode) ? $instance->getTranslation($langcode) : $instance;
+        $this->list[$key] = $this->createItem($key, $translation);
       }
     }
   }

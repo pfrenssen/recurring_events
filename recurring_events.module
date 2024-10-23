@@ -185,15 +185,21 @@ function recurring_events_eventseries_translation_insert(EntityInterface $transl
   if (\Drupal::isConfigSyncing()) {
     return;
   }
-  $creation_service = \Drupal::service('recurring_events.event_creation_service');
-  $creation_service->createInstances($translation);
-
+  /** @var \Drupal\recurring_events\Entity\EventInstance[] $instances */
   $instances = $translation->event_instances->referencedEntities();
   if (!empty($instances)) {
+    /** @var \Drupal\recurring_events\EventCreationService $creation_service */
+    $creation_service = \Drupal::service('recurring_events.event_creation_service');
+    $translation_langcode = $translation->language()->getId();
+
     foreach ($instances as $instance) {
-      if ($instance->hasTranslation($translation->language()->getId())) {
-        $instance = $instance->getTranslation($translation->language()->getId());
+      if ($instance->hasTranslation($translation_langcode)) {
+        $instance = $instance->getTranslation($translation_langcode);
       }
+      else {
+        $instance = $instance->addTranslation($translation_langcode);
+      }
+
       $instance->set('eventseries_id', $translation->id());
       $instance->setNewRevision(FALSE);
 
@@ -248,6 +254,7 @@ function recurring_events_field_inheritance_update(EntityInterface $entity) {
 function recurring_events_eventseries_update(EntityInterface $entity) {
   $original = $entity->original;
   $moderated = $entity->hasField('moderation_state');
+  /** @var \Drupal\recurring_events\EventCreationService $creation_service */
   $creation_service = \Drupal::service('recurring_events.event_creation_service');
 
   $date_changes = $creation_service->checkForOriginalRecurConfigChanges($entity, $original);

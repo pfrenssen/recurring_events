@@ -528,6 +528,16 @@ class EventSeries extends EditorialContentEntityBase implements EventInterface {
   }
 
   /**
+   * Returns the event instances that are part of this series.
+   *
+   * @return \Drupal\recurring_events\Entity\EventInstance[]
+   *   The event instances.
+   */
+  public function getInstances(): array {
+    return $this->get('event_instances')->referencedEntities();
+  }
+
+  /**
    * Get the number of instances.
    *
    * @return int
