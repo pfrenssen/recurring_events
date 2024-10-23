@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\group_recurring_events_series\Plugin\GroupContentEnabler;
 
 use Drupal\Core\Form\FormStateInterface;

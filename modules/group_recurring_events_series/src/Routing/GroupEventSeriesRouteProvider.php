@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\group_recurring_events_series\Routing;
 
 use Drupal\recurring_events\Entity\EventSeriesType;

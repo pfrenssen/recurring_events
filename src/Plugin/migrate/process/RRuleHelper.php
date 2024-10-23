@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events\Plugin\migrate\process;
 
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;

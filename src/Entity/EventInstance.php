@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events\Entity;
 
 use Drupal\Core\Entity\EditorialContentEntityBase;
@@ -226,8 +228,8 @@ class EventInstance extends EditorialContentEntityBase implements EventInterface
   /**
    * {@inheritdoc}
    */
-  public function getChangedTime() {
-    return $this->get('changed')->value;
+  public function getChangedTime(): int {
+    return (int) $this->get('changed')->value;
   }
 
   /**

@@ -5,6 +5,8 @@
  * Install and update functions for the Registration Reminders submodule.
  */
 
+declare(strict_types=1);
+
 use Drupal\Core\Field\BaseFieldDefinition;
 
 /**

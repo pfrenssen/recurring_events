@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events\Plugin\Field\FieldType;
 
 use Drupal\Core\Datetime\DrupalDateTime;

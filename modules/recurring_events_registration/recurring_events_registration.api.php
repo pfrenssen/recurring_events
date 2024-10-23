@@ -2,8 +2,14 @@
 
 /**
  * @file
- * Custom hooks exposed by the recurring_events_registration module.
+ * Provides custom hooks for the recurring_events_registration module.
+ *
+ * This file contains hooks that allow developers to alter the behavior
+ * of the recurring events registration system, including modifying
+ * waitlist handling, notifications, and message parameters.
  */
+
+declare(strict_types=1);
 
 use Drupal\recurring_events_registration\Entity\Registrant;
 use Drupal\recurring_events_registration\Entity\RegistrantInterface;

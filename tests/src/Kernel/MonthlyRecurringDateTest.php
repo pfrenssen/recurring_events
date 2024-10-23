@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\recurring_events\Kernel;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -150,9 +152,9 @@ class MonthlyRecurringDateTest extends KernelTestBase {
     $end_date = new DrupalDateTime('2019-02-28 00:00:00');
 
     $month_days = [
-      '1',
-      '29',
-      '-1',
+      1,
+      29,
+      -1,
     ];
 
     $expected_dates = $actual_dates = [];

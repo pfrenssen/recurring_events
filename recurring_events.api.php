@@ -5,6 +5,8 @@
  * Custom hooks exposed by the recurring_events module.
  */
 
+declare(strict_types=1);
+
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\recurring_events\EventInstanceCreatorInterface;
 use Drupal\recurring_events\EventInstanceCreatorPluginManager;

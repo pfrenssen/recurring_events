@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\recurring_events_registration\Plugin\views\filter;
 
 use Drupal\Core\Form\FormStateInterface;

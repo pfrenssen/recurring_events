@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\recurring_events\Unit\Plugin\migrate\process;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;

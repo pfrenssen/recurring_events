@@ -5,6 +5,8 @@
  * Tokens for the recurring_events_reminders module.
  */
 
+declare(strict_types=1);
+
 use Drupal\Core\Render\BubbleableMetadata;
 
 /**
