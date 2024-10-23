@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\recurring_events_registration\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -394,6 +395,20 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
       $this->getEventInstance()?->getCacheTagsToInvalidate() ?? [],
       $this->getEventSeries()?->getCacheTagsToInvalidate() ?? [],
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function invalidateTagsOnSave($update) {
+    parent::invalidateTagsOnSave($update);
+
+    // The parent method only invalidates list cache tags when a new registrant
+    // is created. We also need to invalidate the cache tags for the event
+    // instance and series so that the counters are updated.
+    if (!$update) {
+      Cache::invalidateTags($this->getCacheTagsToInvalidate());
+    }
   }
 
 }
