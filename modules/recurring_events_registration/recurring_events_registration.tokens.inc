@@ -60,6 +60,11 @@ function recurring_events_registration_token_info() {
     'description' => t('The eventseries associated with a registrant'),
     'type' => 'eventseries',
   ];
+  $registrant['places'] = [
+    'name' => t('Registrant Places'),
+    'description' => t('The number of places registered by the registrant'),
+    'type' => 'places',
+  ];
 
   return [
     'types' => [
@@ -131,6 +136,10 @@ function recurring_events_registration_tokens($type, $tokens, array $data, array
           $series = $registrant->getEventSeries();
           $bubbleable_metadata->addCacheableDependency($series);
           $replacements[$original] = $series->label();
+          break;
+
+        case 'places':
+          $replacements[$original] = $registrant->getPlaces();
           break;
       }
     }
