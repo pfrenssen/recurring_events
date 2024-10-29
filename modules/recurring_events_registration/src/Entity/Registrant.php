@@ -237,6 +237,22 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
       ->setDescription(t('The ID of the eventinstance entity.'))
       ->setSetting('target_type', 'eventinstance');
 
+    $fields['places'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Places'))
+      ->setDescription(t('The number of places to reserve.'))
+      ->setDefaultValue(1)
+      ->setSetting('unsigned', TRUE)
+      ->setRequired(TRUE)
+      ->setDisplayOptions('form', [
+        'weight' => 6,
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'weight' => 10,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['waitlist'] = BaseFieldDefinition::create('boolean')
       ->setRevisionable(TRUE)
       ->setLabel(t('Waitlist'))
@@ -344,6 +360,25 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
    */
   public function setRegistrationType(RegistrationType $type) {
     $this->set('type', $type->value);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPlaces(): int {
+    $places = (int) $this->get('places')->value;
+    return $places > 0 ? $places : 1;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPlaces(int $places): RegistrantInterface {
+    if ($places < 1) {
+      throw new \InvalidArgumentException('The number of places must be 1 or greater.');
+    }
+    $this->set('places', $places);
     return $this;
   }
 

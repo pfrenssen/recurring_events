@@ -305,10 +305,32 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       '#default_value' => $items[$delta]->capacity ?: '',
       '#min' => 0,
       '#states' => [
+        'required' => [
+          ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
+        ],
         'visible' => [
           ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
         ],
       ],
+      '#element_validate' => [[static::class, 'validateCapacity']],
+    ];
+
+    $element['max_places'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Maximum Places Per Registration'),
+      '#description' => $this->t('The maximum number of attendees allowed per registration.'),
+      '#weight' => 7,
+      '#default_value' => $items[$delta]->max_places ?: 1,
+      '#min' => 1,
+      '#states' => [
+        'required' => [
+          ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
+        ],
+        'visible' => [
+          ':input[name="event_registration[0][registration]"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#element_validate' => [[static::class, 'validateMaxPlaces']],
     ];
 
     $enable_waitlist = $this->getSetting('show_enable_waitlist');
@@ -318,7 +340,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       '#type' => 'checkbox',
       '#title' => $this->t('Enable Waiting List'),
       '#description' => $this->t('Enable a waiting list if the number of registrations reaches capacity.'),
-      '#weight' => 7,
+      '#weight' => 8,
       '#default_value' => $waitlist_default_value,
       '#states' => [
         'visible' => [
@@ -346,6 +368,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       $item['instance_schedule_close_units'] = $item['instance_registration']['close_registration']['instance_schedule_close_units'];
       $item['instance_schedule_close_type'] = $item['instance_registration']['close_registration']['instance_schedule_close_type'];
       $item['capacity'] = (int) $item['capacity'];
+      $item['max_places'] = (int) $item['max_places'];
       $selected_roles = array_filter($item['permitted_roles'], function ($i) {
         return $i !== 0;
       });
@@ -375,6 +398,10 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
 
       if (empty($item['capacity'])) {
         $item['capacity'] = 0;
+      }
+
+      if (empty($item['max_places'])) {
+        $item['max_places'] = 1;
       }
 
       if (empty($item['waitlist'])) {
@@ -470,6 +497,72 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
           $form_state->setError($element, $this->t('The @title end date cannot be before the start date', ['@title' => $element['#title']]));
         }
       }
+    }
+  }
+
+  /**
+   * Validate callback for the maximum places per registration.
+   *
+   * The maximum places per registration must be less than or equal to the
+   * capacity.
+   *
+   * @param array $element
+   *   An associative array containing the properties and children of the
+   *   generic form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array $complete_form
+   *   The complete form structure.
+   */
+  public static function validateMaxPlaces(array $element, FormStateInterface $form_state, array &$complete_form) {
+    // Skip validation if registration is not enabled.
+    $values = $form_state->getValue('event_registration');
+    if (empty($values[0]['registration'])) {
+      return;
+    }
+
+    // The max_places field is required.
+    $max_places = (int) $values[0]['max_places'];
+    if (empty($max_places) || $max_places < 1) {
+      $form_state->setError($element, t('Please choose how many places can be reserved per registration.'));
+      return;
+    }
+
+    // The max_places field must be less than or equal to the capacity, unless
+    // capacity is 0 (which indicates an event that is waitlist-only).
+    $capacity = (int) $values[0]['capacity'];
+    if ($capacity === 0) {
+      return;
+    }
+    if ($max_places > $capacity) {
+      $form_state->setError($element, t('The maximum places per registration cannot be greater than the total number of spaces available.'));
+    }
+  }
+
+  /**
+   * Validate callback for the capacity field.
+   *
+   * The capacity field is required if registration is enabled.
+   *
+   * @param array $element
+   *   An associative array containing the properties and children of the
+   *   generic form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param array $complete_form
+   *   The complete form structure.
+   */
+  public static function validateCapacity(array $element, FormStateInterface $form_state, array &$complete_form) {
+    // Skip validation if registration is not enabled.
+    $values = $form_state->getValue('event_registration');
+    if (empty($values[0]['registration'])) {
+      return;
+    }
+
+    // The capacity field is required.
+    $capacity = $values[0]['capacity'];
+    if (!isset($capacity) || !is_numeric($capacity)) {
+      $form_state->setError($element, t('Please choose how many spaces are available for this event.'));
     }
   }
 

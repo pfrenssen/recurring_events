@@ -1,8 +1,19 @@
+parameters:
+  # The grace period for keeping track of the number of available spaces that
+  # were shown to the user. If the user submits the form within this time, and
+  # in the meantime the event has run out of space, they will be shown an error
+  # message rather than being put silently on the waitlist.
+  recurring_events_registration.tempstore.expire: 600
 services:
   recurring_events_registration.creation_service:
     class: Drupal\recurring_events_registration\RegistrationCreationService
     arguments: ['@string_translation', '@database', '@logger.factory', '@messenger', '@entity_type.manager', '@module_handler', '@token']
     shared: false
+  recurring_events_registration.tempstore.private:
+    class: Drupal\Core\TempStore\PrivateTempStoreFactory
+    arguments: ['@keyvalue.expirable', '@lock', '@current_user', '@request_stack', '%recurring_events_registration.tempstore.expire%']
+    tags:
+      - { name: backend_overridable }
   recurring_events_registration.notification_service:
     class: Drupal\recurring_events_registration\NotificationService
     arguments: ['@string_translation', '@config.factory', '@logger.factory', '@messenger', '@token', '@module_handler', '@recurring_events_registration.creation_service', '@queue', '@entity_type.manager']
