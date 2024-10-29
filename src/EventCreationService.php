@@ -195,7 +195,9 @@ class EventCreationService {
     $config['included_dates'] = $event->getIncludedDates();
 
     if ($config['type'] === 'custom') {
-      $config['custom_dates'] = $event->getCustomDates();
+      if ($custom_dates = $event->getCustomDates()) {
+        $config['custom_dates'] = $event->getCustomDates();
+      }
     }
     else {
       $field_definition = $this->fieldTypePluginManager->getDefinition($config['type']);
