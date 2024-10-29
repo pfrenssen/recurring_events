@@ -25,7 +25,7 @@ class EventInstanceRegistrationAvailability extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function render(ResultRow $values) {
-    $event = $values->_entity;
+    $event = $this->getEntity($values);
     $capacity = $event->get('availability_count')->getValue()[0]['value'] ?? 0;
 
     if ($capacity === -1) {
