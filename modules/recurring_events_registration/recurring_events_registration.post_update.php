@@ -114,6 +114,6 @@ function recurring_events_registration_post_update_add_notifications_to_registra
  */
 function recurring_events_registration_post_update_set_default_event_capacity() {
   \Drupal::configFactory()->getEditable('recurring_events_registration.registrant.config')
-    ->set('default_capacity', 10)
+    ->set('default_capacity', NULL)
     ->save(TRUE);
 }
