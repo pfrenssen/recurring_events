@@ -111,6 +111,7 @@ class RegistrantSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('recurring_events_registration.registrant.config')
       ->set('show_capacity', $form_state->getValue('show_capacity'))
+      ->set('default_capacity', $form_state->getValue('default_capacity'))
       ->set('insert_redirect_choice', $form_state->getValue('insert_redirect_choice'))
       ->set('insert_redirect_other', $form_state->getValue('insert_redirect_other'))
       ->set('use_admin_theme', $form_state->getValue('use_admin_theme'))
@@ -173,6 +174,13 @@ class RegistrantSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Show Capacity?'),
       '#description' => $this->t('When users are registering for events, show the available capacity?'),
       '#default_value' => $config->get('show_capacity'),
+    ];
+
+    $form['process']['default_capacity'] = [
+      '#type' => 'number',
+      '#title' => $this->t('Default Capacity'),
+      '#description' => $this->t('Enter the default capacity for new events. Leave empty to not impose a default capacity.'),
+      '#default_value' => $config->get('default_capacity'),
     ];
 
     $form['process']['insert_redirect_choice'] = [
