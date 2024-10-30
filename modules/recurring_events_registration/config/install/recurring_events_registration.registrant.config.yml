@@ -1,4 +1,5 @@
 show_capacity: true
+default_capacity: 10
 insert_redirect_choice: current
 insert_redirect_other: ''
 use_admin_theme: false
