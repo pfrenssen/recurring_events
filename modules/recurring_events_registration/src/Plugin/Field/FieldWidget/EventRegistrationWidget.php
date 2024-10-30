@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\recurring_events_registration\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\datetime_range\Plugin\Field\FieldWidget\DateRangeDefaultWidget;
 use Drupal\user\Entity\Role;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'event registration' widget.
@@ -25,6 +29,33 @@ use Drupal\user\Entity\Role;
 class EventRegistrationWidget extends DateRangeDefaultWidget {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    $pluginId,
+    $pluginDefinition,
+    FieldDefinitionInterface $fieldDefinition,
+    array $settings,
+    array $thirdPartySettings,
+    EntityStorageInterface $dateStorage,
+    protected ConfigFactoryInterface $configFactory,
+  ) {
+    parent::__construct($pluginId, $pluginDefinition, $fieldDefinition, $settings, $thirdPartySettings, $dateStorage);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('entity_type.manager')->getStorage('date_format'),
+      $container->get('config.factory'),
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -302,7 +333,7 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
       '#title' => $this->t('Total Number of Spaces Available'),
       '#description' => $this->t('Maximum number of attendees available for each series, or individual event. Leave blank for unlimited.'),
       '#weight' => 6,
-      '#default_value' => $items[$delta]->capacity ?: '',
+      '#default_value' => $items[$delta]->capacity ?: $this->getConfig('default_capacity'),
       '#min' => 0,
       '#states' => [
         'required' => [
@@ -564,6 +595,19 @@ class EventRegistrationWidget extends DateRangeDefaultWidget {
     if (!isset($capacity) || !is_numeric($capacity)) {
       $form_state->setError($element, t('Please choose how many spaces are available for this event.'));
     }
+  }
+
+  /**
+   * Returns the Recurring Events Registration configuration for the given key.
+   *
+   * @param $key
+   *   The configuration key.
+   *
+   * @return mixed
+   *   The configuration value.
+   */
+  protected function getConfig($key) {
+    return $this->configFactory->get('recurring_events_registration.registrant.config')->get($key);
   }
 
 }

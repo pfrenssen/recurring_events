@@ -5,6 +5,9 @@ recurring_events_registration.registrant.config:
     show_capacity:
       type: boolean
       label: 'Whether to display the remaining capacity for an event during registration'
+    default_capacity:
+      type: integer
+      label: 'The default capacity for an event'
     insert_redirect_choice:
       type: string
       label: 'Choose where registrant form redirects'
