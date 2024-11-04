@@ -29,6 +29,10 @@ modify registrant waitlist:
 modify registrant author:
   title: 'Modify registrant author value'
   description: 'Allow a role to set and override the author value of a registrant'
+administer any registrant:
+  title: 'Administer any registrant'
+  description: 'Create, update, or delete any registrant'
+  restrict access: true
 resend registrant emails:
   title: 'Resend registrant emails'
   description: 'Allow a role to resent the registration confirmation emails'

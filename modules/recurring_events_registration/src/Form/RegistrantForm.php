@@ -569,25 +569,29 @@ class RegistrantForm extends ContentEntityForm {
     $event_instance = $this->routeMatch->getParameter('eventinstance');
     $event_series = $event_instance->getEventSeries();
 
-    /** @var \Drupal\recurring_events\Entity\RegistrantInterface $entity */
+    /** @var \Drupal\recurring_events_registration\Entity\RegistrantInterface $entity */
     $entity = $this->entity;
+    if (isset($this->notificationService) && isset($entity)) {
+      $this->notificationService->setEntity($entity);
+    }
 
     // Use the registration creation service to grab relevant data.
     $this->creationService->setEventInstance($event_instance);
     // Just to be sure we have a fresh copy of the event series.
     $this->creationService->setEventSeries($event_series);
 
+    // Only allow creation or modification of registrants if registration is
+    // still open and there is availability or a waitlist. Or, if the user has
+    // the 'administer any registrant' permission.
+    $registration_open = $this->creationService->registrationIsOpen();
     $availability = $event_instance->availability_count->getValue()[0]['value'];
     $waitlist = $this->creationService->hasWaitlist();
-    $registration_open = $this->creationService->registrationIsOpen();
-    $reg_type = $this->creationService->getRegistrationType();
-    $registration = $this->creationService->hasRegistration();
+    $registration_possible = $registration_open && ($availability > 0 || $availability == -1 || $waitlist);
+    $user_is_admin = $this->currentUser->hasPermission('administer any registrant');
 
-    if (isset($this->notificationService) && isset($this->entity)) {
-      $this->notificationService->setEntity($this->entity);
-    }
-    if ($registration && $registration_open && ($availability > 0 || $availability == -1 || $waitlist)) {
+    if ($user_is_admin || $registration_possible) {
       $add_to_waitlist = (int) $form_state->getValue('add_to_waitlist');
+      $reg_type = $this->creationService->getRegistrationType();
       $this->entity->setEventSeries($event_series);
       $this->entity->setEventInstance($event_instance);
       $this->entity->setWaitlist($add_to_waitlist);
@@ -619,11 +623,12 @@ class RegistrantForm extends ContentEntityForm {
     else {
       if ($this->entity->isNew()) {
         $message = $this->config('recurring_events_registration.registrant.config')->get('registration_closed');
+        $this->messenger()->addMessage(new FormattableMarkup($this->notificationService->parseTokenizedString($message), []));
       }
       else {
-        $message = $this->t('Registrant successfully updated');
+        $message = $this->t('Unable to update registrant');
+        $this->messenger()->addError($message);
       }
-      $this->messenger()->addMessage(new FormattableMarkup($this->notificationService->parseTokenizedString($message), []));
     }
 
     $redirect_choice = $this->config('recurring_events_registration.registrant.config')->get('insert_redirect_choice');
