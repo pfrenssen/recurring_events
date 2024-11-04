@@ -67,6 +67,9 @@ class EventInstanceCapacity extends FieldPluginBase {
    */
   public function render(ResultRow $values) {
     $event = $this->getEntity($values);
+    if (!$event) {
+      return $this->t('N/A');
+    }
     $this->registrationCreationService->setEventInstance($event);
     $capacity = (int) $this->registrationCreationService->getEventSeries()->event_registration->capacity;
     if ($capacity === -1) {
