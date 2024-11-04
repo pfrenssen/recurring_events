@@ -28,6 +28,9 @@ class EventInstanceRegistrationCount extends FieldPluginBase {
    */
   public function render(ResultRow $values) {
     $eventinstance = $this->getEntity($values);
+    if (!$eventinstance) {
+      return $this->t('N/A');
+    }
     return $eventinstance->get('registration_count')->getValue()[0]['value'] ?? 0;
   }
 

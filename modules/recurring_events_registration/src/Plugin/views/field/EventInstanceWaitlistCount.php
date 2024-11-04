@@ -28,6 +28,9 @@ class EventInstanceWaitlistCount extends FieldPluginBase {
    */
   public function render(ResultRow $values) {
     $event = $this->getEntity($values);
+    if (!$event) {
+      return $this->t('N/A');
+    }
     return $event->get('waitlist_count')->getValue()[0]['value'] ?? 0;
   }
 
