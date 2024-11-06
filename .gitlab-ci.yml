@@ -23,7 +23,7 @@ include:
 # https://git.drupalcode.org/project/gitlab_templates/-/blob/main/includes/include.drupalci.variables.yml
 ################
 variables:
-  _TARGET_PHP: $CORE_PHP_NEXT
+  _TARGET_PHP: $CORE_PHP_MAX
   # Keep testing on Drupal 10 until our dependencies are D11 ready.
   CORE_STABLE: $CORE_PREVIOUS_STABLE
 
