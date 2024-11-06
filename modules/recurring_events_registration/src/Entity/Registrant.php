@@ -53,6 +53,7 @@ use Drupal\user\UserInterface;
  *     "uid" = "user_id",
  *     "label" = "title",
  *     "bundle" = "bundle",
+ *     "langcode" = "langcode",
  *     "status" = "status",
  *     "published" = "status",
  *   },
