@@ -127,14 +127,23 @@ class RegistrationCreationService {
   }
 
   /**
-   * Set the event entities.
+   * Sets the event entities from the given event instance.
+   *
+   * The service depends on having an event series set, so make sure to pass in
+   * a fully populated event instance that references an event series.
    *
    * @param \Drupal\recurring_events\Entity\EventInstance $event_instance
    *   The event instance.
    */
   public function setEventInstance(EventInstance $event_instance) {
     $this->eventInstance = $event_instance;
-    $this->eventSeries = $event_instance->getEventSeries();
+    $event_series = $event_instance->getEventSeries();
+    if (empty($event_series)) {
+      // Trigger a deprecation warning, we need the event series to be set. This
+      // will be an exception in the next major version.
+      @trigger_error('Passing an incomplete event instance with a missing event series reference to RegistrationCreationService::setEventInstance() is deprecated in recurring_events:2.0.3 and will result in an InvalidArgumentException from recurring_events:3.0.0. Pass in a fully populated event instance. See https://www.drupal.org/project/recurring_events/issues/3483283', E_USER_DEPRECATED);
+    }
+    $this->eventSeries = $event_series;
   }
 
   /**
