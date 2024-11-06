@@ -1,6 +1,6 @@
 recurring_events_registration.registrant_type.*:
   type: config_entity
-  label: 'registrant type config'
+  label: 'Registrant type config'
   mapping:
     id:
       type: string

@@ -11,7 +11,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
  *
  * @ConfigEntityType(
  *   id = "registrant_type",
- *   label = @Translation("registrant type"),
+ *   label = @Translation("Registrant type"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\recurring_events_registration\RegistrantTypeListBuilder",
