@@ -6,6 +6,7 @@ namespace Drupal\recurring_events_registration\Form;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\language\Entity\ContentLanguageSettings;
 
 /**
  * Provides a form for editing a registrant type.
@@ -42,6 +43,27 @@ class RegistrantTypeForm extends EntityForm {
       '#type' => 'textarea',
       '#default_value' => $registrant_type->getDescription(),
     ];
+
+    if ($this->moduleHandler->moduleExists('language')) {
+      $form['language'] = [
+        '#type' => 'details',
+        '#title' => $this->t('Language settings'),
+        '#group' => 'additional_settings',
+      ];
+
+      $language_configuration = ContentLanguageSettings::loadByEntityTypeBundle('registrant', $registrant_type->id());
+      $form['language']['language_configuration'] = [
+        '#type' => 'language_configuration',
+        '#entity_information' => [
+          'entity_type' => 'registrant',
+          'bundle' => $registrant_type->id(),
+        ],
+        '#default_value' => $language_configuration,
+        // Registrant have a language but are not translatable. Skip the options
+        // for content translation.
+        '#content_translation_skip_alter' => TRUE,
+      ];
+    }
 
     return $form;
   }
