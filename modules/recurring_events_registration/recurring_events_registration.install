@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\recurring_events_registration\Plugin\Field\ComputedRegistrantTitleFieldItemList;
 
 /**
@@ -651,4 +652,23 @@ function recurring_events_registration_update_8013() {
         ->execute();
     }
   }
+}
+
+/**
+ * Add a langcode base field to registrant entities.
+ */
+function recurring_events_registration_update_8014() {
+  $storage_definition = BaseFieldDefinition::create('language')
+    ->setLabel(new TranslatableMarkup('Language'))
+    ->setDisplayOptions('view', [
+      'region' => 'hidden',
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'language_select',
+      'weight' => 2,
+    ])
+    ->setRevisionable(TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('langcode', 'registrant', 'registrant', $storage_definition);
 }

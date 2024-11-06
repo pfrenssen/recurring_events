@@ -130,14 +130,21 @@ class RegistrationCreationService {
   }
 
   /**
-   * Set the event entities.
+   * Sets the event entities from the given event instance.
+   *
+   * The service depends on having an event series set, so make sure to pass in
+   * a fully populated event instance that references an event series.
    *
    * @param \Drupal\recurring_events\Entity\EventInstance $event_instance
    *   The event instance.
    */
   public function setEventInstance(EventInstance $event_instance) {
     $this->eventInstance = $event_instance;
-    $this->eventSeries = $event_instance->getEventSeries();
+    $event_series = $event_instance->getEventSeries();
+    if (empty($event_series)) {
+      throw new \InvalidArgumentException('No event series set on event instance.');
+    }
+    $this->eventSeries = $event_series;
   }
 
   /**
