@@ -59,8 +59,8 @@ class RegistrantTypeForm extends EntityForm {
           'bundle' => $registrant_type->id(),
         ],
         '#default_value' => $language_configuration,
-        // Registrant have a language but are not translatable. Skip the options
-        // for content translation.
+        // Registrants have a language but are not translatable. Skip the
+        // options for content translation.
         '#content_translation_skip_alter' => TRUE,
       ];
     }
