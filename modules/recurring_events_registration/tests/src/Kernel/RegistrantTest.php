@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\recurring_events_registration\Kernel;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\recurring_events_registration\Entity\Registrant;
@@ -25,6 +28,7 @@ class RegistrantTest extends KernelTestBase {
     'datetime',
     'datetime_range',
     'field_inheritance',
+    'language',
     'options',
     'recurring_events',
     'recurring_events_registration',
@@ -38,6 +42,7 @@ class RegistrantTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('configurable_language');
     $this->installEntitySchema('eventseries');
     $this->installEntitySchema('eventinstance');
     $this->installEntitySchema('registrant');
@@ -146,6 +151,34 @@ class RegistrantTest extends KernelTestBase {
         'save' => TRUE,
       ],
     ];
+  }
+
+  /**
+   * @covers ::getLangcode
+   * @covers ::setLangcode
+   */
+  public function testLangcode(): void {
+    // Enable the French language and configure it as the default language for
+    // the default registrant bundle.
+    ConfigurableLanguage::create([
+      'id' => 'fr',
+      'name' => 'French',
+      'direction' => LanguageInterface::DIRECTION_LTR,
+    ])->save();
+
+    $configuration = ContentLanguageSettings::loadByEntityTypeBundle('registrant', 'default');
+    $configuration->setDefaultLangcode('fr')->save();
+
+    $registrant = Registrant::create();
+    $this->assertEquals('fr', $registrant->getLangcode(), 'On a newly created registrant, the langcode is set to the default language configured in the bundle settings.');
+    $this->assertEquals('fr', $registrant->get('langcode')->value, 'The langcode is stored in the langcode field.');
+
+    $registrant->setLangcode('en');
+    $this->assertEquals('en', $registrant->getLangcode(), 'The langcode can be set and retrieved.');
+    $this->assertEquals('en', $registrant->get('langcode')->value, 'The langcode is stored in the langcode field.');
+
+    $registrant->set('langcode', NULL);
+    $this->assertEquals(LanguageInterface::LANGCODE_NOT_SPECIFIED, $registrant->getLangcode(), 'If the langcode field is not populated, the langcode is not specified.');
   }
 
 }

@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\recurring_events\Entity\EventInstance;
 use Drupal\recurring_events\Entity\EventSeries;
 use Drupal\recurring_events_registration\Enum\RegistrationType;
@@ -369,6 +370,21 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
    */
   public function setWaitlist($waitlist) {
     $this->set('waitlist', $waitlist);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLangcode(): string {
+    return $this->get('langcode')?->value ?? LanguageInterface::LANGCODE_NOT_SPECIFIED;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setLangcode(string $langcode): RegistrantInterface {
+    $this->set('langcode', $langcode);
     return $this;
   }
 

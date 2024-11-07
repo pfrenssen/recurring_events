@@ -52,4 +52,23 @@ interface RegistrantInterface extends ContentEntityInterface, EntityChangedInter
    */
   public function getEventSeries(): ?EventSeries;
 
+  /**
+   * Returns the langcode of the language used during registration.
+   *
+   * @return string
+   *   The langcode.
+   */
+  public function getLangcode(): string;
+
+  /**
+   * Sets the langcode.
+   *
+   * @param string $langcode
+   *   The langcode.
+   *
+   * @return \Drupal\recurring_events_registration\Entity\RegistrantInterface
+   *   The registrant entity, for chaining.
+   */
+  public function setLangcode(string $langcode): RegistrantInterface;
+
 }
