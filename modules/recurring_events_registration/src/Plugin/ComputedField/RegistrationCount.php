@@ -59,14 +59,20 @@ class RegistrationCount extends FieldItemList {
       return;
     }
 
-    /*
-     * The ComputedItemListTrait only calls this once on the same instance; from
-     * then on, the value is automatically cached in $this->items, for use by
-     * methods like getValue().
-     */
+    // The ComputedItemListTrait only calls this once on the same instance; from
+    // then on, the value is automatically cached in $this->items, for use by
+    // methods like getValue().
     if (!isset($this->list[0])) {
       $entity = $this->getEntity();
-      $this->list[0] = $this->createItem(0, $this->getRegistrationCreationService($entity)->retrieveRegisteredPartiesCount(TRUE, FALSE));
+      if ($entity->isNew()) {
+        // Skip the calculation if this is a newly created, unsaved event
+        // instance. It is meaningless to return a value if the entity is not
+        // yet validated and potentially incomplete.
+        $this->list[0] = $this->createItem();
+      }
+      else {
+        $this->list[0] = $this->createItem(0, $this->getRegistrationCreationService($entity)->retrieveRegisteredPartiesCount(TRUE, FALSE));
+      }
     }
   }
 

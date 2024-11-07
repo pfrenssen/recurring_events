@@ -65,6 +65,12 @@ class RegistrantAccessControlHandler extends EntityAccessControlHandler implemen
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\recurring_events_registration\Entity\RegistrantInterface $entity */
+    // If the user can administer any registrant, then let them do anything.
+    $result = AccessResult::allowedIfHasPermission($account, 'administer any registrant');
+    if ($result->isAllowed()) {
+      return $result;
+    }
+
     switch ($operation) {
       case 'view':
         return AccessResult::allowedIfHasPermission($account, 'view registrant entities');
