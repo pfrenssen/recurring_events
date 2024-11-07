@@ -45,8 +45,6 @@ class RegistrantTypeForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    $form['#tree'] = TRUE;
-
     /** @var \Drupal\recurring_events_registration\Entity\RegistrantTypeInterface $registrant_type */
     $registrant_type = $this->entity;
     $form['label'] = [
@@ -81,6 +79,7 @@ class RegistrantTypeForm extends EntityForm {
     $form['notifications'] = [
       '#type' => 'vertical_tabs',
       '#title' => $this->t('Email notifications'),
+      '#tree' => TRUE,
     ];
 
     foreach ($notification_types as $type => $notification) {
