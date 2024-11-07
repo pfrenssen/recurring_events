@@ -63,6 +63,7 @@ class RegistrantTypeForm extends EntityForm {
         // options for content translation.
         '#content_translation_skip_alter' => TRUE,
       ];
+      $form['#submit'][] = 'language_configuration_element_submit';
     }
 
     return $form;
