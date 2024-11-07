@@ -287,7 +287,17 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
    * {@inheritdoc}
    */
   public function getEventSeries(): ?EventSeries {
-    return $this->get('eventseries_id')?->entity;
+    $series = $this->get('eventseries_id')?->entity;
+
+    // Return the series in the correct language if available.
+    if (!empty($series)) {
+      $langcode = $this->getLangcode();
+      if ($series->hasTranslation($langcode)) {
+        $series = $series->getTranslation($langcode);
+      }
+    }
+
+    return $series;
   }
 
   /**
@@ -308,7 +318,17 @@ class Registrant extends EditorialContentEntityBase implements RegistrantInterfa
    * {@inheritdoc}
    */
   public function getEventInstance(): ?EventInstance {
-    return $this->get('eventinstance_id')?->entity;
+    $instance = $this->get('eventinstance_id')?->entity;
+
+    // Return the instance in the correct language if available.
+    if (!empty($instance)) {
+      $langcode = $this->getLangcode();
+      if ($instance->hasTranslation($langcode)) {
+        $instance = $instance->getTranslation($langcode);
+      }
+    }
+
+    return $instance;
   }
 
   /**
